@@ -1,9 +1,10 @@
 import { Input, Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import axios from "axios";
-import { updateRoom } from "../../../services/RoomService";
-
+import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { fetchAllClubs } from "../../../serviceToken/ClubService";
+import { fetchAllTrainer } from "../../../serviceToken/TrainerService";
+import { UpdateRoomDashboard } from "../../../serviceToken/RoomService";
 const { Option } = Select;
 
 const UpdateRoom = (props) => {
@@ -21,42 +22,12 @@ const UpdateRoom = (props) => {
     const [clubs, setClubs] = useState([]);
     const [trainers, setTrainers] = useState([]);
     const [error, setErrors] = useState({});
-
+    const tokenData = getTokenData();
     useEffect(() => {
         // Fetch Clubs
-        const fetchAllClubs = async () => {
-            try {
-                const response = await fetch("http://localhost:8081/api/dashboard/clubs",{
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                setClubs(data.data);
-            } catch (error) {
-                console.error("Error fetching clubs:", error);
-            }
-        };
-
+        fetchAllClubs(tokenData.access_token);
         // Fetch Trainers
-        const fetchAllTrainer = async () => {
-            try {
-                const response = await fetch("http://localhost:8081/api/dashboard/trainers",{
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                setTrainers(data.data);
-            } catch (error) {
-                console.error("Error fetching trainers:", error);
-            }
-        };
-
-        fetchAllClubs();
-        fetchAllTrainer();
+        fetchAllTrainer(tokenData.access_token);
     }, []);
 
     useEffect(() => {
@@ -137,7 +108,7 @@ const UpdateRoom = (props) => {
             return;
         }
 
-        const res = await updateRoom(
+        const res = await UpdateRoomDashboard(
             dataUpdate.id,
             club,
             trainer,
@@ -147,7 +118,8 @@ const UpdateRoom = (props) => {
             facilities,
             status,
             startTime,
-            endTime
+            endTime,
+            tokenData.access_token
         );
 
         if (res.data) {

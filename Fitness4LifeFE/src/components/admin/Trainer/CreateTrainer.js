@@ -1,12 +1,13 @@
 import { Input, Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
 import { createTrainer } from "../../../services/TrainerService";
-import axios from "axios";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { fetchAllBranch } from "../../../serviceToken/BrandService";
 
 const { Option } = Select;
 
 function CreateTrainer(props) {
-    const { loadTrainers, isModalOpen, setIsModelOpen,token } = props;
+    const { loadTrainers, isModalOpen, setIsModelOpen, token } = props;
 
     const [fullName, setFullName] = useState("");
     const [slug, setSlug] = useState("");
@@ -19,27 +20,11 @@ function CreateTrainer(props) {
     const [branch, setBranch] = useState(0);
     const [branches, setBranches] = useState([]); // State to store branch data
     const [error, setErrors] = useState({});
+    const tokenData = getTokenData();//tokenData.access_token
 
     useEffect(() => {
         // Fetch Branch data when component is mounted
-        const fetchAllBranch = async () => {
-            try {
-                const response = await fetch("http://localhost:8081/api/dashboard/branchs",{
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                setBranches(data.data);
-                console.log(">>Chack Data", setBranches);
-
-            } catch (error) {
-                console.error("Error fetching branches:", error);
-            }
-        };
-
-        fetchAllBranch();
+        fetchAllBranch(tokenData.access_token);
     }, []);
 
     const validateField = (field, value) => {

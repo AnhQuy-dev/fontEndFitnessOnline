@@ -21,20 +21,6 @@ const createAuthConfig = () => {
     };
 };
 
-
-const updateClubApi = async (id, name, address, contactPhone, description, openHour, closeHour) => {
-    const URL_BACKEND = `${URL_CLUB}/club/update/${id}`;
-    const data = {
-        name,
-        address,
-        contactPhone,
-        description,
-        openHour,
-        closeHour
-    };
-    return axios.put(URL_BACKEND, data, createAuthConfig());
-};
-
 const deleteClubApi = async (id) => {
     const URL_BACKEND = `${URL_CLUB}/club/delete/${id}`;
     return axios.delete(URL_BACKEND, createAuthConfig());
@@ -83,7 +69,6 @@ api.interceptors.response.use(
 );
 
 export {
-    updateClubApi,
     deleteClubApi,
     fetchClubById
 };

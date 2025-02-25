@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Input, Menu, notification, Popconfirm, Table } from 'antd';
-import moment from 'moment';
-import { deleteRoom } from '../../../services/RoomService';
 import DetailRoom from './DetailRoom';
 import UpdateRoom from './UpdateRoom';
 import '../../../assets/css/club.css';
+import { deleteRoom } from '../../../serviceToken/RoomService';
+import { getTokenData } from '../../../serviceToken/tokenUtils';
 
 function AllRoom(props) {
-    const { loadRoom, dataRoom, filteredData, setFilteredData, setIsModalOpen,token } = props;
+    const { loadRoom, dataRoom, filteredData, setFilteredData, setIsModalOpen, token } = props;
 
     const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
     const [dataUpdate, setDataUpdate] = useState(null);
@@ -18,14 +18,11 @@ function AllRoom(props) {
 
     const [searchText, setSearchText] = useState('');
 
+    const tokenData = getTokenData();//tokenData.access_token
+
     useEffect(() => {
         if (dataRoom && dataRoom.length > 0) {
             const uniqueRoomNames = [...new Set(dataRoom.map((room) => room.roomName))];
-            const filters = uniqueRoomNames.map((roomName) => ({
-                text: roomName,
-                value: roomName,
-            }));
-            // Nếu cần filter theo room name, xử lý tại đây
         }
     }, [dataRoom]);
 
@@ -128,8 +125,8 @@ function AllRoom(props) {
 
     const handleDeleteRoom = async (id) => {
         try {
-            const res = await deleteRoom(id);
-            if (res.status === 200 || res.data?.status === 200) {
+            const response = await deleteRoom(id, tokenData.access_token);
+            if (response.status === 200 || response.status === 201) {
                 notification.success({
                     message: 'Delete Room',
                     description: 'Delete Room successfully!',
@@ -138,7 +135,7 @@ function AllRoom(props) {
             } else {
                 notification.error({
                     message: 'Error deleting room',
-                    description: res.data?.message || 'Failed to delete room',
+                    description: response.data?.message || 'Failed to delete room',
                 });
             }
         } catch (error) {
@@ -192,7 +189,7 @@ function AllRoom(props) {
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
                 loadRoom={loadRoom}
-                token={token} 
+                token={token}
             />
 
             <DetailRoom
@@ -200,7 +197,7 @@ function AllRoom(props) {
                 setDataDetail={setDataDetail}
                 isDataDetailOpen={isDataDetailOpen}
                 setIsDataDetailOpen={setIsDataDetailOpen}
-                token={token} 
+                token={token}
             />
         </>
     );

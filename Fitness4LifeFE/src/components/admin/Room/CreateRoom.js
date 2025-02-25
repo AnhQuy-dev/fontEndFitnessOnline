@@ -1,12 +1,14 @@
 import { Input, Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { createRoom } from "../../../services/RoomService";
+import { fetchAllClubs } from "../../../serviceToken/ClubService";
+import { fetchAllTrainer } from "../../../serviceToken/TrainerService";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { CreateRoomDashboard } from "../../../serviceToken/RoomService";
 
 const { Option } = Select;
 
 function CreateRoom(props) {
-    const { loadRoom, isModalOpen, setIsModalOpen,token } = props;
+    const { loadRoom, isModalOpen, setIsModalOpen, token } = props;
 
     const [club, setClub] = useState(0);
     const [trainer, setTrainer] = useState(0);
@@ -20,42 +22,12 @@ function CreateRoom(props) {
     const [clubs, setClubs] = useState([]);
     const [trainers, setTrainers] = useState([]);
     const [error, setErrors] = useState({});
-
+    const tokenData = getTokenData();
     useEffect(() => {
         // Fetch Clubs
-        const fetchAllClubs = async () => {
-            try {
-                const response = await fetch("http://localhost:8081/api/dashboard/clubs",{
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                setClubs(data.data);
-            } catch (error) {
-                console.error("Error fetching clubs:", error);
-            }
-        };
-
+        fetchAllClubs(tokenData.access_token);
         // Fetch Trainers
-        const fetchAllTrainer = async () => {
-            try {
-                const response = await fetch("http://localhost:8081/api/dashboard/trainers",{
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                setTrainers(data.data);
-            } catch (error) {
-                console.error("Error fetching trainers:", error);
-            }
-        };
-
-        fetchAllClubs();
-        fetchAllTrainer();
+        fetchAllTrainer(tokenData.access_token);
     }, []);
 
     const validateField = (field, value) => {
@@ -127,7 +99,7 @@ function CreateRoom(props) {
             return;
         }
 
-        const res = await createRoom(club, trainer, roomName, slug, capacity, facilities, status, startTime, endTime);
+        const res = await CreateRoomDashboard(club, trainer, roomName, slug, capacity, facilities, status, startTime, endTime, tokenData.access_token);
 
         if (res.data) {
             notification.success({

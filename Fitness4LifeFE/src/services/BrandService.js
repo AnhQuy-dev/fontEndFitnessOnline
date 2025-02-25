@@ -21,10 +21,6 @@ const createAuthConfig = () => {
     };
 };
 
-const fetchAllBranch = async () => {
-    const URL_BACKEND = `${URL_BRAND}/branchs`;
-    return axios.get(URL_BACKEND, createAuthConfig());
-}
 
 const deleteBranch = async (id) => {
     const URL_BACKEND = `${URL_BRAND}/branch/delete/${id}`;
@@ -98,7 +94,6 @@ api.interceptors.response.use(
 );
 
 export {
-    fetchAllBranch,
     deleteBranch,
     createBrand,
     updateBranch

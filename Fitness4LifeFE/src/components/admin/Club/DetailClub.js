@@ -1,7 +1,7 @@
 import { Drawer, Descriptions, Typography, Image, Button, Checkbox, notification } from "antd";
 import { useState } from "react";
 import "../../../assets/css/Admin/imageClub.css";
-import { AddMoreImageClub, UpdateImageClub } from "../../../serviceToken/ClubService";
+import { AddMoreImageClub, ChosePrimaryImage, DeleteImageClub, UpdateImageClub } from "../../../serviceToken/ClubService";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
 
 const { Title, Text } = Typography;
@@ -10,26 +10,56 @@ const ViewClubDetail = (props) => {
   const { dataDetail, setDataDetail, isDataDetailOpen, setIsDataDetailOpen } = props;
   const tokenData = getTokenData();//tokenData.access_token
 
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
 
-  const [isAddingImage, setIsAddingImage] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [uploadedImages, setUploadedImages] = useState([]);
 
+  const [isAddingImage, setIsAddingImage] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [choseImage, setchoseImage] = useState(false);
+  const [deleteImage, setDeleteImage] = useState(false);
+
+  // Helper function to reset all states except one
+  const resetOtherStates = (activeState) => {
+    setIsAddingImage(activeState === 'adding');
+    setIsUpdating(activeState === 'updating');
+    setchoseImage(activeState === 'choosing');
+    setDeleteImage(activeState === 'deleting');
+    setSelectedImage(null); // Reset selected image when switching modes
+  };
+
 
   const handleToggleAddImage = () => {
-    setIsAddingImage((prev) => {
-      if (!prev) setIsUpdating(false); // Nếu bật Add Image, phải tắt Update Image
-      return !prev;
-    });
+    if (isAddingImage) {
+      resetOtherStates(null); // Reset all to false
+    } else {
+      resetOtherStates('adding');
+    }
   };
 
   const handleToggleUpdateImage = () => {
-    setIsUpdating((prev) => {
-      if (!prev) setIsAddingImage(false); // Nếu bật Update Image, phải tắt Add Image
-      return !prev;
-    });
+    if (isUpdating) {
+      resetOtherStates(null); // Reset all to false
+    } else {
+      resetOtherStates('updating');
+    }
+  };
+
+  // Update existing handlers
+  const handleDeleteImageToggle = () => {
+    if (deleteImage) {
+      resetOtherStates(null);
+    } else {
+      resetOtherStates('deleting');
+    }
+  };
+
+  const handleChooseImageToggle = () => {
+    if (choseImage) {
+      resetOtherStates(null);
+    } else {
+      resetOtherStates('choosing');
+    }
   };
 
 
@@ -123,39 +153,62 @@ const ViewClubDetail = (props) => {
       });
       return;
     }
+    try {
+      // Gọi API cập nhật ảnh primary
+      const response = await ChosePrimaryImage(selectedImage, tokenData.access_token);
 
-    console.log("selectedImage in handleChoosePrimaryImage: ", selectedImage);
+      console.log("🚀 ChosePrimaryImage:", response);
 
+      if (response.status == 200) {
+        notification.success({
+          message: "Primary Image Updated",
+          description: "The selected image is now the primary image.",
+        });
+      } else {
+        throw new Error("Failed to update primary image.");
+      }
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: error.message || "Something went wrong while setting primary image.",
+      });
+    }
 
-    // try {
-    //   // Gọi API cập nhật ảnh primary
-    //   const response = await UpdateImageClub(selectedImage, { primary: true }, tokenData.access_token);
-
-    //   if (response) {
-    //     notification.success({
-    //       message: "Primary Image Updated",
-    //       description: "The selected image is now the primary image.",
-    //     });
-
-    //     // Cập nhật state để hiển thị ảnh primary mới
-    //     setDataDetail((prev) => ({
-    //       ...prev,
-    //       clubImages: prev.clubImages.map((img) => ({
-    //         ...img,
-    //         primary: img.id === selectedImage, // Đặt ảnh được chọn làm primary
-    //       })),
-    //     }));
-    //   } else {
-    //     throw new Error("Failed to update primary image.");
-    //   }
-    // } catch (error) {
-    //   notification.error({
-    //     message: "Error",
-    //     description: error.message || "Something went wrong while setting primary image.",
-    //   });
-    // }
   };
 
+
+  const handleDeleteImage = async () => {
+    if (!selectedImage) {
+      notification.warning({
+        message: "No Image Selected",
+        description: "Please select an image to set as primary.",
+      });
+      return;
+    }
+    console.log("selectedImage in handleDeleteImage: ", selectedImage);
+
+    try {
+      // Gọi API cập nhật ảnh primary
+      const response = await DeleteImageClub(selectedImage, tokenData.access_token);
+
+      // console.log("🚀 DeleteImageClub:", response);
+
+      if (response.status == 200) {
+        notification.success({
+          message: "delete imageClub successfully",
+          description: "delete imageClub successfully.",
+        });
+      } else {
+        throw new Error("Failed to delete imageClub.");
+      }
+    } catch (error) {
+      notification.error({
+        message: "Error",
+        description: error.message || "Something went wrong while delete imageClub.",
+      });
+    }
+
+  };
 
   return (
     <Drawer
@@ -165,6 +218,9 @@ const ViewClubDetail = (props) => {
         setIsDataDetailOpen(false);
         setIsUpdating(false); // Reset trạng thái cập nhật ảnh
         setIsAddingImage(false); // Reset trạng thái thêm ảnh
+        setDeleteImage(false);
+        setchoseImage(false);
+        setSelectedImage(null);
       }}
       open={isDataDetailOpen}
       width={1200}
@@ -208,18 +264,67 @@ const ViewClubDetail = (props) => {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
               <Title level={5} style={{ margin: 0 }}>Club Images</Title>
               <div>
+                {!deleteImage ? (
+                  <Button
+                    type="dashed"
+                    onClick={handleDeleteImageToggle}
+                    style={{ marginLeft: "10px" }}
+                  >
+                    Delete Image
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      type="dashed"
+                      onClick={() => {
+                        setDeleteImage(false);
+                        setSelectedImage(null);
+                      }}
+                      style={{ marginLeft: "10px" }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="primary"
+                      onClick={handleDeleteImage}
+                      disabled={!selectedImage}
+                      style={{ marginLeft: "10px" }}
+                    >
+                      delete
+                    </Button>
+                  </>
+                )}
 
-                <Button
-                  type="dashed"
-                  disabled={!selectedImage} // Vô hiệu hóa nếu chưa chọn ảnh
-                  onClick={() => {
-                    setchoseImage(!choseImage);
-                    handleChoosePrimaryImage();
-                  }}
-                  style={{ marginLeft: "10px" }}
-                >
-                  {choseImage ? "Cancel" : "Choose Primary Image"}
-                </Button>
+                {!choseImage ? (
+                  <Button
+                    type="dashed"
+                    onClick={handleChooseImageToggle}
+                    style={{ marginLeft: "10px" }}
+                  >
+                    Choose Primary Image
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      type="dashed"
+                      onClick={() => {
+                        setchoseImage(false);
+                        setSelectedImage(null);
+                      }}
+                      style={{ marginLeft: "10px" }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="primary"
+                      onClick={handleChoosePrimaryImage}
+                      disabled={!selectedImage}
+                      style={{ marginLeft: "10px" }}
+                    >
+                      Choose
+                    </Button>
+                  </>
+                )}
 
                 <Button type="primary" onClick={handleToggleAddImage}>
                   {isAddingImage ? "Cancel" : "Add Image"}
@@ -238,7 +343,7 @@ const ViewClubDetail = (props) => {
               <div className="club-images-container">
                 {dataDetail.clubImages.map((image, index) => (
                   <div key={index} className="club-image-wrapper" onClick={() => handleSelectImage(image.id)}>
-                    {(isUpdating || choseImage) && (
+                    {(isUpdating || choseImage || deleteImage) && (
                       <label className="checkbox-label">
                         <input
                           type="checkbox"
@@ -253,7 +358,7 @@ const ViewClubDetail = (props) => {
                       alt={`Club Image ${index + 1}`}
                       className="club-image"
                       placeholder
-                      preview={(!isUpdating || !choseImage)}
+                      preview={!isUpdating && !choseImage && !deleteImage}
                     />
                   </div>
                 ))}
@@ -280,8 +385,6 @@ const ViewClubDetail = (props) => {
                 )}
               </div>
             )}
-
-
           </div>
         </>
       ) : (

@@ -1,28 +1,26 @@
 
 
 import { useEffect, useState } from "react";
-import { fetchAllPackage } from "../../../services/PackageService";
 import AllPackage from "./AllPackage";
 import CreatePackage from "./CreatePackage";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { fetchAllPackage } from "../../../serviceToken/PackageService";
 
 function Package() {
     const [dataPackage, setDataPackage] = useState([]);
     const [filteredData, setFilteredData] = useState(dataPackage);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const tokenData = getTokenData();//tokenData.access_token
+
     useEffect(() => {
         loadPackage();
     }, []);
 
     const loadPackage = async () => {
-        const tokenData = getTokenData();
-        // console.log("t", tokenData.access_token);
-        const res = await fetchAllPackage(tokenData.access_token);
-        console.log("txx", res);
-        setFilteredData(res.data);
-        setDataPackage(res.data);
-        console.log(">>>CHeck RES", res);
-
+        const response = await fetchAllPackage(tokenData.access_token);
+        console.log('fetchAllPackage response:', response); // Ad
+        setFilteredData(response.data);
+        setDataPackage(response.data);
     }
 
     return (

@@ -1,26 +1,27 @@
 import { useEffect, useState } from "react";
-import { fetchAllTrainer } from "../../../services/TrainerService";
 import AllTrainers from "./AllTrainers";
 import CreateTrainer from "./CreateTrainer";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { fetchAllTrainer } from "../../../serviceToken/TrainerService";
 
 function Trainer() {
     const [dataTrainer, setDataTrainer] = useState([]);
     const [filteredData, setFilteredData] = useState([]); // Khởi tạo là mảng rỗng
     const [isModalOpen, setIsModelOpen] = useState(false);
-    const tokenData = localStorage.getItem("tokenData");
-    const { access_token } = JSON.parse(tokenData);
+
+    const tokenData = getTokenData();//tokenData.access_token
 
     const loadTrainers = async () => {
         try {
-            const data = await fetchAllTrainer(access_token);
-            console.log("Response data:", data);
+            const response = await fetchAllTrainer(tokenData.access_token);
+            console.log("Response data:", response);
 
-            if (data && Array.isArray(data.data.data)) {
-                setFilteredData(data.data.data);
-                setDataTrainer(data.data.data);
-                console.log("Trainers loaded successfully:", data.data.data);
+            if (response && Array.isArray(response.data)) {
+                setFilteredData(response.data);
+                setDataTrainer(response.data);
+                console.log("Trainers loaded successfully:", response.data);
             } else {
-                console.error("Invalid data format received:", data);
+                console.error("Invalid data format received:", response);
                 setDataTrainer([]);
                 setFilteredData([]);
             }
@@ -41,7 +42,6 @@ function Trainer() {
                 loadTrainers={loadTrainers}
                 isModalOpen={isModalOpen}
                 setIsModelOpen={setIsModelOpen}
-                token={access_token}
             />
 
             <AllTrainers
@@ -50,7 +50,6 @@ function Trainer() {
                 filteredData={filteredData}
                 setFilteredData={setFilteredData}
                 setIsModelOpen={setIsModelOpen}
-                token={access_token}
             />
         </div>
     )

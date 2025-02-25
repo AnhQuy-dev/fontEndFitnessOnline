@@ -1,30 +1,6 @@
 import axios from "axios";
-import { bookkingAPI, URL_BOOKING } from "../components/helpers/constants";
-
 const URL_PACK = "http://localhost:8082/api/booking";
 const tokenData = localStorage.getItem("tokenData");
-
-
-export const fetchAllPackage = async (token) => {
-    try {
-        console.log("123", token);
-
-        const response = await axios.get(`${URL_BOOKING}/booking/packages`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-        });
-        return response.data;
-    } catch (error) {
-        if (error.response) {
-            return error.response.data || 'An error occurred'
-        } else {
-            return error.message || 'An unexpected error occurred'
-        }
-    }
-};
 
 export const submitBookingRoom = async (bookingData) => {
     try {

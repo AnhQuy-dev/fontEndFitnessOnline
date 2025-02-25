@@ -17,7 +17,7 @@ export const fetchAllClubs = async (token) => {
         }
 
         const data = await response.json(); // Chuyển response thành JSON
-        console.log("Dữ liệu nhận được: ", data);
+        // console.log("Dữ liệu nhận được: ", data);
         return data;
     } catch (error) {
         console.error("Lỗi khi fetch dữ liệu: ", error);
@@ -57,6 +57,34 @@ export const CreateClub = async (newData, token) => {
         }
     } catch (error) {
         console.error("Lỗi khi tạo club:", error.message);
+        return `Lỗi: ${error.message}`;
+    }
+};
+
+export const UpdateClub = async (clubId, data, token) => {
+    try {
+        const response = await fetch(`${APIGetWay}/dashboard/club/update/${clubId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            credentials: "include",
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Lỗi ${response.status}: ${errorText}`);
+        }
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return await response.json();
+        } else {
+            return await response.text();
+        }
+    } catch (error) {
+        console.error("Lỗi khi update club:", error.message);
         return `Lỗi: ${error.message}`;
     }
 };
@@ -138,6 +166,34 @@ export const ChosePrimaryImage = async (ImageId, token) => {
         }
     } catch (error) {
         console.error("Lỗi khi chose primary ImageClub:", error.message);
+        return `Lỗi: ${error.message}`;
+    }
+};
+
+
+export const DeleteImageClub = async (ImageId, token) => {
+    try {
+        const response = await fetch(`${APIGetWay}/dashboard/clubImage/delete/${ImageId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            credentials: "include",
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Lỗi ${response.status}: ${errorText}`);
+        }
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return await response.json();
+        } else {
+            return await response.text();
+        }
+    } catch (error) {
+        console.error("Lỗi khi DELETE ImageClub:", error.message);
         return `Lỗi: ${error.message}`;
     }
 };

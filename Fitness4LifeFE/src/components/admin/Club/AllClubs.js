@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
 import { Dropdown, Input, Menu, notification, Popconfirm, Table } from 'antd';
-import UpdateClub from './UpdateClub';
 import ViewClubDetail from './DetailClub';
 import { deleteClubApi } from '../../../services/ClubService';
 import '../../../assets/css/club.css';
 import moment from 'moment';
+import UpdateClubModa from './UpdateClubModa';
 
 function AllClubs(props) {
     const { dataClubs, loadClubs, setFilteredData, filteredData, setIsModelOpen, token } = props;
@@ -204,7 +204,7 @@ function AllClubs(props) {
                 />
             </div>
 
-            <UpdateClub
+            <UpdateClubModa
                 isModalUpdateOpen={isModalUpdateOpen}
                 setIsModalUpdateOpen={setIsModalUpdateOpen}
                 dataUpdate={dataUpdate}

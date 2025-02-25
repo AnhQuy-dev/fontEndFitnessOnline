@@ -1,25 +1,24 @@
 import { useEffect, useState } from "react";
-import { fetchAllBranch } from "../../../services/BrandService";
 import AllBranch from "./AllBranch";
 import CreateBranch from "./CreateBrand";
+import { fetchAllBranch } from "../../../serviceToken/BrandService";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
 
 function Branch() {
     const [dataBranch, setDataBrand] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
-    // Add token handling
-    const tokenData = localStorage.getItem("tokenData");
-    const { access_token } = JSON.parse(tokenData);
+
+    const tokenData = getTokenData();//tokenData.access_token
 
     const loadBranch = async () => {
         try {
-            const res = await fetchAllBranch(access_token); // Pass token to service
-            
-            if (res && res.data && Array.isArray(res.data.data)) {
-                setDataBrand(res.data.data);
-                setFilteredData(res.data.data);
-                console.log("Branches loaded successfully:", res.data.data);
+            const res = await fetchAllBranch(tokenData.access_token);
+
+            if (res && res.data && Array.isArray(res.data)) {
+                setDataBrand(res.data);
+                setFilteredData(res.data);
+                console.log("Branches loaded successfully:", res.data);
             } else {
                 console.error("Invalid data format received:", res);
                 setDataBrand([]);
@@ -42,7 +41,6 @@ function Branch() {
                 loadBranch={loadBranch}
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}
-                token={access_token}  // Pass token to CreateBranch
             />
 
             <AllBranch
@@ -51,7 +49,6 @@ function Branch() {
                 filteredData={filteredData}
                 setFilteredData={setFilteredData}
                 setIsModalOpen={setIsModalOpen}
-                token={access_token}  // Pass token to AllBranch
             />
         </div>
     )

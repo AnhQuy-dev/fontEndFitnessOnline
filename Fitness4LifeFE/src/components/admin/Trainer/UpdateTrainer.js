@@ -2,6 +2,8 @@ import { Input, notification, Modal, Select, Space, Switch } from "antd";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { updateTrainer } from "../../../services/TrainerService";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { fetchAllBranch } from "../../../serviceToken/BrandService";
 
 const UpdateTrainer = (props) => {
     const { isModalUpdateOpen, setIsModalUpdateOpen, dataUpdate, setDataUpdate, loadTrainers, token } = props;
@@ -18,26 +20,11 @@ const UpdateTrainer = (props) => {
 
     const [branches, setBranches] = useState([]);  // State to store branch data
     const [error, setErrors] = useState({});
+    const tokenData = getTokenData();//tokenData.access_token
 
-    // Fetch Branch data when component mounts
     useEffect(() => {
-        const fetchAllBranch = async () => {
-            try {
-                const response = await fetch("http://localhost:8081/api/dashboard/branchs",{
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                setBranches(data.data);
-
-            } catch (error) {
-                console.error("Error fetching branches:", error);
-            }
-        };
-
-        fetchAllBranch();
+        // Fetch Branch data when component is mounted
+        fetchAllBranch(tokenData.access_token);
     }, []);
 
     const validateField = (field, value) => {
@@ -289,10 +276,10 @@ const UpdateTrainer = (props) => {
                         dropdownStyle={{ minWidth: 250 }}
                     >
                         {branches.map((branchItem) => (
-                            <Select.Option key={branchItem.id} 
-                                        value={branchItem.id}
-                                        placeholder={"SELECT BRANCH"}
-                                        >
+                            <Select.Option key={branchItem.id}
+                                value={branchItem.id}
+                                placeholder={"SELECT BRANCH"}
+                            >
                                 {branchItem.branchName}
                             </Select.Option>
                         ))}

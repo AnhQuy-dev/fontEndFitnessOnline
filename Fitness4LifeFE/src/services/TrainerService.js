@@ -21,16 +21,6 @@ const createAuthConfig = (extraHeaders = {}) => {
     };
 };
 
-const fetchAllTrainer = async () => {
-    try {
-        const URL_BACKEND = `${URL_TRAINER}/trainers`;
-        const response = await axios.get(URL_BACKEND, createAuthConfig());
-        return response;
-    } catch (error) {
-        console.error('Error fetching trainers:', error);
-        throw error;
-    }
-}
 
 const deleteTrainer = async (id) => {
     try {
@@ -46,7 +36,7 @@ const createTrainer = async (fullName, slug, file, specialization, experienceYea
     try {
         const URL_BACKEND = `${URL_TRAINER}/trainer/add`;
         const formData = new FormData();
-        
+
         formData.append('fullName', fullName);
         formData.append('slug', slug);
         if (file) {
@@ -72,7 +62,7 @@ const updateTrainer = async (id, fullName, slug, file, specialization, experienc
     try {
         const URL_BACKEND = `${URL_TRAINER}/trainer/update/${id}`;
         const formData = new FormData();
-        
+
         formData.append("id", id);
         formData.append("fullName", fullName);
         formData.append("slug", slug);
@@ -128,7 +118,6 @@ api.interceptors.response.use(
 );
 
 export {
-    fetchAllTrainer,
     deleteTrainer,
     createTrainer,
     updateTrainer,
