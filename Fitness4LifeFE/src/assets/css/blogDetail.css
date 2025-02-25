@@ -1,0 +1,237 @@
+/* blogDetail.css */
+#blogdetail-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 40px;
+    background-color: #f9f9f9;
+    margin: 70px 0 0 0;
+    flex-wrap: wrap; /* Cho phép phần tử con xuống dòng khi không đủ chỗ */
+}
+
+.blog-detail {
+    flex: 8;
+    padding: 30px;
+    margin-right: 50px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.blog-detail h2 {
+    font-size: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.blog-detail .loading-spinner {
+    text-align: center;
+    margin-top: 50px;
+}
+
+.blog-detail .loading-spinner .spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #f9690e;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.blog-detail .blog-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.blog-detail .blog-info p {
+    font-size: 1.1em;
+    color: #555;
+}
+
+.blog-detail .content {
+    line-height: 1.8;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.blog-detail .content p {
+    margin-bottom: 20px;
+}
+
+.blog-detail img {
+    max-width: 80%;
+    height: auto;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.related-blogs {
+    flex: 4;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.related-blogs h3 {
+    font-size: 1.5em;
+    color: #f9690e;
+    border-bottom: 2px solid #f9690e;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+}
+
+.related-blogs ul {
+    list-style: none;
+    padding: 0;
+}
+
+.related-blogs li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.related-blogs .blog-list-item {
+    display: flex;
+    text-decoration: none;
+    color: #333;
+}
+
+.related-blogs .blog-list-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+
+.related-blogs .blog-list-item div {
+    display: flex;
+    flex-direction: column;
+}
+
+.related-blogs .blog-list-item div span {
+    font-size: 0.9em;
+}
+
+.related-blogs li:hover {
+    background-color: #aeb8bf; /* Màu nền khi hover */
+    border-radius: 5px;
+    padding: 5px;
+  }
+  
+ 
+  
+  .related-blogs .blog-list-item:hover {
+    color: #bf9065; /* Thay đổi màu chữ khi hover */
+  }
+.related-blogs .blog-list-item div span:first-child {
+    font-weight: bold;
+}
+
+.related-blogs .blog-list-item div span:last-child {
+    color: #555;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+    #blogdetail-container {
+        flex-direction: column; /* Đảm bảo các phần hiển thị theo chiều dọc trên màn hình nhỏ */
+    }
+
+    .blog-detail {
+        margin-right: 0;
+        margin-bottom: 30px;
+    }
+
+    .related-blogs {
+        margin-top: 30px;
+    }
+
+    .related-blogs h3 {
+        font-size: 1.3em;
+    }
+
+    .related-blogs li {
+        margin-bottom: 10px;
+    }
+}
+
+/* ===== */
+
+.comments-section {
+    max-width: 1300px; /* Giới hạn chiều rộng của phần bình luận */
+    margin: 20px auto; /* Căn giữa phần bình luận */
+    padding: 30px;
+    border: 1px solid #ddd; /* Đường viền xung quanh */
+    border-radius: 8px; /* Bo tròn các góc */
+    background-color: #f9f9f9; /* Màu nền nhẹ */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  }
+  
+  .comments-list {
+    margin-bottom: 20px; /* Khoảng cách giữa danh sách bình luận và ô nhập bình luận */
+  }
+  
+  .comment {
+    padding: 10px;
+    border-bottom: 1px solid #eee; /* Đường viền dưới mỗi bình luận */
+  }
+  
+  .comment:last-child {
+    border-bottom: none; /* Không có đường viền dưới bình luận cuối cùng */
+  }
+  
+  .comment p {
+    margin: 5px 0; /* Khoảng cách giữa các đoạn văn */
+  }
+  
+  .comment-time {
+    font-size: 0.9em; /* Kích thước chữ nhỏ hơn cho thời gian */
+    color: #888; /* Màu xám cho thời gian */
+  }
+  
+  .comment-form {
+    display: flex;
+    align-items: flex-start; /* Căn chỉnh ô nhập và nút gửi */
+  }
+  
+  .comment-form textarea {
+    flex: 1; /* Chiếm toàn bộ chiều rộng còn lại */
+    padding: 10px; /* Khoảng cách bên trong */
+    border: 1px solid #ccc; /* Đường viền xung quanh */
+    border-radius: 4px; /* Bo tròn các góc */
+    resize: none; /* Không cho phép thay đổi kích thước */
+    font-size: 1em; /* Kích thước chữ */
+    margin-right: 8px; /* Khoảng cách giữa ô nhập và nút gửi */
+  }
+  
+  .comment-form button {
+    background-color: #f9690e; /* Màu nền cho nút gửi */
+    color: white; /* Màu chữ */
+    border: none; /* Không có đường viền */
+    border-radius: 4px; /* Bo tròn các góc */
+    padding: 10px 15px; /* Khoảng cách bên trong */
+    cursor: pointer; /* Con trỏ chuột khi di chuột qua */
+    display: flex;
+    align-items: center; /* Căn giữa icon trong nút */
+  }
+  
+  .comment-form button:disabled {
+    background-color: #ccc; /* Màu nền cho nút khi bị vô hiệu hóa */
+    cursor: not-allowed; /* Con trỏ chuột khi nút bị vô hiệu hóa */
+  }
+  
+  .comment-form button:hover:not(:disabled) {
+    background-color: #f9690e; /* Màu nền khi di chuột qua nút */
+  }

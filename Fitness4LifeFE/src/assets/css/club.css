@@ -1,0 +1,44 @@
+/* 1. Di chuyển ô search sang bên trái */
+.table-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 20px;
+  /* Căn chỉnh khoảng cách */
+}
+
+.table-header .ant-input {
+  margin-left: 10px;
+}
+
+/* 2. Làm chữ "Table Clubs" to lên */
+.table-header .table-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-right: auto;
+  /* Đẩy sang trái */
+  color: #333;
+}
+
+/* 3. Chuyển icon edit và delete thành dấu ba chấm */
+.table-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.table-actions .ant-dropdown-trigger {
+  font-size: 20px;
+}
+
+.table-actions .ant-dropdown-menu {
+  min-width: 120px;
+}
+
+.row-highlight-table .ant-table-tbody>tr:nth-child(even) {
+  background-color: #ECECEC;
+}
+
+.row-highlight-table .ant-table-tbody>tr:nth-child(odd) {
+  background-color: #ffffff;
+}
