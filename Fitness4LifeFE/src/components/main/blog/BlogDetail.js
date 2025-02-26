@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
 import '../../../assets/css/blogDetail.css';
 import CommentsSection from './CommentsSection';
-
+import { fetchBlogById, fetchAllBlogs } from '../../../serviceToken/BlogService';
 const BlogDetail = () => {
   const [blog, setBlog] = useState(null);
   const [blogs, setBlogs] = useState([]);
@@ -13,9 +12,10 @@ const BlogDetail = () => {
   useEffect(() => {
     // Fetch current blog details
     setLoading(true);
-    axios.get(`http://localhost:8082/api/blogs/${id}`)
-      .then((response) => {
-        setBlog(response.data.data);
+    fetchBlogById(id)
+      .then((data) => {
+        setBlog(data);
+        console.log("data",data);
         setLoading(false);
       })
       .catch((error) => {
@@ -26,9 +26,9 @@ const BlogDetail = () => {
 
   useEffect(() => {
     // Fetch other blogs (exclude the current one)
-    axios.get("http://localhost:8082/api/blogs")
-      .then((response) => {
-        const allBlogs = response.data.data.filter((b) => b.id != id);
+    fetchAllBlogs()
+      .then((data) => {
+        const allBlogs = data.filter((b) => b.id != id);
         const shuffledBlogs = allBlogs.sort(() => 0.5 - Math.random());
         const randomBlogs = shuffledBlogs.slice(0, 4);
         setBlogs(randomBlogs);
@@ -50,20 +50,20 @@ const BlogDetail = () => {
     <div id="blogdetail-container">
       {/* Blog detail on the left side */}
       <div className="blog-detail" style={{ flex: 8, paddingLeft: '30px', paddingRight: '20px', marginRight: '50px' }}>
-        {loading ? (
+        {loading || !blog ? (
           <div className="loading-spinner" style={{ textAlign: 'center', marginTop: '50px' }}>
             <div className="spinner"></div>
             <p>Loading...</p>
           </div>
         ) : (
           <>
-            <h2>{blog.title}</h2>
+            <h2 style={{ color: '#F9690E' }}>{blog.title}</h2>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
               <div style={{ display: 'flex', gap: '20px' }}>
-                <p><strong>Category:</strong> {blog.category}</p>
-                <p><strong>Tags:</strong> {blog.tags}</p>
+                <p><strong style={{ color: '#F9690E' }}>Category:</strong> {blog.category}</p>
+                <p><strong style={{ color: '#F9690E' }}>Tags:</strong> {blog.tags}</p>
               </div>
-              <p style={{ alignSelf: 'flex-end' }}><strong>Created At:</strong> {formatDateTime(blog.createdAt)}</p>
+              <p style={{ alignSelf: 'flex-end' }}><strong style={{ color: '#F9690E' }}>Created At:</strong> {formatDateTime(blog.createdAt)}</p>
             </div>
             <div>
               {blog.content.split('\n').map((paragraph, index) => (
@@ -74,7 +74,7 @@ const BlogDetail = () => {
                       <img
                         src={blog.thumbnailUrl[index].imageUrl}
                         alt={`Related image ${index}`}
-                        style={{ maxWidth: '80%', height: 'auto', borderRadius: '8px' }}
+                        style={{ maxWidth: '80%', height: 'auto', borderRadius: '8px', boxShadow: '0 4px 8px rgba(249, 105, 14, 0.2)' }}
                       />
                     </div>
                   )}
@@ -87,12 +87,12 @@ const BlogDetail = () => {
 
       {/* Related blog links on the right side */}
       <div className="related-blogs" style={{ flex: 3 }}>
-        <h3 style ={{ borderBottom: '2px solid #F9690E', width: '144px', paddingBottom: '5px' }}>Other Blogs</h3>
+        <h3 style={{ borderBottom: '2px solid #F9690E', width: '144px', paddingBottom: '5px', color: '#F9690E' }}>Other Blogs</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {blogs.map((relatedBlog) => (
-            <li key={relatedBlog.id} style={{ borderBottom: '0.4px solid #007bff', width: '320px', paddingBottom: '5px', display: 'flex', marginBottom: '15px' }}>
-              <Link className='blog-list-item' to={`/blog/${relatedBlog.id}`} style={{ textDecoration: 'none', color: '#007bff', display: 'flex', width: '100%' }}>
-                <div style={{ marginRight: '10px', width: '80px', height: '80px', overflow: 'hidden' }}>
+            <li key={relatedBlog.id} style={{ borderBottom: '0.4px solid #F9690E', width: '320px', paddingBottom: '5px', display: 'flex', marginBottom: '15px' }}>
+              <Link className='blog-list-item' to={`/blog/${relatedBlog.id}`} style={{ textDecoration: 'none', color: '#333', display: 'flex', width: '100%' }}>
+                <div style={{ marginRight: '10px', width: '80px', height: '80px', overflow: 'hidden', borderRadius: '4px', boxShadow: '0 2px 4px rgba(249, 105, 14, 0.2)' }}>
                   <img
                     src={relatedBlog.thumbnailUrl[0].imageUrl}
                     alt={relatedBlog.title}
@@ -100,7 +100,7 @@ const BlogDetail = () => {
                   />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontWeight: 'bold' }}>{relatedBlog.title}</span>
+                  <span style={{ fontWeight: 'bold', color: '#F9690E' }}>{relatedBlog.title}</span>
                   <span style={{ fontSize: '0.9em', color: '#555' }}>
                     {formatDateTime(relatedBlog.createdAt)}
                   </span>
@@ -110,12 +110,15 @@ const BlogDetail = () => {
           ))}
         </ul>
 
-        <h3 style={{ borderBottom: '2px solid #F9690E', width: '144px', paddingBottom: '5px' }}>News Blogs</h3>
+        <h3 style={{ borderBottom: '2px solid #F9690E', width: '144px', paddingBottom: '5px', color: '#F9690E' }}>News Blogs</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {blogs.map((relatedBlog) => (
-            <li key={relatedBlog.id} style={{ borderBottom: '0.4px solid #007bff', width: '320px', paddingBottom: '5px', display: 'flex', marginBottom: '15px' }}>
-              <Link className='blog-list-item' to={`/blog/${relatedBlog.id}`} style={{ textDecoration: 'none', color: '#007bff', display: 'flex', width: '100%' }}>
-                <div style={{ marginRight: '10px', width: '80px', height: '80px', overflow: 'hidden' }}>
+            <li key={relatedBlog.id} style={{ borderBottom: '0.4px solid #F9690E', width: '320px', paddingBottom: '5px', display: 'flex', marginBottom: '15px' }}>
+              <Link className='blog-list-item' to={`/blog/${relatedBlog.id}`} style={{ textDecoration: 'none', color: '#333', display: 'flex', width: '100%', transition: 'transform 0.2s' }} 
+                onMouseOver={(e) => e.currentTarget.style.transform = 'translateX(5px)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'translateX(0)'}
+              >
+                <div style={{ marginRight: '10px', width: '80px', height: '80px', overflow: 'hidden', borderRadius: '4px', boxShadow: '0 2px 4px rgba(249, 105, 14, 0.2)' }}>
                   <img
                     src={relatedBlog.thumbnailUrl[0].imageUrl}
                     alt={relatedBlog.title}
@@ -123,7 +126,7 @@ const BlogDetail = () => {
                   />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontWeight: 'bold' }}>{relatedBlog.title}</span>
+                  <span style={{ fontWeight: 'bold', color: '#F9690E' }}>{relatedBlog.title}</span>
                   <span style={{ fontSize: '0.9em', color: '#555' }}>
                     {formatDateTime(relatedBlog.createdAt)}
                   </span>
@@ -134,9 +137,9 @@ const BlogDetail = () => {
         </ul>
       </div> 
     </div>
-    <div>
+    {/* <div>
       <CommentsSection blogId={id} />
-    </div>
+    </div> */}
     </div>
   );
 };

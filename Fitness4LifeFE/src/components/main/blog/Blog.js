@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // import Link for navigation
-import axios from 'axios';
 import '../../../assets/css/blog.css';
+import { fetchAllBlogs } from '../../../serviceToken/BlogService'; // Import service mới
 
 const Blog = () => {
   const [blogs, setBlogs] = useState([]);
@@ -10,10 +10,13 @@ const Blog = () => {
   const blogsPerPage = 6;
 
   useEffect(() => {
-    // Fetch blog data 
-    axios.get('http://localhost:8082/api/blogs')
+    // Sử dụng service thay vì gọi axios trực tiếp
+    fetchAllBlogs()
       .then((response) => {
-        const sortedBlogs = response.data.data.sort((a, b) => {
+        // Đảm bảo lấy đúng dữ liệu từ response
+        const data = response.data || response;
+        console.log(data);
+        const sortedBlogs = data.sort((a, b) => {
           const dateA = new Date(a.createdAt[0], a.createdAt[1] - 1, a.createdAt[2], a.createdAt[3], a.createdAt[4], a.createdAt[5]);
           const dateB = new Date(b.createdAt[0], b.createdAt[1] - 1, b.createdAt[2], b.createdAt[3], b.createdAt[4], b.createdAt[5]);
           return dateB - dateA; // Sort in descending order (latest first)
@@ -56,7 +59,7 @@ const Blog = () => {
   return (
     <section id="blog-container">
       <div style={{ textAlign: "center", marginTop: "50px", marginBottom: "40px" }}>
-        <div href="#" className="logo">
+        <div href="#" className="logo-blog">
           <span className="daily-text">Daily</span> <span className="blogs-text">Blogs</span>
         </div>
       </div>
@@ -72,9 +75,15 @@ const Blog = () => {
             <div key={blog.id} className="blog-item">
               <div className="blog-thumbnail-container">
                 <img
-                  src={blog.thumbnailUrl[0].imageUrl}
+                  src={blog.thumbnailUrl && blog.thumbnailUrl.length > 0 
+                    ? blog.thumbnailUrl[0].imageUrl 
+                    : 'https://placehold.co/300x200?text=No+Image'}
                   alt={blog.title}
                   className="blog-thumbnail"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://placehold.co/300x200?text=No+Image';
+                  }}
                 />
               </div>
               <div className="blog-content">
@@ -82,9 +91,13 @@ const Blog = () => {
                   <Link to={`/blog/${blog.id}`}>{blog.title}</Link>
                 </h3>
                 <p>{blog.content.substring(0, 150)}...</p>
-                <p><strong>Category:</strong> {blog.category}</p>
-                <p><strong>Tags:</strong> {blog.tags}</p>
-                <p><strong>Created At:</strong> {formatDateTime(blog.createdAt)}</p>
+                <p><strong>Category:</strong> <span className="blog-category">{blog.category}</span></p>
+                <div className="blog-tags">
+                  {blog.tags.split(',').map((tag, index) => (
+                    <span key={index} className="blog-tag">{tag.trim()}</span>
+                  ))}
+                </div>
+                <p className="blog-date">{formatDateTime(blog.createdAt)}</p>
                 <div className="blog-stats">
                   <span className="blog-likes">{blog.likesCount} Likes</span>
                   <span className="blog-views">{blog.viewCount} Views</span>
