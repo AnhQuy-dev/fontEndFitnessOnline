@@ -1,0 +1,22 @@
+MAIN{
+   BOOKING
+   PACKAGE
+   PAYPAL	
+}
+
+ADMIN{
+   PACKAGE
+   BRANCH
+   TRAINER
+   ROOOM
+}
+
+SERVICE{
+    TrainerSERVICE
+    StaticsticsSERVICE
+    RoomSERVICE
+    PaymentSERVICE
+    PackageSERVICE
+    BrachSERVICE
+    BookingSERVICE	
+}
