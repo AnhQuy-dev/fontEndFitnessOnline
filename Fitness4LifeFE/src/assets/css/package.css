@@ -1,0 +1,52 @@
+/* PackageMain.css */
+.custom-card {
+    height: 500px; /* Ensure card occupies full height */
+    width: 67%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+    margin: 0 auto;
+}
+
+.card-header {
+    background-color: #F9690E;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+    width: 100%; /* Chiều ngang bằng với card */
+    margin: 0; /* Xóa margin để khớp viền */
+    z-index: 1; /* Đảm bảo header nằm trên card */
+    box-sizing: border-box; /* Đảm bảo padding không làm rộng phần tử */
+    position: relative
+}
+
+.card-description, .card-duration {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.card-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: red; /* Highlight price in red */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.paynow-btn {
+    width: 37%; /* Full width button */
+    font-weight: bold;
+    font-size: 16px;
+    height: 40px;
+}

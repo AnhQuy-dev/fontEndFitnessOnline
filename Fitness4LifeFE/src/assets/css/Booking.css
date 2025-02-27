@@ -1,0 +1,42 @@
+.room-card {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.slot-info {
+    color: #888;
+    font-size: 14px;
+}
+
+.card-meta {
+    padding: 10px 0;
+}
+
+.time-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: bold;
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    padding: 0 10px;
+    color: #333;
+}
+
+.start-time {
+    color: #4caf50;
+}
+
+.end-time {
+    color: #f44336;
+}
