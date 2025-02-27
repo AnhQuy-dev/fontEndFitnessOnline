@@ -10,7 +10,7 @@ const CommentsSection = ({ blogId }) => {
 
   useEffect(() => {
     // Fetch comments for the current blog
-    axios.get(`http://localhost:8082/api/blogs/blog/${blogId}/comment`)
+    axios.get(`http://localhost:9001/api/blogs/blog/${blogId}/comment`)
       .then((response) => {
         setComments(response.data);
       })

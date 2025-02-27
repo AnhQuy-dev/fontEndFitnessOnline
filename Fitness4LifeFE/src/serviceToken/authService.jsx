@@ -2,30 +2,25 @@ import { APIGetWay } from "../components/helpers/constants";
 
 export const loginUser = async (email, password) => {
   try {
-    const response = await fetch(`${APIGetWay}/users/login`, {
+    const response = await fetch('http://localhost:9001/api/users/login', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      credentials: "include",
-      body: JSON.stringify({ email, password })  // Sửa lỗi JSON.stringify
+      body: JSON.stringify({ email, password }),
+      mode: 'cors',
+      credentials: 'include'
     });
 
     if (!response.ok) {
-      throw new Error(`Lỗi: ${response.status} - ${response.statusText}`);
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Đăng nhập thất bại');
     }
 
-    const result = await response.json(); // Sửa lỗi response.data.json()
-    return result;
-
+    return await response.json();
   } catch (error) {
-    if (error.response) {
-      throw new Error(error.response.data.message || 'An error occurred while logging in.');
-    } else if (error.request) {
-      throw new Error('No response from server. Please try again later.');
-    } else {
-      throw new Error('An unexpected error occurred.');
-    }
+    console.error('Lỗi đăng nhập:', error);
+    throw error;
   }
 };
 
