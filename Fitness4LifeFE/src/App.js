@@ -12,11 +12,9 @@ import ContactForm from './components/main/contact/ContactForm';
 import Club from './components/admin/Club/Club'
 import Blogs from './components/admin/Blog/Blogs';
 import Users from './components/admin/User/Users';
-import Booking from './components/admin/Booking/Booking';
 import Room from './components/admin/Room/Room';
 import Branch from './components/admin/Branch/Branch';
-import Trainer from './components/admin/Trainer/Trainer';
-import BookingMain from './components/main/booking/Booking';
+// import Trainer from './components/admin/Trainer/Trainer';
 import Package from './components/admin/Package/Package';
 import PackageMain from './components/main/package/Package';
 import PaymentMain from './components/main/Paypal/PaymentMain';
@@ -85,7 +83,6 @@ const App = () => {
             <Route path="/your-posts" element={<YourPostThread />} />
             <Route path="/post/:postId" element={<YourPostDetailPage />} />
             <Route path="/update-question/:postId" element={<UpdateQuestion />} />
-            <Route path='/bookingMain' element={<BookingMain />} />
             <Route path="/payment" element={<PaymentMain />} />
             <Route path="/order" element={<OrderPage />} />
             <Route path='/user/profile/yourcode' element={<YourPromotionPage />} />
@@ -107,10 +104,9 @@ const App = () => {
             <Route path="Users" element={<Users />} />
             <Route path="Blogs" element={<Blogs />} />
             <Route path="Club" element={<Club />} />
-            <Route path="Booking" element={<Booking />} />
             <Route path="Room" element={<Room />} />
             <Route path="Branch" element={<Branch />} />
-            <Route path="Trainer" element={<Trainer />} />
+            {/* <Route path="Trainer" element={<Trainer />} /> */}
             <Route path="Package" element={<Package />} />
             <Route path="Promotion" element={<PromotionPage />} />
             <Route path="Post" element={<PostPage />} />

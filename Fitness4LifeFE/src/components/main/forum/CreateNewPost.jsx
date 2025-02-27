@@ -45,7 +45,7 @@ const CreateNewPost = () => {
     const location = useLocation();
     const tokenData = getTokenData();
     const decotoken = getDecodedToken();
-    console.log("decotoken: ", decotoken);//tokenData.access_token
+    // console.log("decotoken: ", decotoken);//tokenData.access_token
 
     useEffect(() => {
         const queryParams = new URLSearchParams(location.search);

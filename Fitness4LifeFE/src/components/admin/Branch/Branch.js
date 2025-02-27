@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import AllBranch from "./AllBranch";
-import CreateBranch from "./CreateBrand";
-import { fetchAllBranch } from "../../../serviceToken/BrandService";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { fetchAllBranch } from "../../../serviceToken/BrachSERVICE";
+import CreateBranch from "./CreateBrand";
+import AllBranch from "./AllBranch";
 
 function Branch() {
     const [dataBranch, setDataBrand] = useState([]);
@@ -10,10 +10,14 @@ function Branch() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const tokenData = getTokenData();//tokenData.access_token
+    console.log("tokenData", tokenData);
+
 
     const loadBranch = async () => {
         try {
             const res = await fetchAllBranch(tokenData.access_token);
+            console.log("ré", res);
+
 
             if (res && res.data && Array.isArray(res.data)) {
                 setDataBrand(res.data);

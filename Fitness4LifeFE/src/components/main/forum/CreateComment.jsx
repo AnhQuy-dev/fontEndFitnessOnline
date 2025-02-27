@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Typography, Button, Input, Form, message, Modal } from "antd";
-import { createComment, deleteComment, updateComment } from "../../../services/forumService";
 import moment from "moment";
 import { getDecodedToken, getTokenData } from "../../../serviceToken/tokenUtils";
-import { GetCommentByQuestionId } from "../../../serviceToken/ForumService";
+import { createComment, deleteComment, GetCommentByQuestionId, updateComment } from "../../../serviceToken/ForumService";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -60,9 +59,11 @@ const CreateComment = ({ questionId }) => {
             content: values.content,
         };
         try {
-            const response = await createComment(commentData);
+            const response = await createComment(commentData, tokenData.access_token);
+            // console.log("response create comment: ", response);
 
-            if (response && response.status === 200) {
+
+            if (response && response.status === 200 || response.status === 201) {
                 form.resetFields();
                 setActiveReplyForm(null);
 
@@ -117,7 +118,7 @@ const CreateComment = ({ questionId }) => {
         };
 
         try {
-            const response = await updateComment(commentId, updatedCommentData);
+            const response = await updateComment(commentId, updatedCommentData, tokenData.access_token);
             if (response && response.status === 200) {
                 message.success("Cập nhật bình luận thành công!");
                 setEditingCommentId(null); // Đóng form chỉnh sửa
@@ -154,7 +155,7 @@ const CreateComment = ({ questionId }) => {
             return;
         }
         try {
-            const response = await deleteComment(idComment);
+            const response = await deleteComment(idComment, tokenData.access_token);
 
             if (response && response.status === 200) {
                 message.success("Comment deleted successfully!");

@@ -1,12 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { Card, Button, notification, Row, Col, Typography, Divider, Space, message } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { DataContext } from '../../helpers/DataContext';
 import axios from 'axios';
 import { SyncOutlined, ArrowLeftOutlined, CreditCardOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import stickman from '../../../assets/images/Stickman.gif';
-import { jwtDecode } from 'jwt-decode';
 import '../../../assets/css/Main/payMent.css';
+import { getDecodedToken, getTokenData } from '../../../serviceToken/tokenUtils';
+import { ProceedToPayment } from '../../../serviceToken/PaymentService';
 
 const { Title, Text } = Typography;
 
@@ -14,9 +14,14 @@ const PaymentPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { package: selectedPackage } = location.state || {};
-  const { user } = useContext(DataContext);
   const [isLoading, setIsLoading] = useState(false);
 
+  const tokenData = getTokenData();
+  const decodeToken = getDecodedToken();
+
+  const userFullname = decodeToken.fullName;
+  const userId = decodeToken.id;
+  const userEmail = decodeToken.sub;
   if (!selectedPackage) {
     return (
       <div className="empty-package-container">
@@ -37,10 +42,10 @@ const PaymentPage = () => {
     setIsLoading(true);
     try {
       // Validate required data
-      if (!selectedPackage?.id || !user?.id) {
+      if (!selectedPackage?.id || !userId) {
         console.error("Validation Error:", {
           selectedPackage: selectedPackage,
-          user: user,
+          user: decodeToken,
           message: "Package or user information is missing"
         });
         throw new Error("Package or user information is missing");
@@ -48,7 +53,7 @@ const PaymentPage = () => {
 
       const payload = {
         packageId: selectedPackage.id,
-        userId: user.id,
+        userId: userId,
         description: selectedPackage.description || "Package Subscription",
         cancelUrl: "http://localhost:5173/cancel",
         successUrl: "http://localhost:3000/order",
@@ -56,8 +61,6 @@ const PaymentPage = () => {
         intent: "Sale",
       };
 
-      // Get and validate token
-      const tokenData = localStorage.getItem("tokenData");
       if (!tokenData) {
         notification.error({
           message: 'Authentication Error',
@@ -66,43 +69,14 @@ const PaymentPage = () => {
         return;
       }
 
-      let parsedTokenData;
-      try {
-        parsedTokenData = JSON.parse(tokenData);
-      } catch (error) {
-        notification.error({
-          message: 'Session Error',
-          description: 'Your session is invalid. Please log in again.',
-        });
-        return;
-      }
-
-      const { access_token } = parsedTokenData;
-
-      if (!access_token) {
-        notification.error({
-          message: 'Authentication Error',
-          description: 'Invalid session. Please log in again.',
-        });
-        return;
-      }
-
-      // Use message.loading instead of notification.loading
       const hide = message.loading('Processing payment...', 0);
-
+      
       try {
-        const response = await axios.post(
-          'http://localhost:8082/api/paypal/pay',
-          payload,
-          {
-            headers: {
-              Authorization: `Bearer ${access_token}`
-            },
-            timeout: 10000,
-          }
-        );
-
-        // Hide loading message
+        console.log("Payload",payload);
+        
+        const response = await ProceedToPayment(payload,tokenData.access_token);
+        console.log("response",response);
+        
         hide();
 
         const approvalUrl = response.data?.approvalUrl;
@@ -185,9 +159,9 @@ const PaymentPage = () => {
               <div className="customer-info">
                 <Title level={5}>CUSTOMER INFORMATION</Title>
                 <div className="customer-details">
-                  <Text><strong>Name:</strong> {user?.fullName || 'Guest User'}</Text>
-                  <Text><strong>Member ID:</strong> {user?.id || 'N/A'}</Text>
-                  <Text><strong>Email:</strong> {user?.email || 'N/A'}</Text>
+                  <Text><strong>Name:</strong> {userFullname || 'Guest User'}</Text>
+                  <Text><strong>Member ID:</strong> {userId || 'N/A'}</Text>
+                  <Text><strong>Email:</strong> {userEmail || 'N/A'}</Text>
                 </div>
               </div>
 
@@ -306,7 +280,7 @@ const PaymentPage = () => {
               <Button
                 type="default"
                 size="middle"
-                onClick={() => navigate('/packages')}
+                onClick={() => navigate('/PackageMain')}
                 className="back-to-packages-button"
               >
                 <ArrowLeftOutlined /> Back to Packages

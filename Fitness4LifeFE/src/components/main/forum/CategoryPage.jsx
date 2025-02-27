@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Typography } from "antd";
 import { FileTextOutlined } from "@ant-design/icons";
 import "../../../assets/css/CategoryPage.css";

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
-import { Dropdown, Input, Menu, notification, Popconfirm, Table } from 'antd';
+import { Dropdown, Input, Menu, Popconfirm, Table } from 'antd';
 import ViewClubDetail from './DetailClub';
-import { deleteClubApi } from '../../../services/ClubService';
 import '../../../assets/css/club.css';
 import moment from 'moment';
 import UpdateClubModa from './UpdateClubModa';
+import { getTokenData } from '../../../serviceToken/tokenUtils';
 
 function AllClubs(props) {
-    const { dataClubs, loadClubs, setFilteredData, filteredData, setIsModelOpen, token } = props;
+    const { dataClubs, loadClubs, setFilteredData, filteredData, setIsModelOpen } = props;
     const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
     const [dataUpdate, setDataUpdate] = useState(null);
 
@@ -18,7 +18,7 @@ function AllClubs(props) {
     const [searchText, setSearchText] = useState('');
 
     const [addressFilters, setAddressFilters] = useState([]);
-
+    const tokenData = getTokenData();
 
     useEffect(() => {
         const uniqueAddresses = [...new Set(dataClubs.map((club) => club.address))];
@@ -114,7 +114,7 @@ function AllClubs(props) {
                             <Popconfirm
                                 title="Delete Club"
                                 description="Are you sure delete it?"
-                                onConfirm={() => handleDeleteUser(record.id)}
+                                // onConfirm={() => handleDeleteUser(record.id)}
                                 okText="Yes"
                                 cancelText="No"
                                 placement="left"
@@ -146,27 +146,27 @@ function AllClubs(props) {
         setFilteredData(filtered);
     };
 
-    const handleDeleteUser = async (id) => {
-        try {
-            const res = await deleteClubApi(id, token);
-            console.log("Delete response:", res); // Thêm log để debug
+    // const handleDeleteUser = async (id) => {
+    //     try {
+    //         const res = await deleteClubApi(id, token);
+    //         console.log("Delete response:", res); // Thêm log để debug
 
-            // Kiểm tra response có tồn tại
-            if (res && res.data) {
-                notification.success({
-                    message: 'Delete Club',
-                    description: 'Delete Club successfully....!',
-                });
-                await loadClubs(); // Reload danh sách sau khi xóa
-            }
-        } catch (error) {
-            console.error("Delete error:", error); // Thêm log error
-            notification.error({
-                message: 'Error deleting club',
-                description: error.message || 'Failed to delete club',
-            });
-        }
-    };
+    //         // Kiểm tra response có tồn tại
+    //         if (res && res.data) {
+    //             notification.success({
+    //                 message: 'Delete Club',
+    //                 description: 'Delete Club successfully....!',
+    //             });
+    //             await loadClubs(); // Reload danh sách sau khi xóa
+    //         }
+    //     } catch (error) {
+    //         console.error("Delete error:", error); // Thêm log error
+    //         notification.error({
+    //             message: 'Error deleting club',
+    //             description: error.message || 'Failed to delete club',
+    //         });
+    //     }
+    // };
 
     return (
         <>

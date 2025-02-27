@@ -1,9 +1,9 @@
 import { Input, Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
 import { fetchAllClubs } from "../../../serviceToken/ClubService";
-import { fetchAllTrainer } from "../../../serviceToken/TrainerService";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
-import { CreateRoomDashboard } from "../../../serviceToken/RoomService";
+import { createRoom } from "../../../serviceToken/RoomSERVICE";
+import { fetchAllTrainer } from "../../../serviceToken/TrainerSERVICE";
 
 const { Option } = Select;
 
@@ -23,12 +23,57 @@ function CreateRoom(props) {
     const [trainers, setTrainers] = useState([]);
     const [error, setErrors] = useState({});
     const tokenData = getTokenData();
+
+
+
+    // useEffect để fetch clubs
+    const getClubs = async () => {
+        try {
+            // Kiểm tra token
+            if (!tokenData || !tokenData.access_token) {
+                console.error("Access token không có sẵn");
+                return;
+            }
+
+            const response = await fetchAllClubs(tokenData.access_token);
+            console.log("Clubs data loaded:", response.data);
+
+            if (response && response.data) {
+                setClubs(response.data);
+            }
+        } catch (error) {
+            console.error("Lỗi khi tải clubs:", error);
+            setClubs([]);
+        }
+    };
     useEffect(() => {
-        // Fetch Clubs
-        fetchAllClubs(tokenData.access_token);
-        // Fetch Trainers
-        fetchAllTrainer(tokenData.access_token);
-    }, []);
+
+        getClubs();
+    }, [tokenData.access_token]);
+
+    // useEffect để fetch trainers
+    const getTrainers = async () => {
+        try {
+            // Kiểm tra token
+            if (!tokenData || !tokenData.access_token) {
+                console.error("Access token không có sẵn");
+                return;
+            }
+
+            const response = await fetchAllTrainer(tokenData.access_token);
+            if (response && response.data) {
+                setTrainers(response.data);
+                console.log("Trainers data loaded:", response.data);
+            }
+        } catch (error) {
+            console.error("Lỗi khi tải trainers:", error);
+            setTrainers([]);
+        }
+    };
+    useEffect(() => {
+
+        getTrainers();
+    }, [tokenData.access_token]);
 
     const validateField = (field, value) => {
         const newErrors = { ...error };
@@ -99,7 +144,11 @@ function CreateRoom(props) {
             return;
         }
 
-        const res = await CreateRoomDashboard(club, trainer, roomName, slug, capacity, facilities, status, startTime, endTime, tokenData.access_token);
+        const RoomDataPayload = {
+            club, trainer, roomName, slug, capacity, facilities, status, startTime, endTime
+        }   
+
+        const res = await createRoom(RoomDataPayload, tokenData.access_token);
 
         if (res.data) {
             notification.success({

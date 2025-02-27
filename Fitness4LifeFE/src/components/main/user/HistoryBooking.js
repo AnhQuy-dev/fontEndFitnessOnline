@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { fetchAllBookingHistoryByUserId, getQrCode } from '../../../services/BookingRoomService';
 import { Card, Empty } from 'antd';
 import { getDecodedToken, getTokenData } from '../../../serviceToken/tokenUtils';
+import { fetchAllBookingHistoryByUserId, getQrCode } from '../../../serviceToken/BookingMain';
 
 const BookingHistoryPage = () => {
     const [bookingHistory, setBookingHistory] = useState([]);

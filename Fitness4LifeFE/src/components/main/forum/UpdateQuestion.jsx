@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Input, Upload, notification } from "antd";
-import { updateQuestion } from "../../../services/forumService";
-
+import { updateQuestion } from "../../../serviceToken/ForumService";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
 const { TextArea } = Input;
 
 const UpdateQuestion = () => {
@@ -15,6 +15,7 @@ const UpdateQuestion = () => {
     const [imagesUpload, setImagesUpload] = useState([]);
     const [deleteImageUrl, setDeleteImageUrl] = useState([]); // Lưu các ảnh cũ cần xóa
     const [existingImages, setExistingImages] = useState(post.questionImage);
+    const tokenData = getTokenData();
 
     // Xử lý xóa ảnh cũ trực tiếp
     const handleDeleteExistingImage = (image) => {
@@ -40,7 +41,8 @@ const UpdateQuestion = () => {
                 console.log(`${key}:`, value);
             }
 
-            const response = await updateQuestion(post.id, formData);
+            const response = await updateQuestion(post.id, formData, tokenData.access_token);
+            console.log("response update question: ", response);
             if (response.status === 200) {
                 notification.success({ message: "Cập nhật thành công" });
                 setExistingImages(response.data.updatedImages); // Cập nhật danh sách ảnh sau chỉnh sửa

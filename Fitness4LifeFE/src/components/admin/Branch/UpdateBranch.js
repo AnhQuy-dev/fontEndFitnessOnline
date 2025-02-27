@@ -1,7 +1,8 @@
 import { Input, notification, Modal, TimePicker, Checkbox } from "antd";
 import { useEffect, useState } from "react";
 import moment from "moment";
-import { updateBranch } from "../../../services/BrandService";
+import { updateBranch } from "../../../serviceToken/BrachSERVICE";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
 
 const UpdateBranch = (props) => {
     const { isModalUpdateOpen, setIsModalUpdateOpen, dataUpdate, setDataUpdate, loadBranch } = props;
@@ -14,6 +15,7 @@ const UpdateBranch = (props) => {
     const [closeHours, setCloseHours] = useState(null);
     const [services, setServices] = useState([]);
     const [error, setErrors] = useState({});
+    const tokenData = getTokenData();//tokenData.access_token
 
     const serviceOptions = ["GYM", "YOGA", "GROUPX", "DANCE", "TUMS", "CYCLING"];
 
@@ -114,16 +116,22 @@ const UpdateBranch = (props) => {
         }
 
 
-        const res = await updateBranch(
-            dataUpdate.id,
+        const branchDataPayloadUpdate = {
             branchName,
             slug,
             address,
             phoneNumber,
             email,
-            openHours ? openHours.format("HH:mm") : null,
-            closeHours ? closeHours.format("HH:mm") : null,
+            openHours: openHours ? openHours.format("HH:mm") : null,
+            closeHours: closeHours ? closeHours.format("HH:mm") : null,
             services
+        }
+
+        const res = await updateBranch(
+            dataUpdate.id,
+            branchDataPayloadUpdate,
+            tokenData.access_token
+
         );
 
         if (res.data) {

@@ -33,7 +33,7 @@ const LoginToken = () => {
     try {
       setLoading(true);
       const response = await loginUser(data.email, data.password);
-      console.log("response", response);
+      // console.log("response", response);
 
       const { access_token } = response;
 

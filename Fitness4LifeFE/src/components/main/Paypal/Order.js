@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams, useLocation, Navigate, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import { notification, Spin } from 'antd';
+import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { getMembershipByPaymentId, PaymentSuccessFully } from "../../../serviceToken/PaymentService";
+
 
 const OrderPage = () => {
     const [searchParams] = useSearchParams();
@@ -10,10 +12,13 @@ const OrderPage = () => {
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
     const [membershipData, setMembershipData] = useState(null);
- const navigate = useNavigate();
+    const navigate = useNavigate();
+    const tokenData = getTokenData();
 
- console.log("membershipData",membershipData);
- 
+    console.log("membershipData", membershipData);
+
+
+
     useEffect(() => {
         const paymentId = searchParams.get("paymentId");
         const token = searchParams.get("token");
@@ -21,82 +26,42 @@ const OrderPage = () => {
 
         const completePayment = async () => {
             try {
-                const tokenData = localStorage.getItem("tokenData");
-                if (!tokenData) {
-                    throw new Error("Token not found");
-                }
-        
-                const { access_token } = JSON.parse(tokenData);
-                console.log("Access Token:", access_token);
-        
-                // 1. Gọi API hoàn tất thanh toán
-                try {
-                    console.log("Calling success API with params:", {
-                        paymentId,
-                        token,
-                        PayerID: PayerID
-                    });
-        
-                    const successResponse = await axios.post(
-                        `http://localhost:8082/api/paypal/success?paymentId=${paymentId}&token=${token}&PayerID=${PayerID}`,
-                        {},  // Empty object as body
-                        {
-                            headers: {
-                                'Authorization': `Bearer ${access_token}`
-                            }
-                        }
-                    );
-                    console.log("Success API Response:", successResponse.data);
-        
-                } catch (successError) {
-                    console.error("Success API Error:", {
-                        status: successError.response?.status,
-                        data: successError.response?.data,
-                        message: successError.message
-                    });
-                    throw successError;
-                }
-        
-                // 2. Gọi API lấy thông tin membership
-                try {
-                    const membershipResponse = await axios.get(
-                        `http://localhost:8082/api/paypal/getMembershipByPaymentId/${paymentId}`,
-                        {
-                            headers: {
-                                'Authorization': `Bearer ${access_token}`
-                            }
-                        }
-                    );
-                    console.log("Membership API Response:", membershipResponse);
-                    console.log("Membership API Response BODY:", membershipResponse.data.body.fullName);
 
-        
-                    if (membershipResponse.data.body) {
-                        setMembershipData(membershipResponse.data.body);
-                    console.log("Membership DATA BODY:", setMembershipData);
+                const successResponse = await PaymentSuccessFully(paymentId, token, PayerID, tokenData.access_token);
+                console.log("successResponse", successResponse);
 
-                        setMessage("Thanh toán thành công! Cảm ơn bạn đã sử dụng dịch vụ.");
-                        notification.success({
-                            message: 'Thanh toán thành công',
-                            description: 'Gói dịch vụ của bạn đã được kích hoạt',
-                        });
-                    }
-                } catch (membershipError) {
-                    console.error("Membership API Error:", {
-                        status: membershipError.response?.status,
-                        data: membershipError.response?.data,
-                        message: membershipError.message
+            } catch (successError) {
+                console.error("Success API Error:", {
+                    status: successError.response?.status,
+                    data: successError.response?.data,
+                    message: successError.message
+                });
+                throw successError;
+            }
+
+            try {
+                const membershipResponse = await getMembershipByPaymentId(paymentId, tokenData.access_token);
+                console.log("membershipResponse111111", membershipResponse);
+                console.log("membershipResponse333333", membershipResponse.body);
+                setMembershipData(membershipResponse.body);
+
+
+                if (membershipResponse.statusCodeValue == 200) {
+                    setMessage("Thanh toán thành công! Cảm ơn bạn đã sử dụng dịch vụ.");
+                    notification.success({
+                        message: 'Thanh toán thành công',
+                        description: 'Gói dịch vụ của bạn đã được kích hoạt',
                     });
-                    throw membershipError;
                 }
-        
-            } catch (error) {
+
+            }
+            catch (error) {
                 console.error("General Error:", {
                     name: error.name,
                     message: error.message,
                     response: error.response?.data
                 });
-                
+
                 setMessage("Có lỗi xảy ra trong quá trình hoàn tất thanh toán.");
                 notification.error({
                     message: 'Lỗi thanh toán',
@@ -113,7 +78,7 @@ const OrderPage = () => {
             setMessage("Thông tin thanh toán không hợp lệ.");
             setLoading(false);
         }
-    }, [searchParams,navigate]);
+    }, [searchParams, navigate]);
 
     if (loading) {
         return (
@@ -127,7 +92,7 @@ const OrderPage = () => {
     return (
         <section id="services">
             <div style={{ maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-                <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>Kết quả thanh toán</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>Kết quả thanh toán111111</h1>
                 <p style={{ textAlign: 'center', marginBottom: '20px' }}>{message}</p>
 
                 {membershipData && (
@@ -146,7 +111,6 @@ const OrderPage = () => {
                         <p><strong>Ngày kết thúc:</strong> {new Date(membershipData.endDate).toLocaleDateString('vi-VN')}</p>
                     </div>
                 )}
-    
                 {selectedPackage && !membershipData && (
                     <div style={{
                         backgroundColor: '#f8f9fa',

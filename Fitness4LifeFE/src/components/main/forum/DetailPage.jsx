@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Typography, Spin, message, Button } from "antd";
 import moment from "moment";
-import { voteQuestion } from "../../../services/forumService";
 import CreateComment from "./CreateComment";
-import { getQuestionById, incrementViewCount } from "../../../serviceToken/ForumService";
+import { getQuestionById, incrementViewCount, voteQuestion } from "../../../serviceToken/ForumService";
 import { getDecodedToken, getTokenData } from "../../../serviceToken/tokenUtils";
 const { Title, Paragraph, Text } = Typography;
 
@@ -93,11 +92,12 @@ const DetailPage = () => {
             }
 
             // Gửi yêu cầu vote đến API
-            const response = await voteQuestion(id, voteType, decotoken.id);
+            const response = await voteQuestion(id, voteType, decotoken.id, tokenData.access_token);
+            console.log("response vote question: ", response);
 
-            if (response && response.status === 200) {
+            if (response === "Vote successfully handled") {
                 setQuestion(updatedQuestion);
-                message.success("Cập nhật thành công!");
+                // message.success("Cập nhật thành công!");
             } else {
                 message.error("Có lỗi xảy ra khi thực hiện vote!");
             }

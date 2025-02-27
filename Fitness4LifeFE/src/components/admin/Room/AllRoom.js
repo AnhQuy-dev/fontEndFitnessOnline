@@ -4,8 +4,8 @@ import { Button, Dropdown, Input, Menu, notification, Popconfirm, Table } from '
 import DetailRoom from './DetailRoom';
 import UpdateRoom from './UpdateRoom';
 import '../../../assets/css/club.css';
-import { deleteRoom } from '../../../serviceToken/RoomService';
 import { getTokenData } from '../../../serviceToken/tokenUtils';
+import { deleteRoom } from '../../../serviceToken/RoomSERVICE';
 
 function AllRoom(props) {
     const { loadRoom, dataRoom, filteredData, setFilteredData, setIsModalOpen, token } = props;

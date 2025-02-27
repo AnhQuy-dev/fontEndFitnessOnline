@@ -2,21 +2,22 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Image } from 'antd';
 import moment from 'moment';
-import { fetchClubById } from '../../../services/ClubService';
 import '../../../assets/css/branch.css'
+import { getTokenData } from '../../../serviceToken/tokenUtils';
+import { fetchClubById } from '../../../serviceToken/ClubService';
 function ClubDetails() {
     const { id } = useParams();
     const [club, setClub] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const tokenData = getTokenData();
     useEffect(() => {
         loadClubDetails();
     }, [id]);
 
     const loadClubDetails = async () => {
         try {
-            const response = await fetchClubById(id);
+            const response = await fetchClubById(id, tokenData.access_token);
             console.log('Fetched Club Data:', response); // Debugging
             setClub(response.data.data);
         } catch (err) {

@@ -1,10 +1,11 @@
 import "../../../assets/css/postAdmin.css";
 import React, { useEffect, useState } from "react";
 import { Spin, Typography, message, Card, Button, Pagination, Tabs, Select } from "antd";
-import { changePublished, deleteQuestion, GetAllQuestion } from "../../../services/forumService"; // Giả sử bạn có API updateStatus
 import moment from "moment";
 import QuestionDetailModal from "./QuestionDetailModal";
 import CreateQuestionModal from "./CreateQuestionModal";
+import { changePublished, deleteQuestion, GetAllQuestion } from "../../../serviceToken/ForumService";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
 
 const { Title, Paragraph, Text } = Typography;
 const { TabPane } = Tabs;
@@ -24,29 +25,34 @@ const PostPage = () => {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     const [filterStatus, setFilterStatus] = useState("ALL"); // Trạng thái lọc của bài viết bên USER tab
+    const tokenData = getTokenData();
 
-    // const fetchQuestions = async () => {
-    //     try {
-    //         setLoading(true);
-    //         const response = await GetAllQuestion();
-    //         if (response.status === 200) {
-    //             // Phân loại bài viết theo rolePost
-    //             const privatePosts = response.data.data.filter((q) => q.rolePost === "PRIVATES");
-    //             const publicPosts = response.data.data.filter((q) => q.rolePost === "PUBLICED");
+    const fetchQuestions = async () => {
+        try {
+            setLoading(true);
+            const response = await GetAllQuestion(tokenData.access_token);
+            console.log("response: ", response);
+            if (response.status === 200) {
+                // Phân loại bài viết theo rolePost
+                const privatePosts = response.data.filter((q) => q.rolePost === "PRIVATES");
+                const publicPosts = response.data.filter((q) => q.rolePost === "PUBLICED");
 
-    //             setPrivateQuestions(privatePosts);
-    //             setPublicQuestions(publicPosts);
+                console.log("privatePosts: ", privatePosts);
+                console.log("publicPosts: ", publicPosts);
 
-    //             // message.success("Lấy danh sách bài viết thành công!");
-    //         } else {
-    //             message.error(response.message || "Lấy danh sách thất bại!");
-    //         }
-    //     } catch (error) {
-    //         message.error("Có lỗi xảy ra khi gọi API!");
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
+                setPrivateQuestions(privatePosts);
+                setPublicQuestions(publicPosts);
+
+                // message.success("Lấy danh sách bài viết thành công!");
+            } else {
+                message.error(response.message || "Lấy danh sách thất bại!");
+            }
+        } catch (error) {
+            message.error("Có lỗi xảy ra khi gọi API!");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleUpdate = (id) => {
         message.info(`Cập nhật bài viết ID: ${id}`);
@@ -55,7 +61,8 @@ const PostPage = () => {
     const handleDelete = async (id) => {
         try {
             setLoading(true);
-            const response = await deleteQuestion(id);
+            const response = await deleteQuestion(id, tokenData.access_token);
+            console.log("response: ", response);
             if (response.status === 200) {
                 message.success("Xóa bài viết thành công!");
                 // fetchQuestions(); // Tải lại danh sách bài viết sau khi xóa
@@ -80,7 +87,8 @@ const PostPage = () => {
             if (currentQuestion.status === "PENDING" && newStatus === "UNDER_REVIEW") {
                 // Thực hiện thay đổi trạng thái
                 const changeStatus = { status: newStatus };
-                const response = await changePublished(questionId, changeStatus);
+                const response = await changePublished(questionId, changeStatus, tokenData.access_token);
+                console.log("response: ", response);
 
                 if (response.status === 201) {
                     message.success("Cập nhật trạng thái bài viết thành công!");
@@ -91,7 +99,8 @@ const PostPage = () => {
             } else if (currentQuestion.status === "UNDER_REVIEW" && newStatus === "APPROVED") {
                 // Thực hiện thay đổi trạng thái
                 const changeStatus = { status: newStatus };
-                const response = await changePublished(questionId, changeStatus);
+                const response = await changePublished(questionId, changeStatus, tokenData.access_token);
+                console.log("response: ", response);
 
                 if (response.status === 201) {
                     message.success("Cập nhật trạng thái bài viết thành công!");
@@ -130,7 +139,7 @@ const PostPage = () => {
     };
 
     useEffect(() => {
-        // fetchQuestions();
+        fetchQuestions();
     }, []);
 
     // Pagination logic

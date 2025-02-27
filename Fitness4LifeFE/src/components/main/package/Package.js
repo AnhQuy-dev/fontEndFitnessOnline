@@ -10,8 +10,8 @@ import classicPlusImage from '../../..//assets//images/img3.jpg';
 import citifitsportImage from '../../..//assets//images/img3.jpg';
 import royalImage from '../../..//assets//images/img3.jpg';
 import signatureImage from '../../..//assets//images/img3.jpg';
-import { fetchAllPackage } from '../../../serviceToken/PackageService';
 import { getTokenData } from '../../../serviceToken/tokenUtils';
+import { fetchAllPackage } from '../../../serviceToken/PackageSERVICE';
 const PackageMain = () => {
     const [dataPackage, setDataPackage] = useState([]);
     const navigate = useNavigate();
@@ -36,7 +36,7 @@ const PackageMain = () => {
     const loadPackage = async () => {
         try {
             const result = await fetchAllPackage(tokenData.access_token);
-            setDataPackage(result.data.data);
+            setDataPackage(result.data);
         } catch (error) {
             console.error('Error fetching packages:', error);
         } finally {
