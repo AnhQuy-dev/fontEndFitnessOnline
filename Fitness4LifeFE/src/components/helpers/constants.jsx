@@ -1,1 +1,0 @@
-export const APIGetWay = "http://localhost:9001/api"
