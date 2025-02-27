@@ -24,7 +24,13 @@ export const fetchAllBlogs = async () => {
 // Hàm lấy blog theo ID
 export const fetchBlogById = async (id) => {
     try {
-      const response = await axios.get(`${API_URL}/deal/blogs/${id}`);
+      const tokenData = getTokenData();
+      const config = {
+        headers: {
+          Authorization: tokenData ? `Bearer ${tokenData.access_token}` : ''
+        }
+      };
+      const response = await axios.get(`${API_URL}/deal/blogs/${id}`, config);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching blog by ID:', error);

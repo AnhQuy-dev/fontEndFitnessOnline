@@ -27,14 +27,21 @@ const BlogDetail = () => {
   useEffect(() => {
     // Fetch other blogs (exclude the current one)
     fetchAllBlogs()
-      .then((data) => {
-        const allBlogs = data.filter((b) => b.id != id);
-        const shuffledBlogs = allBlogs.sort(() => 0.5 - Math.random());
-        const randomBlogs = shuffledBlogs.slice(0, 4);
-        setBlogs(randomBlogs);
+      .then((response) => {
+        // Kiểm tra xem response có phải là array không
+        const dataArray = Array.isArray(response) ? response : response.data || [];
+        if (dataArray.length > 0) {
+          const allBlogs = dataArray.filter((b) => b.id != id);
+          const shuffledBlogs = allBlogs.sort(() => 0.5 - Math.random());
+          const randomBlogs = shuffledBlogs.slice(0, 4);
+          setBlogs(randomBlogs);
+        } else {
+          setBlogs([]);
+        }
       })
       .catch((error) => {
         console.error('Error fetching blogs:', error);
+        setBlogs([]); // Set empty array on error
       });
   }, [id]);
 
