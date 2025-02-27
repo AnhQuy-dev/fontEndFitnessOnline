@@ -1,0 +1,21 @@
+/* Sidebar cố định */
+.ant-layout-sider {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: auto;
+}
+
+/* Logo */
+.logo {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    padding: 16px;
+    background: #f0f2f5;
+}
+
+/* Menu item */
+.ant-menu-item {
+    font-size: 16px;
+}

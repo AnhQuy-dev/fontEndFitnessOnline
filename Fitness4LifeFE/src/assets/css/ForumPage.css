@@ -1,0 +1,70 @@
+.forum-container {
+    padding: 20px;
+    max-width: 1000px;
+    background-color: #f8f8f8;
+}
+
+.forum-title {
+    text-align: left;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.spinner-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 9999; /* Xóa dấu phẩy thừa */
+}
+
+
+.forum-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.forum-item {
+    display: flex;
+    flex-direction: row;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.forum-item:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.forum-image img {
+    width: 200px;
+    height: 150px;
+    object-fit: cover;
+}
+
+.forum-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.forum-title-item {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.forum-author {
+    font-size: 14px;
+    margin-bottom: 10px;
+    display: block;
+}

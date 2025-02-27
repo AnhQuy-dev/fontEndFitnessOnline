@@ -1,0 +1,119 @@
+/* Container chính */
+.post-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Tiêu đề chính */
+.post-page-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333333;
+}
+
+/* Loading */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+}
+
+/* Grid Layout cho bài viết */
+.post-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 cột */
+    gap: 20px; /* Khoảng cách giữa các bài viết */
+}
+
+/* Card bài viết */
+.post-card {
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.post-card:hover {
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.post-card-content {
+    padding: 20px;
+}
+
+.post-card-title {
+    color: #1890ff;
+    margin-bottom: 10px;
+}
+
+.post-card-meta {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #666666;
+}
+
+.post-card-paragraph {
+    font-size: 16px;
+    color: #444444;
+    margin-bottom: 20px;
+}
+
+.post-card-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Pagination */
+.ant-pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+.post-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+/* Chi tiết bài viết */
+.question-detail {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+.question-title {
+    margin-bottom: 10px;
+    color: #1d3557;
+    font-weight: bold;
+}
+
+.question-meta {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.question-category {
+    font-size: 14px;
+    margin-bottom: 15px;
+    color: #777;
+}
+
+.question-content {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.question-image img {
+    border-radius: 5px;
+    max-width: 100%;
+}
+
+.question-stats {
+    font-size: 14px;
+    color: #555;
+}
