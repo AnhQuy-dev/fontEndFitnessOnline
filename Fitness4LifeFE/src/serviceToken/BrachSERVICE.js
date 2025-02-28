@@ -11,18 +11,18 @@ export const fetchAllBranch = async (token) => {
       credentials: "include"
     });
     if (!response.ok) {
-      throw new Error(`Lỗi: ${response.status} - ${response.statusText}`);
+      const errorText = await response.text();
+      throw new Error(`Lỗi ${response.status}: ${errorText}`);
     }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Lỗi khi fetch dữ liệu: ", error);
-
-    if (error.response) {
-      return error.response.data || 'An error occurred';
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
     } else {
-      return error.message || 'An unexpected error occurred';
+      return await response.text();
     }
+  } catch (error) {
+    console.error("Lỗi khi lấy branch:", error.message);
+    return `Lỗi: ${error.message}`;
   }
 };
 

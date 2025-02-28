@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
 import { Input, Dropdown, Menu, notification, Popconfirm, Table } from 'antd';
-import { deleteTrainer } from '../../../services/TrainerService';
 import UpdateTrainer from './UpdateTrainer';
 import DetailTrainer from './DetailTrainer';
 import '../../../assets/css/club.css';
-import { fetchAllBranch } from '../../../services/BrandService';
+import { getTokenData } from '../../../serviceToken/tokenUtils';
+import { deleteTrainer } from '../../../serviceToken/TrainerSERVICE';
 
 function AllTrainers(props) {
     const { dataTrainer, loadTrainers, setFilteredData, filteredData, setIsModelOpen, token } = props;
@@ -17,6 +17,7 @@ function AllTrainers(props) {
 
     const [searchText, setSearchText] = useState('');
     const [branchFilters, setBranchFilters] = useState([]);
+    const tokenData = getTokenData();
 
     // Columns definition for Table
     const columns = [
@@ -118,7 +119,7 @@ function AllTrainers(props) {
 
     const handleDeleteTrainer = async (id) => {
         try {
-            const res = await deleteTrainer(id);
+            const res = await deleteTrainer(id,tokenData.access_token);
             if (res.status === 200 || res.data?.status === 200) {
                 notification.success({
                     message: 'Delete Trainer',

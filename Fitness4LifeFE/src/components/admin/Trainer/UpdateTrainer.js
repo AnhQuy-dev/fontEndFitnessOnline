@@ -1,9 +1,21 @@
-import { Input, notification, Modal, Select, Space, Switch } from "antd";
+import { Input, notification, Modal, Select, Upload, Button } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { updateTrainer } from "../../../services/TrainerService";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
-import { fetchAllBranch } from "../../../serviceToken/BrandService";
+import { fetchAllBranch } from "../../../serviceToken/BrachSERVICE";
+import { updateTrainer } from "../../../serviceToken/TrainerSERVICE";
+
+const { Option } = Select;
+
+const scheduleOptions = [
+    { value: "MONDAY", label: "Monday" },
+    { value: "TUESDAY", label: "Tuesday" },
+    { value: "WEDNESDAY", label: "Wednesday" },
+    { value: "THURSDAY", label: "Thursday" },
+    { value: "FRIDAY", label: "Friday" },
+    { value: "SATURDAY", label: "Saturday" },
+    { value: "SUNDAY", label: "Sunday" },
+];
 
 const UpdateTrainer = (props) => {
     const { isModalUpdateOpen, setIsModalUpdateOpen, dataUpdate, setDataUpdate, loadTrainers, token } = props;
@@ -15,17 +27,29 @@ const UpdateTrainer = (props) => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [scheduleTrainers, setScheduleTrainers] = useState([]);
     const [branch, setBranch] = useState("");
-    const [file, setFile] = useState(null);
-    const [currentFile, setCurrentFile] = useState(null);
+    const [fileList, setFileList] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const [branches, setBranches] = useState([]);  // State to store branch data
     const [error, setErrors] = useState({});
-    const tokenData = getTokenData();//tokenData.access_token
+    const tokenData = getTokenData();
 
     useEffect(() => {
-        // Fetch Branch data when component is mounted
-        fetchAllBranch(tokenData.access_token);
-    }, []);
+        const getAllBranch = async () => {
+            try {
+                const dataBranch = await fetchAllBranch(tokenData.access_token);
+                setBranches(dataBranch.data);
+                console.log("Fetched branches:", dataBranch.data);
+            } catch (error) {
+                notification.error({
+                    message: "Error",
+                    description: "Failed to fetch branches."
+                });
+            }
+        };
+
+        getAllBranch();
+    }, [tokenData.access_token]);
 
     const validateField = (field, value) => {
         const newErrors = { ...error };
@@ -39,7 +63,9 @@ const UpdateTrainer = (props) => {
             case "experienceYear":
                 newErrors.experienceYear = value && Number(value) >= 0 ? "" : "Experience year must be a positive number.";
                 break;
-
+            case "slug":
+                newErrors.slug = value.trim() ? "" : "Slug is required.";
+                break;
             default:
                 break;
         }
@@ -53,8 +79,8 @@ const UpdateTrainer = (props) => {
             experienceYear: experienceYear && Number(experienceYear) >= 0 ? "" : "Experience year must be a positive number.",
             specialization: specialization ? "" : "Specialization is required.",
             branch: branch ? "" : "Branch is required.",
+            slug: slug.trim() ? "" : "Slug is required.",
         };
-
 
         setErrors(newErrors);
         return Object.values(newErrors).some((err) => err);
@@ -70,18 +96,48 @@ const UpdateTrainer = (props) => {
             phoneNumber: setPhoneNumber,
             scheduleTrainers: setScheduleTrainers,
             branch: setBranch,
-            file: setFile,
         };
 
         setters[field]?.(value);
         validateField(field, value);
-
     };
 
+    // Handle file changes directly
+    const handleFileChange = ({ fileList: newFileList }) => {
+        console.log("File change detected:", newFileList);
+        setFileList(newFileList);
+    };
 
+    // Prevent auto upload and do custom file validation if needed
+    const beforeUpload = (file) => {
+        console.log("File selected:", file);
+        
+        // Validate file type
+        const isImage = file.type.startsWith('image/');
+        if (!isImage) {
+            notification.error({
+                message: 'Upload Error',
+                description: 'You can only upload image files!'
+            });
+            return Upload.LIST_IGNORE;
+        }
+        
+        // Validate file size (e.g., limit to 5MB)
+        const isLt5M = file.size / 1024 / 1024 < 5;
+        if (!isLt5M) {
+            notification.error({
+                message: 'Upload Error',
+                description: 'Image must be smaller than 5MB!'
+            });
+            return Upload.LIST_IGNORE;
+        }
+        
+        return false; // Return false to prevent auto upload
+    };
 
     useEffect(() => {
         if (dataUpdate) {
+            console.log("Data update received:", dataUpdate);
             setFullName(dataUpdate.fullName || "");
             setSlug(dataUpdate.slug || "");
             setSpecialization(dataUpdate.specialization || "");
@@ -89,26 +145,31 @@ const UpdateTrainer = (props) => {
             setCertificate(dataUpdate.certificate || "");
             setPhoneNumber(dataUpdate.phoneNumber || "");
             setScheduleTrainers(dataUpdate.scheduleTrainers || []);
-            setBranch(dataUpdate.branch || "");
-            setCurrentFile(dataUpdate.photo);
-            console.log("f", currentFile);
-
-
+            
+            // Handle branch correctly
+            if (dataUpdate.branch) {
+                if (typeof dataUpdate.branch === 'object' && dataUpdate.branch.id) {
+                    setBranch(dataUpdate.branch.id);
+                } else {
+                    setBranch(dataUpdate.branch);
+                }
+            } else {
+                setBranch("");
+            }
+            
+            // Handle photo
+            if (dataUpdate.photo) {
+                setFileList([{
+                    uid: '-1',
+                    name: 'current-image.jpg',
+                    status: 'done',
+                    url: dataUpdate.photo,
+                }]);
+            } else {
+                setFileList([]);
+            }
         }
     }, [dataUpdate]);
-
-    useEffect(() => {
-        if (dataUpdate) {
-            setCurrentFile(dataUpdate.photo); // Lưu URL ảnh hiện tại
-        }
-    }, [dataUpdate]);
-
-    const convertURLToFile = async (url) => {
-        const response = await fetch(url); // Tải ảnh từ URL
-        const blob = await response.blob(); // Chuyển đổi dữ liệu thành Blob
-        const fileName = url.split('/').pop(); // Lấy tên file từ URL
-        return new File([blob], fileName, { type: blob.type }); // Tạo đối tượng File
-    };
 
     const handleSubmitBtn = async () => {
         const hasErrors = validateAllFields();
@@ -120,29 +181,38 @@ const UpdateTrainer = (props) => {
             return;
         }
 
-        let fileToUpdate = null;
-        if (!file) {
-            if (currentFile.startsWith("http")) {
-                fileToUpdate = await convertURLToFile(currentFile); // Chuyển URL thành File
-            } else {
-                fileToUpdate = currentFile; // Nếu đã là File, sử dụng trực tiếp
-            }
-        } else {
-            fileToUpdate = file; // Nếu có file mới, sử dụng file mới
-        }
-
         try {
+            setLoading(true);
+            
+            // Create FormData object - matching the CreateTrainer approach
+            const formData = new FormData();
+            formData.append("fullName", fullName);
+            formData.append("slug", slug);
+            formData.append("specialization", specialization);
+            formData.append("experienceYear", experienceYear);
+            formData.append("certificate", certificate);
+            formData.append("phoneNumber", phoneNumber);
+            formData.append("branch", branch);
+            
+            if (scheduleTrainers && scheduleTrainers.length > 0) {
+                scheduleTrainers.forEach(day => {
+                    formData.append("scheduleTrainers", day);
+                });
+            }
+            
+            if (fileList && fileList.length > 0 && fileList[0].originFileObj) {
+                const fileObj = fileList[0].originFileObj;
+                console.log("File object being added:", fileObj);
+                formData.append("file", fileObj);
+            }
+            
+            console.log("Form data being sent:");
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+            
             const res = await updateTrainer(
-                dataUpdate.id,
-                fullName,
-                slug,
-                fileToUpdate,
-                specialization,
-                experienceYear,
-                certificate,
-                phoneNumber,
-                scheduleTrainers,
-                branch
+                dataUpdate.id, formData, tokenData.access_token
             );
 
             if (res.status === 200) {
@@ -164,11 +234,10 @@ const UpdateTrainer = (props) => {
                 message: "Error Updating Trainer",
                 description: error.response?.data?.message || "An unexpected error occurred.",
             });
+        } finally {
+            setLoading(false);
         }
     };
-
-
-
 
     const resetAndCloseModal = () => {
         setIsModalUpdateOpen(false);
@@ -180,7 +249,7 @@ const UpdateTrainer = (props) => {
         setPhoneNumber("");
         setScheduleTrainers([]);
         setBranch("");
-        setFile(null);
+        setFileList([]);
         setDataUpdate(null);
     };
 
@@ -193,6 +262,7 @@ const UpdateTrainer = (props) => {
             okText="Update"
             cancelText="Cancel"
             maskClosable={false}
+            confirmLoading={loading}
         >
             <div style={{ display: "flex", gap: "15px", flexDirection: "column" }}>
                 <div>
@@ -202,6 +272,7 @@ const UpdateTrainer = (props) => {
                         placeholder="Full Name"
                         onChange={(e) => handleChange("fullName", e.target.value)}
                     />
+                    {error.fullName && <span style={{ color: "red" }}>{error.fullName}</span>}
                 </div>
 
                 <div>
@@ -211,6 +282,7 @@ const UpdateTrainer = (props) => {
                         placeholder="Slug"
                         onChange={(e) => handleChange("slug", e.target.value)}
                     />
+                    {error.slug && <span style={{ color: "red" }}>{error.slug}</span>}
                 </div>
 
                 <div>
@@ -220,6 +292,7 @@ const UpdateTrainer = (props) => {
                         placeholder="Specialization"
                         onChange={(e) => handleChange("specialization", e.target.value)}
                     />
+                    {error.specialization && <span style={{ color: "red" }}>{error.specialization}</span>}
                 </div>
 
                 <div>
@@ -229,6 +302,7 @@ const UpdateTrainer = (props) => {
                         placeholder="Experience Year"
                         onChange={(e) => handleChange("experienceYear", e.target.value)}
                     />
+                    {error.experienceYear && <span style={{ color: "red" }}>{error.experienceYear}</span>}
                 </div>
 
                 <div>
@@ -238,6 +312,7 @@ const UpdateTrainer = (props) => {
                         placeholder="Certificate"
                         onChange={(e) => handleChange("certificate", e.target.value)}
                     />
+                    {error.certificate && <span style={{ color: "red" }}>{error.certificate}</span>}
                 </div>
 
                 <div>
@@ -247,6 +322,7 @@ const UpdateTrainer = (props) => {
                         placeholder="Phone Number"
                         onChange={(e) => handleChange("phoneNumber", e.target.value)}
                     />
+                    {error.phoneNumber && <span style={{ color: "red" }}>{error.phoneNumber}</span>}
                 </div>
 
                 <div>
@@ -256,15 +332,10 @@ const UpdateTrainer = (props) => {
                         value={scheduleTrainers}
                         placeholder="Schedule"
                         onChange={(value) => handleChange("scheduleTrainers", value)}
+                        options={scheduleOptions}
                     >
-                        <Select.Option value="MONDAY">Monday</Select.Option>
-                        <Select.Option value="TUESDAY">Tuesday</Select.Option>
-                        <Select.Option value="WEDNESDAY">Wednesday</Select.Option>
-                        <Select.Option value="THURSDAY">Thursday</Select.Option>
-                        <Select.Option value="FRIDAY">Friday</Select.Option>
-                        <Select.Option value="SATURDAY">Saturday</Select.Option>
-                        <Select.Option value="SUNDAY">Sunday</Select.Option>
                     </Select>
+                    {error.scheduleTrainers && <span style={{ color: "red" }}>{error.scheduleTrainers}</span>}
                 </div>
 
                 <div>
@@ -276,48 +347,31 @@ const UpdateTrainer = (props) => {
                         dropdownStyle={{ minWidth: 250 }}
                     >
                         {branches.map((branchItem) => (
-                            <Select.Option key={branchItem.id}
-                                value={branchItem.id}
-                                placeholder={"SELECT BRANCH"}
-                            >
+                            <Option key={branchItem.id} value={branchItem.id}>
                                 {branchItem.branchName}
-                            </Select.Option>
+                            </Option>
                         ))}
                     </Select>
+                    {error.branch && <span style={{ color: "red" }}>{error.branch}</span>}
                 </div>
 
                 <div>
                     <span>Photo</span>
-                    <div>
-                        {file ? (
-                            <img
-                                src={URL.createObjectURL(file)}
-                                alt="Selected File"
-                                style={{ width: '100px', height: '100px', objectFit: 'cover', marginBottom: '10px' }}
-                            />
-                        ) : currentFile ? (
-                            <img
-                                src={currentFile}
-                                alt="Current Photo"
-                                style={{ width: '100px', height: '100px', objectFit: 'cover', marginBottom: '10px' }}
-                            />
-                        ) : (
-                            <span>No photo available</span>
-                        )}
-                    </div>
-                    <Input
-                        type="file"
-                        accept=".jpeg, .jpg, .png"
-                        onChange={(e) => {
-                            const selectedFile = e.target.files[0];
-                            handleChange("file", selectedFile); // Cập nhật file mới
-                        }}
-                    />
+                    <Upload
+                        listType="picture"
+                        fileList={fileList}
+                        onChange={handleFileChange}
+                        beforeUpload={beforeUpload}
+                        maxCount={1}
+                        accept="image/*"
+                        onRemove={() => setFileList([])}
+                    >
+                        <Button icon={<UploadOutlined />}>Upload Image</Button>
+                    </Upload>
+                    {error.file && <span style={{ color: "red" }}>{error.file}</span>}
                 </div>
-
             </div>
-            {error.file && <span style={{ color: "red" }}>{error.file}</span>}
-        </Modal >
+        </Modal>
     );
 };
 

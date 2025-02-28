@@ -1,247 +1,268 @@
-import { Input, Modal, notification, Select } from "antd";
-import { useEffect, useState } from "react";
-import { createTrainer } from "../../../services/TrainerService";
+import React, { useEffect, useState } from "react";
+import { Modal, Form, Input, Upload, Button, notification, Select } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
-import { fetchAllBranch } from "../../../serviceToken/BrandService";
+import { fetchAllBranch } from "../../../serviceToken/BrachSERVICE";
+import { createTrainer } from "../../../serviceToken/TrainerSERVICE";
 
 const { Option } = Select;
 
-function CreateTrainer(props) {
-    const { loadTrainers, isModalOpen, setIsModelOpen, token } = props;
+const scheduleOptions = [
+    { value: "Monday", label: "Monday" },
+    { value: "Tuesday", label: "Tuesday" },
+    { value: "Wednesday", label: "Wednesday" },
+    { value: "Thursday", label: "Thursday" },
+    { value: "Friday", label: "Friday" },
+    { value: "Saturday", label: "Saturday" },
+    { value: "Sunday", label: "Sunday" },
+];
 
-    const [fullName, setFullName] = useState("");
-    const [slug, setSlug] = useState("");
-    const [file, setFile] = useState(null);
-    const [specialization, setSpecialization] = useState("");
-    const [experienceYear, setExperienceYear] = useState(0);
-    const [certificate, setCertificate] = useState("");
-    const [phoneNumber, setPhoneNumber] = useState("");
-    const [scheduleTrainers, setScheduleTrainers] = useState([]);
-    const [branch, setBranch] = useState(0);
-    const [branches, setBranches] = useState([]); // State to store branch data
-    const [error, setErrors] = useState({});
-    const tokenData = getTokenData();//tokenData.access_token
+const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
+    const [form] = Form.useForm();
+    const [branches, setBranches] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [fileList, setFileList] = useState([]); // Separate state for file management
+    const tokenData = getTokenData();
 
     useEffect(() => {
-        // Fetch Branch data when component is mounted
-        fetchAllBranch(tokenData.access_token);
-    }, []);
+        const getAllBranch = async () => {
+            try {
+                const dataBranch = await fetchAllBranch(tokenData.access_token);
+                setBranches(dataBranch.data);
+            } catch (error) {
+                notification.error({
+                    message: "Error",
+                    description: "Failed to fetch branches."
+                });
+            }
+        };
+        
+        getAllBranch();
+    }, [tokenData.access_token]);
 
-    const validateField = (field, value) => {
-        const newErrors = { ...error };
-        switch (field) {
-            case "fullName":
-                newErrors.fullName = value.trim() ? "" : "Full name is required.";
-                break;
-            case "slug":
-                newErrors.slug = value.trim() ? "" : "Slug is required.";
-                break;
-            case "specialization":
-                newErrors.specialization = value.trim() ? "" : "Specialization is required.";
-                break;
-            case "experienceYear":
-                newErrors.experienceYear = value >= 0 ? "" : "Experience year must be greater than or equal to 0.";
-                break;
-            case "certificate":
-                newErrors.certificate = value.trim() ? "" : "Certificate is required.";
-                break;
-            case "phoneNumber":
-                newErrors.phoneNumber = value.trim() ? "" : "Phone number is required.";
-                break;
-            case "branch":
-                newErrors.branch = value ? "" : "Branch is required.";
-                break;
-            case "scheduleTrainers":
-                newErrors.scheduleTrainers = value.length > 0 ? "" : "Schedule is required.";
-                break;
-            default:
-                break;
+    // Reset form and file list when modal closes or opens
+    useEffect(() => {
+        if (!isModalOpen) {
+            form.resetFields();
+            setFileList([]);
         }
-        setErrors(newErrors);
-    };
+    }, [isModalOpen, form]);
 
-    const validateAllFields = () => {
-        const newErrors = {
-            fullName: fullName.trim() ? "" : "Full name is required.",
-            slug: slug.trim() ? "" : "Slug is required.",
-            specialization: specialization.trim() ? "" : "Specialization is required.",
-            experienceYear: experienceYear >= 0 ? "" : "Experience year must be greater than or equal to 0.",
-            certificate: certificate.trim() ? "" : "Certificate is required.",
-            phoneNumber: phoneNumber.trim() ? "" : "Phone number is required.",
-            branch: branch ? "" : "Branch is required.",
-            scheduleTrainers: scheduleTrainers.length > 0 ? "" : "Schedule is required."
-        };
+    const handleSubmit = async (values) => {
+        try {
+            setLoading(true);
+            
+            // Create FormData object
+            const formData = new FormData();
+            formData.append("fullName", values.fullName);
+            formData.append("slug", values.slug);
+            formData.append("specialization", values.specialization);
+            formData.append("experienceYear", values.experienceYear);
+            formData.append("certificate", values.certificate);
+            formData.append("phoneNumber", values.phoneNumber);
+            formData.append("branch", values.branch);
+            
+            if (values.scheduleTrainers && values.scheduleTrainers.length > 0) {
+                values.scheduleTrainers.forEach(day => {
+                    formData.append("scheduleTrainers", day);
+                });
+            }
+            
+            if (fileList && fileList.length > 0) {
+                const fileObj = fileList[0].originFileObj || fileList[0];
+                console.log("File object being added:", fileObj);
+                formData.append("file", fileObj);
+            }
 
-        setErrors(newErrors);
+            const res = await createTrainer(formData, tokenData.access_token);
+            console.log("Server response:", res);
 
-        return Object.values(newErrors).some((err) => err);
-    };
-
-    const handleChange = (field, value) => {
-        const setters = {
-            fullName: setFullName,
-            slug: setSlug,
-            specialization: setSpecialization,
-            experienceYear: setExperienceYear,
-            certificate: setCertificate,
-            phoneNumber: setPhoneNumber,
-            branch: setBranch,
-            scheduleTrainers: setScheduleTrainers,
-        };
-
-        setters[field]?.(value);
-        validateField(field, value);
-    };
-
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        setFile(file);
-    };
-
-    const handleSubmitBtn = async () => {
-        const hasErrors = validateAllFields();
-        if (hasErrors) {
+            if (res.data) {
+                notification.success({
+                    message: "Create Trainer",
+                    description: "Trainer created successfully."
+                });
+                form.resetFields();
+                setFileList([]);
+                setIsModelOpen(false);
+                await loadTrainers();
+            } else {
+                notification.error({
+                    message: "Error Creating Trainer",
+                    description: res.message || "Failed to create trainer."
+                });
+            }
+        } catch (error) {
+            console.error("Form submission error:", error);
             notification.error({
                 message: "Validation Error",
-                description: "Please fix the errors in the form before submitting."
+                description: error.message || "Please check the form fields."
             });
-            return;
-        }
-
-        const res = await createTrainer(fullName, slug, file, specialization, experienceYear, certificate, phoneNumber, scheduleTrainers, branch);
-
-        if (res.data) {
-            notification.success({
-                message: "Create Trainer",
-                description: "Trainer created successfully."
-            });
-            resetAndCloseModal();
-            await loadTrainers();
-        } else {
-            notification.error({
-                message: "Error Creating Trainer",
-                description: JSON.stringify(res.message)
-            });
+        } finally {
+            setLoading(false);
         }
     };
 
-    const resetAndCloseModal = () => {
+    const onClose = () => {
+        form.resetFields();
+        setFileList([]);
         setIsModelOpen(false);
-        setFullName("");
-        setSlug("");
-        setFile(null);
-        setSpecialization("");
-        setExperienceYear(0);
-        setCertificate("");
-        setPhoneNumber("");
-        setBranch(0);
-        setScheduleTrainers([]);
-        setErrors({});
+    };
+    
+    // Handle file changes directly
+    const handleFileChange = ({ fileList: newFileList }) => {
+        console.log("File change detected:", newFileList);
+        setFileList(newFileList);
+    };
+
+    // Prevent auto upload and do custom file validation if needed
+    const beforeUpload = (file) => {
+        console.log("File selected:", file);
+        // Optional: Add file validation here if needed
+        
+        // Validate file type
+        const isImage = file.type.startsWith('image/');
+        if (!isImage) {
+            notification.error({
+                message: 'Upload Error',
+                description: 'You can only upload image files!'
+            });
+            return Upload.LIST_IGNORE;
+        }
+        
+        // Validate file size (e.g., limit to 5MB)
+        const isLt5M = file.size / 1024 / 1024 < 5;
+        if (!isLt5M) {
+            notification.error({
+                message: 'Upload Error',
+                description: 'Image must be smaller than 5MB!'
+            });
+            return Upload.LIST_IGNORE;
+        }
+        
+        return false; // Return false to prevent auto upload
     };
 
     return (
-        <>
-            <Modal
-                title="Create A New Trainer"
-                open={isModalOpen}
-                onOk={() => { handleSubmitBtn(); }}
-                onCancel={() => { resetAndCloseModal(); }}
-                okText={"Create"}
-                cancelText={"Cancel"}
-                maskClosable={false}
+        <Modal
+            title="Create A New Trainer"
+            open={isModalOpen}
+            onCancel={onClose}
+            footer={null}
+            destroyOnClose
+            width="60%"
+            maskClosable={false}
+        >
+            <Form
+                form={form}
+                layout="vertical"
+                onFinish={handleSubmit}
+                initialValues={{
+                    experienceYear: 0
+                }}
             >
-                <div style={{ display: "flex", gap: "15px", flexDirection: "column" }}>
-                    <div>
-                        <span>Full Name</span>
-                        <Input
-                            value={fullName}
-                            onChange={(event) => { handleChange("fullName", event.target.value); }}
-                        />
-                        {error.fullName && <span style={{ color: "red" }}>{error.fullName}</span>}
-                    </div>
-                    <div>
-                        <span>Slug</span>
-                        <Input
-                            value={slug}
-                            onChange={(event) => { handleChange("slug", event.target.value); }}
-                        />
-                        {error.slug && <span style={{ color: "red" }}>{error.slug}</span>}
-                    </div>
-                    <div>
-                        <span>Specialization</span>
-                        <Input
-                            value={specialization}
-                            onChange={(event) => { handleChange("specialization", event.target.value); }}
-                        />
-                        {error.specialization && <span style={{ color: "red" }}>{error.specialization}</span>}
-                    </div>
-                    <div>
-                        <span>Experience Year</span>
-                        <Input
-                            type="number"
-                            value={experienceYear}
-                            onChange={(event) => { handleChange("experienceYear", event.target.value); }}
-                        />
-                        {error.experienceYear && <span style={{ color: "red" }}>{error.experienceYear}</span>}
-                    </div>
-                    <div>
-                        <span>Certificate</span>
-                        <Input
-                            value={certificate}
-                            onChange={(event) => { handleChange("certificate", event.target.value); }}
-                        />
-                        {error.certificate && <span style={{ color: "red" }}>{error.certificate}</span>}
-                    </div>
-                    <div>
-                        <span>Phone Number</span>
-                        <Input
-                            value={phoneNumber}
-                            onChange={(event) => { handleChange("phoneNumber", event.target.value); }}
-                        />
-                        {error.phoneNumber && <span style={{ color: "red" }}>{error.phoneNumber}</span>}
-                    </div>
-                    <div>
-                        <span>Branch</span>
-                        <Select
-                            value={branch}
-                            onChange={(value) => { handleChange("branch", value); }}
-                            style={{ width: "100%" }}
-                        >
-                            {branches.map((branchItem) => (
-                                <Option key={branchItem.id} value={branchItem.id}>
-                                    {branchItem.branchName}
-                                </Option>
-                            ))}
-                        </Select>
-                        {error.branch && <span style={{ color: "red" }}>{error.branch}</span>}
-                    </div>
-                    <div>
+                <Form.Item
+                    name="fullName"
+                    label="Full Name"
+                    rules={[{ required: true, message: "Full name is required." }]}
+                >
+                    <Input placeholder="Enter trainer's full name" />
+                </Form.Item>
 
-                        <span>Schedule</span>
-                        <Select
-                            mode="multiple"
-                            value={scheduleTrainers}
-                            onChange={(value) => { handleChange("scheduleTrainers", value); }}
-                            style={{ width: "100%" }}
-                        >
-                            <Option value="Monday">Monday</Option>
-                            <Option value="Tuesday">Tuesday</Option>
-                            <Option value="Wednesday">Wednesday</Option>
-                            <Option value="Thursday">Thursday</Option>
-                            <Option value="Friday">Friday</Option>
-                            <Option value="Saturday">Saturday</Option>
-                            <Option value="Sunday">Sunday</Option>
-                        </Select>
-                        {error.scheduleTrainers && <span style={{ color: "red" }}>{error.scheduleTrainers}</span>}
-                    </div>
-                    <div>
-                        <span>File</span>
-                        <Input type="file" onChange={handleFileChange} />
-                    </div>
-                </div>
-            </Modal>
-        </>
+                <Form.Item
+                    name="slug"
+                    label="Slug"
+                    rules={[{ required: true, message: "Slug is required." }]}
+                >
+                    <Input placeholder="Enter slug" />
+                </Form.Item>
+
+                <Form.Item
+                    name="specialization"
+                    label="Specialization"
+                    rules={[{ required: true, message: "Specialization is required." }]}
+                >
+                    <Input placeholder="Enter specialization" />
+                </Form.Item>
+
+                <Form.Item
+                    name="experienceYear"
+                    label="Experience Year"
+                    rules={[
+                        { required: true, message: "Experience year is required." },
+                    ]}
+                >
+                    <Input type="number" placeholder="Enter years of experience" />
+                </Form.Item>
+
+                <Form.Item
+                    name="certificate"
+                    label="Certificate"
+                    rules={[{ required: true, message: "Certificate is required." }]}
+                >
+                    <Input placeholder="Enter certificate details" />
+                </Form.Item>
+
+                <Form.Item
+                    name="phoneNumber"
+                    label="Phone Number"
+                    rules={[{ required: true, message: "Phone number is required." }]}
+                >
+                    <Input placeholder="Enter phone number" />
+                </Form.Item>
+
+                <Form.Item
+                    name="branch"
+                    label="Branch"
+                    rules={[{ required: true, message: "Branch is required." }]}
+                >
+                    <Select placeholder="Select branch">
+                        {branches.map((branchItem) => (
+                            <Option key={branchItem.id} value={branchItem.id}>
+                                {branchItem.branchName}
+                            </Option>
+                        ))}
+                    </Select>
+                </Form.Item>
+
+                <Form.Item
+                    name="scheduleTrainers"
+                    label="Schedule"
+                    rules={[{ required: true, message: "Schedule is required." }]}
+                >
+                    <Select 
+                        mode="multiple"
+                        placeholder="Select working days"
+                        options={scheduleOptions}
+                    />
+                </Form.Item>
+
+                <Form.Item
+                    label="Profile Image"
+                    name="fileUpload" // Changed to a different name to avoid conflicts
+                    rules={[{ required: true, message: "Profile image is required." }]}
+                >
+                    <Upload
+                        listType="picture"
+                        fileList={fileList}
+                        onChange={handleFileChange}
+                        beforeUpload={beforeUpload}
+                        maxCount={1}
+                        accept="image/*"
+                        onRemove={() => setFileList([])}
+                    >
+                        <Button icon={<UploadOutlined />}>Upload Image</Button>
+                    </Upload>
+                </Form.Item>
+
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading} block>
+                        Create Trainer
+                    </Button>
+                </Form.Item>
+            </Form>
+        </Modal>
     );
-}
+};
 
 export default CreateTrainer;

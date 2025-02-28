@@ -16,7 +16,7 @@ const Navbar = ({ menuItems, onToggleSidebar }) => {
 
 
 
-  console.log("userData", userData);
+  // console.log("userData", userData);
 
   useEffect(() => {
     const fetchUserData = async () => {
