@@ -63,7 +63,6 @@ export const getRoomOfPackageId = async (packageId, token) => {
     console.error("Lỗi khi gửi mã khuyến mãi:", error.message);
     return `Lỗi: ${error.message}`;
   }
-
 };
 
 export const getUserProfile = async (id,token) => {

@@ -1,8 +1,14 @@
+import { Modal } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ setMenuItems, isCollapsed }) => {
   const initialIndex = parseInt(localStorage.getItem('activeIndex')) || 0;
   const [activeIndex, setActiveIndex] = useState(initialIndex);
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+
 
   const menuItems = useMemo(() => [
     { label: 'Dashboard', icon: 'bxs-dashboard', path: '/admin/dashboard' },
@@ -31,12 +37,28 @@ const Sidebar = ({ setMenuItems, isCollapsed }) => {
     localStorage.setItem('activeIndex', index);
   };
 
+  const goToHome = () => {
+    navigate('/');
+  };
+
+  const handleLogout = (message = null) => {
+    localStorage.removeItem('tokenData');
+    setIsLoggedIn(false);
+    setUser(null);
+
+
+    navigate('/login');
+
+  };
+
   return (
     <div className={`sidebar ${isCollapsed ? 'close' : ''}`}> {/* Apply collapse class if isCollapsed is true */}
-      <a href="#" className="logo">
+
+      <a href="#" className="logo" onClick={goToHome}>
         <i className="bx bx-code-alt"></i>
         <div className="logo-name"><span>Fitness4</span>Life</div>
       </a>
+
       <ul className="side-menu">
         {menuItems.map((item, index) => (
           <li
@@ -51,7 +73,7 @@ const Sidebar = ({ setMenuItems, isCollapsed }) => {
       </ul>
       <ul className="side-menu">
         <li>
-          <a href="#" className="logout">
+          <a className="logout" onClick={() => handleLogout()}>
             <i className="bx bx-log-out-circle"></i>
             Logout
           </a>

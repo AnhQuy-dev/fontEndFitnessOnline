@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import AllPackage from "./AllPackage";
 import CreatePackage from "./CreatePackage";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
-import { fetchAllPackage } from "../../../serviceToken/PackageService";
+import { fetchAllPackage } from "../../../serviceToken/PackageSERVICE";
 
 function Package() {
     const [dataPackage, setDataPackage] = useState([]);

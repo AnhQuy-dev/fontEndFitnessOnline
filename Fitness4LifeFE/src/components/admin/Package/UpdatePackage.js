@@ -1,6 +1,7 @@
 import { Input, Modal, Select, notification } from "antd";
 import { useState, useEffect } from "react";
-import { updatePackage } from "../../../services/PackageService";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { updatePackage } from "../../../serviceToken/PackageSERVICE";
 
 const { Option } = Select;
 
@@ -12,6 +13,7 @@ const UpdatePackage = (props) => {
     const [durationMonth, setDurationMonth] = useState(0);
     const [price, setPrice] = useState(0);
     const [error, setErrors] = useState({});
+    const tokenData = getTokenData();//tokenData.access_token
 
     // Enum options for packageName
     const packageOptions = [
@@ -87,13 +89,19 @@ const UpdatePackage = (props) => {
             return;
         }
 
+
         try {
-            const res = await updatePackage(
-                dataUpdate.id,
+
+            const PackageDataPayloadUpdate = {
                 packageName,
                 description,
-                Number(durationMonth),
-                Number(price)
+                durationMonth: Number(durationMonth),
+                price: Number(price)
+            }
+            const res = await updatePackage(
+                dataUpdate.id,
+                PackageDataPayloadUpdate,
+                tokenData.access_token
             );
 
             if (res.data) {

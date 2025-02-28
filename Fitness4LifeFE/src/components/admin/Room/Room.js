@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { fetchAllRooms } from "../../../serviceToken/RoomSERVICE";
 import AllRoom from "./AllRoom";
 import CreateRoom from "./CreateRoom";
-import { fetchAllRoom } from "../../../serviceToken/RoomService";
-import { getTokenData } from "../../../serviceToken/tokenUtils";
 
 function Room() {
     const [dataRoom, setDataRoom] = useState([]);
@@ -10,15 +10,19 @@ function Room() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const tokenData = getTokenData();//tokenData.access_token
 
+
+    
+
     useEffect(() => {
         loadRoom();
     }, []);
 
     const loadRoom = async () => {
-        const reponse = await fetchAllRoom(tokenData.access_token);
-        setFilteredData(reponse.data);
-        setDataRoom(reponse.data);
+        const response = await fetchAllRooms(tokenData.access_token);
+        setFilteredData(response.data);
+        setDataRoom(response.data);
     }
+
 
     return (
         <div style={{ padding: "20px" }}>

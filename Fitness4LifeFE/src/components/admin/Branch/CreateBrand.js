@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Input from "antd/es/input/Input";
 import { Button, notification, Modal, Checkbox } from "antd";
-import { createBrand } from "../../../services/BrandService";
+import { createBranch } from "../../../serviceToken/BrachSERVICE";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
 
 function CreateBranch(props) {
     const { loadBranch, isModalOpen, setIsModalOpen } = props;
@@ -16,6 +17,9 @@ function CreateBranch(props) {
     const [services, setServices] = useState([]);
 
     const [error, setErrors] = useState({});
+    const tokenData = getTokenData();//tokenData.access_token
+
+
 
     const serviceOptions = ["GYM", "YOGA", "GROUPX", "DANCE", "TUMS", "CYCLING"];
 
@@ -100,7 +104,11 @@ function CreateBranch(props) {
             return;
         }
 
-        const res = await createBrand(branchName, slug, address, phoneNumber, email, openHours, closeHours, services);
+        const branchDataPayload ={
+            branchName, slug, address, phoneNumber, email, openHours, closeHours, services
+        }
+
+        const res = await createBranch(branchDataPayload, tokenData.access_token);
 
         if (res.data) {
             notification.success({

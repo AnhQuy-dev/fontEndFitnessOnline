@@ -1,6 +1,7 @@
 import { Button, Checkbox, Form, Input, Modal, Select, message, notification } from "antd";
 import { useState } from "react";
-import { createPackageAPI } from "../../../services/PackageService";
+import { createOnePackage } from "../../../serviceToken/PackageSERVICE";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
 
 const { Option } = Select;
 
@@ -12,6 +13,7 @@ function CreatePackage(props) {
     const [durationMonth, setDurationMonth] = useState("");
     const [price, setPrice] = useState("");
     const [error, setErrors] = useState({});
+    const tokenData = getTokenData();//tokenData.access_token
 
     // Enum options for packageName
     const packageOptions = [
@@ -78,7 +80,15 @@ function CreatePackage(props) {
             return;
         }
         try {
-            const res = await createPackageAPI(packageName, description, Number(durationMonth), Number(price));
+            const PackageDataPayload ={
+                packageName,
+                description,
+                durationMonth: Number(durationMonth),
+                price: Number(price)
+            
+            }
+
+            const res = await createOnePackage(PackageDataPayload,tokenData.access_token);
 
             if (res?.data?.data) {
                 notification.success({
@@ -181,173 +191,3 @@ function CreatePackage(props) {
 }
 
 export default CreatePackage;
-
-//====================>Dưới đây là cách validate ngắn gọn hơn ở trên<====================
-// import { Button, Form, Input, Modal, Select, notification } from "antd";
-// import { useRef } from "react";
-// import { createPackageAPI } from "../../../services/PackageService";
-
-// const { Option } = Select;
-
-// function CreatePackage(props) {
-//     const { loadPackage, isModalOpen, setIsModalOpen } = props;
-
-//     // Enum options for packageName
-//     const packageOptions = [
-//         "CLASSIC",
-//         "CLASSIC_PLUS",
-//         "PRESIDENT",
-//         "ROYAL",
-//         "SIGNATURE",
-//     ];
-
-//     // Tạo một ref để tham chiếu đến form
-//     const [form] = Form.useForm();
-
-//     const handleSubmit = async (values) => {
-//         try {
-//             const { packageName, description, durationMonth, price } = values;
-//             const res = await createPackageAPI(packageName, description, Number(durationMonth), Number(price));
-
-//             if (res?.data?.data) {
-//                 notification.success({
-//                     message: "Create Package",
-//                     description: "Package created successfully.",
-//                 });
-//                 resetAndCloseModal(); // Đóng modal sau khi tạo thành công
-//                 await loadPackage(); // Tải lại danh sách gói tập
-//             } else {
-//                 notification.error({
-//                     message: "Error Creating Package",
-//                     description: res?.data?.message || "Unexpected error occurred.",
-//                 });
-//             }
-//         } catch (error) {
-//             notification.error({
-//                 message: "Error Creating Package",
-//                 description: error.response?.data?.message || error.message || "Unexpected error occurred.",
-//             });
-//         }
-//     };
-
-//     const resetAndCloseModal = () => {
-//         form.resetFields(); // Reset lại toàn bộ dữ liệu trong form
-//         setIsModalOpen(false);
-//     };
-
-//     const onFinishFailed = (errorInfo) => {
-//         console.log("Failed:", errorInfo);
-//     };
-
-//     return (
-//         <Modal
-//             title="Create A New Package"
-//             open={isModalOpen}
-//             onCancel={resetAndCloseModal}
-//             footer={null} // Ẩn nút mặc định của Modal
-//             maskClosable={false}
-//         >
-//             <Form
-//                 form={form} // Gắn ref form vào Form
-//                 name="createPackageForm"
-//                 labelCol={{
-//                     span: 8,
-//                 }}
-//                 wrapperCol={{
-//                     span: 16,
-//                 }}
-//                 style={{
-//                     maxWidth: 600,
-//                 }}
-//                 onFinish={handleSubmit}
-//                 onFinishFailed={onFinishFailed}
-//             >
-//                 <Form.Item
-//                     label="Package Name"
-//                     name="packageName"
-//                     rules={[
-//                         {
-//                             required: true,
-//                             message: "Please select a package name!",
-//                         },
-//                     ]}
-//                 >
-//                     <Select placeholder="Select a package name">
-//                         {packageOptions.map((option) => (
-//                             <Option key={option} value={option}>
-//                                 {option}
-//                             </Option>
-//                         ))}
-//                     </Select>
-//                 </Form.Item>
-
-//                 <Form.Item
-//                     label="Description"
-//                     name="description"
-//                     rules={[
-//                         {
-//                             required: true,
-//                             message: "Please input the description!",
-//                         },
-//                     ]}
-//                 >
-//                     <Input />
-//                 </Form.Item>
-
-//                 <Form.Item
-//                     label="Duration (Months)"
-//                     name="durationMonth"
-//                     rules={[
-//                         {
-//                             required: true,
-//                             message: "Please input the duration in months!",
-//                         },
-//                         {
-//                             type: "number",
-//                             min: 1,
-//                             transform: (value) => Number(value),
-//                             message: "Duration must be greater than 0!",
-//                         },
-//                     ]}
-//                 >
-//                     <Input type="number" min="1" />
-//                 </Form.Item>
-
-//                 <Form.Item
-//                     label="Price (VND)"
-//                     name="price"
-//                     rules={[
-//                         {
-//                             required: true,
-//                             message: "Please input the price!",
-//                         },
-//                         {
-//                             type: "number",
-//                             min: 1,
-//                             transform: (value) => Number(value),
-//                             message: "Price must be greater than 0!",
-//                         },
-//                     ]}
-//                 >
-//                     <Input type="number" min="1" />
-//                 </Form.Item>
-
-//                 <Form.Item
-//                     wrapperCol={{
-//                         offset: 8,
-//                         span: 16,
-//                     }}
-//                 >
-//                     <Button type="primary" htmlType="submit">
-//                         Create
-//                     </Button>
-//                     <Button style={{ marginLeft: "10px" }} onClick={resetAndCloseModal}>
-//                         Cancel
-//                     </Button>
-//                 </Form.Item>
-//             </Form>
-//         </Modal>
-//     );
-// }
-
-// export default CreatePackage;

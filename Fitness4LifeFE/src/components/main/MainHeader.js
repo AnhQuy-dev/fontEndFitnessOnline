@@ -228,7 +228,7 @@ const MainHeader = () => {
           <div className="collapse navbar-collapse navbar-right">
             <ul className="nav navbar-nav">
               <li className="scroll active">
-                <a href="#home">Home</a>
+                <Link to="/">Home</Link>
               </li>
               <li className="scroll">
                 <Dropdown overlay={menuB} trigger={['click']}>

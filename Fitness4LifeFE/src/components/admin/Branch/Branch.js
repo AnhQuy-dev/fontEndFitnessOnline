@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import AllBranch from "./AllBranch";
 import CreateBranch from "./CreateBrand";
-import { fetchAllBranch } from "../../../serviceToken/BrandService";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { fetchAllBranch } from "../../../serviceToken/BrachSERVICE";
 
 function Branch() {
     const [dataBranch, setDataBrand] = useState([]);

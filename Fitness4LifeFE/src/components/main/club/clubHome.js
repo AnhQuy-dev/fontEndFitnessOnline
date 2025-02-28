@@ -2,12 +2,15 @@ import { useEffect, useState } from 'react';
 import { Input, Image } from 'antd';
 import '../../../assets/css/branch.css'
 import moment from 'moment';
+import { getTokenData } from '../../../serviceToken/tokenUtils';
+import { fetchAllClubs } from '../../../serviceToken/ClubService';
 
 function ClubHome() {
     const [dataClub, setDataClub] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [searchText, setSearchText] = useState('');
-    const tokenData = localStorage.getItem("tokenData");
+    const tokenData = getTokenData();
+
 
     useEffect(() => {
         loadClub();
@@ -19,28 +22,17 @@ function ClubHome() {
     const loadClub = async () => {
         try {
 
-            const { access_token } = JSON.parse(tokenData);
-            console.log("Access_OutSide",access_token);
-
-
-            const response = await fetch('http://localhost:8081/api/dashboard/clubs', {
-                headers: {
-                    'Authorization': `Bearer ${access_token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await fetchAllClubs(tokenData.access_token)
             
             console.log("res",response);
-            
             if (!response.ok) {
                 throw new Error('Failed to fetch clubs');
             }
             const data = await response.json();
 
 
-            setDataClub(data.data);
-            setFilteredData(data.data);
-            console.log(dataClub);
+            setDataClub(response.data);
+            setFilteredData(response.data);
 
         } catch (error) {
             console.error('Error loading clubs:', error);

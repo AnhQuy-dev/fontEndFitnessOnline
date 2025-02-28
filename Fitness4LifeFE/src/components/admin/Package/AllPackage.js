@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Input, Menu, notification, Popconfirm, Table } from 'antd';
-import moment from 'moment';
 import DetailPackage from './DetailPAckage';
 import UpdatePackage from './UpdatePackage';
-import { deletePackage } from '../../../services/PackageService';
+import { deletePackage } from '../../../serviceToken/PackageSERVICE';
+import { getTokenData } from '../../../serviceToken/tokenUtils';
 function AllPackage(props) {
     const { loadPackage, dataPackage, filteredData, setFilteredData, setIsModalOpen } = props;
 
@@ -15,6 +15,7 @@ function AllPackage(props) {
     const [dataDetail, setDataDetail] = useState(null);
 
     const [searchText, setSearchText] = useState('');
+    const tokenData = getTokenData();//tokenData.access_token
 
     const columns = [
         {
@@ -105,7 +106,7 @@ function AllPackage(props) {
     };
 
     const handleDeletePackage = async (id) => {
-        const res = await deletePackage(id);
+        const res = await deletePackage(id,tokenData.access_token);
         if (res.data) {
             notification.success({
                 message: 'Delete Package',

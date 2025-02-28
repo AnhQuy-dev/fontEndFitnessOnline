@@ -87,17 +87,3 @@ export const getMembershipByPaymentId = async (paymentId, token) => {
     return `Lỗi: ${error.message}`;
   }
 };
-
-// export const getMembershipByPamentId = async (paymentId) => {
-//     const URL_BACKEND = `${BASE_URL}/paypal/getMembershipByPamentId/${paymentId}`;
-//     try {
-//         const response = await fetch(URL_BACKEND, createAuthConfig());
-//         if (response.status === 200 && response.data) {
-//             return response.data;
-//         } else {
-//             throw new Error('Failed to fetch rooms for the package.');
-//         }
-//     } catch (error) {
-//         throw new Error(error.response?.data?.message || 'Error fetching rooms.');
-//     }
-// };

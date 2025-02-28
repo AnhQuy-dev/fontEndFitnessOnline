@@ -3,14 +3,14 @@ import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-d
 import { Button, Dropdown, Input, Menu, notification, Popconfirm, Table } from 'antd';
 import'../../../assets/css/club.css'; 
 import moment from 'moment';
-import { deleteBranch } from '../../../services/BrandService';
+import { getTokenData } from '../../../serviceToken/tokenUtils';
+import { deleteBranch } from '../../../serviceToken/BrachSERVICE';
 import UpdateBranch from './UpdateBranch';
 import DetailBranch from './DetailBranch';
 
 function AllBranch(props) {
     const { loadBranch, dataBranch,filteredData,setFilteredData,setIsModalOpen} = props;
 
-    console.log(">>>Check DATA",dataBranch);
     
     const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
     const [dataUpdate, setDataUpdate] = useState(null);
@@ -20,6 +20,7 @@ function AllBranch(props) {
 
     const [searchText, setSearchText] = useState('');
     const [brandFillter, setBranchFilters] = useState([]);
+    const tokenData = getTokenData();//tokenData.access_token
 
     useEffect(() => {
         if (dataBranch && dataBranch.length > 0) {
@@ -51,10 +52,6 @@ function AllBranch(props) {
         {
             title: 'Branch Name',
             dataIndex: 'branchName',
-            // filters: brandFillter, // Use dynamically generated filters
-            // onFilter: (value, record) => record.branchName.startsWith(value),
-            // filterSearch: true,
-            // width: '25%',
         },
         {
             title: 'Address',
@@ -136,7 +133,7 @@ function AllBranch(props) {
     };
 
     const handleDeleteBranch = async (id) => {
-        const res = await deleteBranch(id);
+        const res = await deleteBranch(id,tokenData.access_token);
         if (res.data) {
             notification.success({
                 message: 'Delete Branch',

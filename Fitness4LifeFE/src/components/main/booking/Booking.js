@@ -2,58 +2,79 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Card, Modal, Button, notification, Layout, Typography, Spin } from 'antd';
 import { CalendarOutlined, EnvironmentOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { DataContext } from '../../helpers/DataContext';
-import { GetRoomsByPackage, submitBookingRoom } from '../../../services/PackageService';
 import stickman from '../../../assets/images/Stickman.gif';
-import { jwtDecode } from 'jwt-decode';
 import { getUserByEmail } from '../../../serviceToken/authService';
+import { getDecodedToken, getTokenData } from '../../../serviceToken/tokenUtils';
+import { getRoomOfPackageId, submitBookingRoom } from '../../../serviceToken/BookingMain';
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
 const BookingMain = () => {
-    const { user, isLoggedIn } = useContext(DataContext);
     const navigate = useNavigate();
     const [filteredRooms, setFilteredRooms] = useState([]);
     const [selectedRoom, setSelectedRoom] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [loading, setLoading] = useState(true);
-    const tokenData = localStorage.getItem("tokenData");
-    const { access_token } = JSON.parse(tokenData);
+    const [user, setUser] = useState("null");
+    const tokenData = getTokenData();
+    const decodeToken = getDecodedToken();
+
+    const userId = decodeToken.id;
+    const userEmail = decodeToken.sub
+
+    console.log("user", user);
+
 
     useEffect(() => {
-        const loadRoomsByPackage = async () => {
-            try {
-                const decodeuser = jwtDecode(access_token);
-                const user = await getUserByEmail(decodeuser.sub,access_token);
-                console.log("user",user);
+        loadUserData();
+    }, [tokenData.access_token]);
 
-                
-                const rooms = await GetRoomsByPackage(user?.workoutPackageId);
-                setFilteredRooms(rooms);
-            } catch (error) {
-                notification.error({
-                    message: 'Lỗi tải dữ liệu phòng',
-                    description: error.message || 'Có lỗi xảy ra khi tải danh sách phòng.',
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
+    const loadUserData = async () => {
+        try {
+            if (!userEmail || !tokenData?.access_token) return;
 
-        if (user?.workoutPackageId) {
-            loadRoomsByPackage();
+            const GetUser = await getUserByEmail(userEmail, tokenData.access_token);
+            setUser(GetUser);
+        } catch (error) {
+            notification.error({
+                message: 'Lỗi tải dữ liệu người dùng',
+                description: error.message || 'Có lỗi xảy ra khi tải thông tin người dùng.',
+            });
         }
+    };
 
-        // Dừng loading sau 5 giây nếu chưa tải xong
-        const timeout = setTimeout(() => setLoading(false), 5000);
 
-        return () => clearTimeout(timeout);
-    }, [user]);
+    const loadRoomsByPackage = async () => {
+        try {
+            setLoading(true);
+
+            if (!user?.workoutPackageId) return;
+
+            const IdIWorkoutPackage = user.workoutPackageId
+            const rooms = await getRoomOfPackageId(IdIWorkoutPackage, tokenData.access_token);
+            console.log("workoutPackageId", IdIWorkoutPackage);
+
+            console.log("room", rooms);
+
+            setFilteredRooms(rooms);
+
+        } catch (error) {
+            notification.error({
+                message: 'Lỗi tải dữ liệu phòng',
+                description: error.message || 'Có lỗi xảy ra khi tải danh sách phòng.',
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        loadRoomsByPackage();
+    }, [user?.workoutPackageId]);
 
     const openModal = (room) => {
-        if (!isLoggedIn) {
+        if (!tokenData) {
             notification.warning({
                 message: 'Bạn chưa đăng nhập',
                 description: 'Hãy đăng nhập để đặt phòng. Đang chuyển hướng...',
@@ -75,12 +96,12 @@ const BookingMain = () => {
         }
 
         const bookingData = {
-            userId: user.id,
+            userId: userId,
             roomId: selectedRoom.id,
         };
 
         try {
-            const response = await submitBookingRoom(bookingData);
+            const response = await submitBookingRoom(bookingData, tokenData.access_token);
             if (response.status === 201) {
                 notification.success({
                     message: 'Đặt phòng thành công!',
