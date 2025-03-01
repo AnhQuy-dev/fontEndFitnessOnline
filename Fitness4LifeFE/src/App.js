@@ -14,7 +14,7 @@ import Blogs from './components/admin/Blog/Blogs';
 import Users from './components/admin/User/Users';
 import Room from './components/admin/Room/Room';
 import Branch from './components/admin/Branch/Branch';
-// import Trainer from './components/admin/Trainer/Trainer';
+import Trainer from './components/admin/Trainer/Trainer';
 import Package from './components/admin/Package/Package';
 import PackageMain from './components/main/package/Package';
 import PaymentMain from './components/main/Paypal/PaymentMain';
@@ -45,6 +45,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import PromotionPage from './components/admin/Promotion/PromotionPage';
 import YourPromotionPage from './components/main/promotion/YourPromotionPage';
 import Register from './components/main/login/Registration';
+import BookingMain from './components/main/booking/Booking';
 
 const App = () => {
   return (
@@ -53,7 +54,6 @@ const App = () => {
       <Routes>
         {/* Public Routes - Accessible without login */}
         <Route path="/" element={<MainLayout />} />
-
         <Route element={<><MainHeader /><Outlet /><Footer /></>}>
           {/* Public routes */}
           <Route path='/login' element={<LoginToken />} />
@@ -65,6 +65,7 @@ const App = () => {
           <Route path="/clubs/" element={<ClubHome />} />
           <Route path="/clubs/:id" element={<ClubDetails />} />
           <Route path="/packageMain/" element={<PackageMain />} />
+          <Route path='/bookingMain' element={<BookingMain />} />
 
           <Route path="/forums" element={<ForumLayout />}>
             <Route index element={<CategoryPage />} />
@@ -106,7 +107,7 @@ const App = () => {
             <Route path="Club" element={<Club />} />
             <Route path="Room" element={<Room />} />
             <Route path="Branch" element={<Branch />} />
-            {/* <Route path="Trainer" element={<Trainer />} /> */}
+            <Route path="Trainer" element={<Trainer />} />
             <Route path="Package" element={<Package />} />
             <Route path="Promotion" element={<PromotionPage />} />
             <Route path="Post" element={<PostPage />} />

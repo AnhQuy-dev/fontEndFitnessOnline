@@ -10,19 +10,22 @@ export const fetchAllTrainer = async (token) => {
       },
       credentials: "include"
     });
+    // Kiểm tra lỗi HTTP (4xx, 5xx)
     if (!response.ok) {
-      throw new Error(`Lỗi: ${response.status} - ${response.statusText}`);
+      const errorText = await response.text(); // Đọc lỗi từ server
+      throw new Error(`Lỗi ${response.status}: ${errorText}`);
     }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Lỗi khi fetch dữ liệu: ", error);
 
-    if (error.response) {
-      return error.response.data || 'An error occurred';
+    // Kiểm tra kiểu dữ liệu trả về
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json(); // Trả về JSON nếu có
     } else {
-      return error.message || 'An unexpected error occurred';
+      return await response.text(); // Trả về text nếu không phải JSON
     }
+  } catch (error) {
+    console.error("Lỗi khi fetch dữ liệu:", error.message);
+    return `Lỗi: ${error.message}`;
   }
 };
 
@@ -33,28 +36,27 @@ export const createTrainer = async (formDataTrainer, token) => {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
       },
       credentials: "include",
       body: formDataTrainer
     });
 
-    const status = response.status;
-    const contentType = response.headers.get("content-type");
-
-    let data;
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
+    // Kiểm tra lỗi HTTP (4xx, 5xx)
+    if (!response.ok) {
+      const errorText = await response.text(); // Đọc lỗi từ server
+      throw new Error(`Lỗi ${response.status}: ${errorText}`);
     }
 
-    console.log("submitBookingRoom response:", { status, data });
-
-    return { status, data };
+    // Kiểm tra kiểu dữ liệu trả về
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json(); // Trả về JSON nếu có
+    } else {
+      return await response.text(); // Trả về text nếu không phải JSON
+    }
   } catch (error) {
-    console.error("Lỗi khi đặt phòng:", error.message);
-    return { status: 500, data: `Lỗi: ${error.message}` };
+    console.error("Lỗi khi tạo trainer:", error.message);
+    return `Lỗi: ${error.message}`;
   }
 };
 
@@ -71,23 +73,22 @@ export const updateTrainer = async (id, TrainerDataPayloadUpdate, token) => {
       credentials: "include",
       body: JSON.stringify(TrainerDataPayloadUpdate)
     });
-
-    const status = response.status;
-    const contentType = response.headers.get("content-type");
-
-    let data;
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
+    // Kiểm tra lỗi HTTP (4xx, 5xx)
+    if (!response.ok) {
+      const errorText = await response.text(); // Đọc lỗi từ server
+      throw new Error(`Lỗi ${response.status}: ${errorText}`);
     }
 
-    console.log("submitBookingRoom response:", { status, data });
-
-    return { status, data };
+    // Kiểm tra kiểu dữ liệu trả về
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json(); // Trả về JSON nếu có
+    } else {
+      return await response.text(); // Trả về text nếu không phải JSON
+    }
   } catch (error) {
-    console.error("Lỗi khi đặt phòng:", error.message);
-    return { status: 500, data: `Lỗi: ${error.message}` };
+    console.error("Lỗi khi cập nhật trainer:", error.message);
+    return `Lỗi: ${error.message}`;
   }
 };
 
@@ -103,21 +104,21 @@ export const deleteTrainer = async (id, token) => {
       body: JSON.stringify()
     });
 
-    const status = response.status;
-    const contentType = response.headers.get("content-type");
-
-    let data;
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      data = await response.text();
+    // Kiểm tra lỗi HTTP (4xx, 5xx)
+    if (!response.ok) {
+      const errorText = await response.text(); // Đọc lỗi từ server
+      throw new Error(`Lỗi ${response.status}: ${errorText}`);
     }
 
-    console.log("submitBookingRoom response:", { status, data });
-
-    return { status, data };
+    // Kiểm tra kiểu dữ liệu trả về
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json(); // Trả về JSON nếu có
+    } else {
+      return await response.text(); // Trả về text nếu không phải JSON
+    }
   } catch (error) {
-    console.error("Lỗi khi đặt phòng:", error.message);
-    return { status: 500, data: `Lỗi: ${error.message}` };
+    console.error("Lỗi khi xóa trainer:", error.message);
+    return `Lỗi: ${error.message}`;
   }
 };

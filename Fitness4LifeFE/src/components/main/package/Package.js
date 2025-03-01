@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Button, Row, Col, notification, Card, Table } from 'antd';
+import { Button, Row, Col, notification, Card, Table, Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import '../../../assets/css/Main/PackageMain.css';
 import packageHeaderPage from '../../../assets/images/Tow_Person_Play_Gym.webp';
@@ -10,13 +10,38 @@ import classicPlusImage from '../../..//assets//images/img3.jpg';
 import citifitsportImage from '../../..//assets//images/img3.jpg';
 import royalImage from '../../..//assets//images/img3.jpg';
 import signatureImage from '../../..//assets//images/img3.jpg';
-import { getTokenData } from '../../../serviceToken/tokenUtils';
+import { getDecodedToken, getTokenData } from '../../../serviceToken/tokenUtils';
+import { getUserByEmail } from '../../../serviceToken/authService';
 import { fetchAllPackage } from '../../../serviceToken/PackageSERVICE';
 const PackageMain = () => {
     const [dataPackage, setDataPackage] = useState([]);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const tokenData = getTokenData();//tokenData.access_token
+    const decodeToken = getDecodedToken();
+
+    const [user, setUser] = useState({});
+    const userEmail = decodeToken?.sub;
+    console.log("ID USER PACKAGE", user);
+    // console.log("ID USER PACKAGE", user.workoutPackageId);
+
+    useEffect(() => {
+        loadUserData();
+    }, []);
+
+    const loadUserData = async () => {
+        try {
+            if (!userEmail || !tokenData?.access_token) return;
+
+            const GetUser = await getUserByEmail(userEmail, tokenData?.access_token);
+            setUser(GetUser);
+        } catch (error) {
+            notification.error({
+                message: 'Lỗi tải dữ liệu người dùng',
+                description: error.message || 'Có lỗi xảy ra khi tải thông tin người dùng.',
+            });
+        }
+    };
 
     // Package image mapping
     const packageImages = {
@@ -35,7 +60,7 @@ const PackageMain = () => {
 
     const loadPackage = async () => {
         try {
-            const result = await fetchAllPackage(tokenData.access_token);
+            const result = await fetchAllPackage();
             setDataPackage(result.data);
         } catch (error) {
             console.error('Error fetching packages:', error);
@@ -45,6 +70,25 @@ const PackageMain = () => {
     };
 
     const handlePaynow = (pkg) => {
+        if (user.workoutPackageId === pkg.id) {
+            Modal.confirm({
+                title: 'Thông báo',
+                content: 'Bạn đã đăng ký gói này rồi. Bạn có muốn tiếp tục mua nữa không?',
+                okText: 'Tiếp tục',
+                cancelText: 'Hủy',
+                onOk() {
+                    // Nếu người dùng xác nhận muốn tiếp tục mua
+                    navigateToPayment(pkg);
+                }
+            });
+        } else {
+            // Nếu người dùng chưa đăng ký gói này
+            navigateToPayment(pkg);
+        }
+    };
+
+
+    const navigateToPayment = (pkg) => {
         navigate('/payment', {
             state: {
                 package: pkg,
@@ -161,6 +205,10 @@ const PackageMain = () => {
                                                         type="primary"
                                                         onClick={() => handlePaynow(pkg)}
                                                         className="package-btn"
+                                                        style={{
+                                                            backgroundColor: String(user.workoutPackageId) === String(pkg.packageId) ? '#FFA500' : undefined,
+                                                            borderColor: String(user.workoutPackageId) === String(pkg.packageId) ? '#FFA500' : undefined
+                                                        }}
                                                     >
                                                         Pay Now
                                                     </Button>
@@ -186,14 +234,6 @@ const PackageMain = () => {
                             </Row>
                         </>
                     )}
-
-                    {/* Package Comparison section remains unchanged */}
-                    <Row style={{ marginTop: '60px' }}>
-                        <div className="comparison-section">
-                            <h2 className="comparison-title">Package Comparison</h2>
-                            {/* Table component from original code */}
-                        </div>
-                    </Row>
                 </div>
             </div>
         </section>

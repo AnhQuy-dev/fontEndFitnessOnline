@@ -1,10 +1,56 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import '../../assets/css/Admin/dashboardAdmin.css'
+import { Avatar, notification } from 'antd';
+import { UserOutlined } from "@ant-design/icons";
+import { getDecodedToken, getTokenData } from '../../serviceToken/tokenUtils';
+import { getUserByEmail } from '../../serviceToken/authService';
 const Navbar = ({ menuItems, onToggleSidebar }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredItems, setFilteredItems] = useState([]);
   const navigate = useNavigate();
+  const tokenData = getTokenData();
+  const decodeToken = getDecodedToken();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+
+
+  // console.log("userData", userData);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const tokenData = getTokenData();
+        const decodeToken = getDecodedToken();
+
+        if (decodeToken && decodeToken.sub && tokenData && tokenData.access_token) {
+          const response = await getUserByEmail(decodeToken.sub, tokenData.access_token);
+          setUserData(response);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        notification.error({
+          message: "Error",
+          description: "Failed to load user data",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const getAvatarUrl = () => {
+    if (userData && userData.profile && userData.profile.avatar) {
+      return userData.profile.avatar.startsWith("http")
+        ? userData.profile.avatar
+        : "https://via.placeholder.com/150";
+    }
+    return "https://via.placeholder.com/150";
+  };
+
 
   const handleSearch = (e) => {
     const term = e.target.value;
@@ -28,6 +74,8 @@ const Navbar = ({ menuItems, onToggleSidebar }) => {
       navigate(filteredItems[0].path);
     }
   };
+
+  
 
   return (
     <nav>
@@ -63,7 +111,12 @@ const Navbar = ({ menuItems, onToggleSidebar }) => {
         <i className="bx bx-bell"></i>
         <span className="count">12</span>
       </a>
-      <a href="/user/profile" className="profile">
+      <a href="/admin/profile" className="profile">
+        <Avatar
+          size={32}
+          src={loading ? null : `${getAvatarUrl()}?t=${Date.now()}`}
+          icon={<UserOutlined />}
+        />
       </a>
     </nav>
   );

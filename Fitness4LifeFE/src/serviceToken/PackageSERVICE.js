@@ -1,15 +1,14 @@
 import { APIGetWay } from "../components/helpers/constants";
 
-export const fetchAllPackage = async (token) => {
+export const fetchAllPackage = async () => {
   try {
 
     const response = await fetch(`${APIGetWay}/booking/packages`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      // credentials: "include",
+      credentials: "include",
     });
 
     if (!response.ok) {

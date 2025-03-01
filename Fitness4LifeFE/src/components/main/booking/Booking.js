@@ -23,9 +23,9 @@ const BookingMain = () => {
 
     const userId = decodeToken.id;
     const userEmail = decodeToken.sub
-    
-    console.log("user",user);
-    
+
+    console.log("user", user);
+
 
     useEffect(() => {
         loadUserData();
@@ -54,10 +54,10 @@ const BookingMain = () => {
 
             const IdIWorkoutPackage = user.workoutPackageId
             const rooms = await getRoomOfPackageId(IdIWorkoutPackage, tokenData.access_token);
-            console.log("workoutPackageId",IdIWorkoutPackage);
+            console.log("workoutPackageId", IdIWorkoutPackage);
 
-            console.log("room",rooms);
-            
+            console.log("room", rooms);
+
             setFilteredRooms(rooms);
 
         } catch (error) {
@@ -101,7 +101,7 @@ const BookingMain = () => {
         };
 
         try {
-            const response = await submitBookingRoom(bookingData,tokenData.access_token);
+            const response = await submitBookingRoom(bookingData, tokenData.access_token);
             if (response.status === 201) {
                 notification.success({
                     message: 'Đặt phòng thành công!',
