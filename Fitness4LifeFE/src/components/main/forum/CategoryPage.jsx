@@ -6,13 +6,13 @@ import "../../../assets/css/CategoryPage.css";
 const { Title, Text } = Typography;
 
 const categories = [
-    { name: "Nội Quy Chung", subcategories: ["Các Chính Sách Diễn Đàn Thể Hình Vui", "Nội Quy Diễn Đàn"] },
-    { name: "Giáo Án Tổng Hợp", subcategories: ["Giáo Án Fitness Nam", "Giáo Án Fitness Nữ"] },
-    { name: "Kiến Thức Thể Hình", subcategories: ["Giáo án Thể Hình", "Hỏi Đáp Thể Hình", "Sửa Tư Thế Kỹ Thuật Tập Luyện", "Kinh Nghiệm Dinh Dưỡng", "Review Thực Phẩm Bổ Sung"] },
-    { name: "Tăng Cân - Giảm Mỡ", subcategories: ["Hỏi Đáp Giảm Cân - Giảm Mỡ", "Hỏi Đáp Tăng Cơ - Tăng Cân"] },
-    { name: "Góc Thể Hiện Bản Thân", subcategories: ["Nhật Ký Thay Đổi", "Tán Gẫu Liên Quan Fitness", "HLV Thể Hình - Trao Đổi Công Việc", "CLB Phòng Gym Toàn Quốc", "Tìm Bạn Tập Cùng - Team Workout"] },
-    { name: "Khu Mua Sắm - Trao Đổi", subcategories: ["Mua Bán Thực Phẩm Bổ Sung", "Dụng Cụ - Phụ Kiện Tập Luyện", "Sang Nhượng Phòng Tập"] },
-    { name: "Chuyên Mục Liên Quan", subcategories: ["Võ Thuật Tổng Hợp MMA", "Cross Fit", "Powerlifting"] }
+    { name: "General Rules", subcategories: ["Fun Fitness Forum Policies", "Forum Rules"] },
+    { name: "Training Programs", subcategories: ["Men's Fitness Program", "Women's Fitness Program"] },
+    { name: "Bodybuilding Knowledge", subcategories: ["General Bodybuilding Program", "Fitness Q&A", "Exercise Form & Technique Correction", "Nutrition Experience", "Supplement Reviews"] },
+    { name: "Body Transformation", subcategories: ["Weight Loss & Fat Loss Q&A", "Muscle Gain & Weight Gain Q&A"] },
+    { name: "Community", subcategories: ["Transformation Journal", "Fitness Related Chats", "Fitness Trainers - Job Exchange", "National Gym Clubs", "Find Workout Partners - Team Workout"] },
+    { name: "Marketplace", subcategories: ["Supplement Marketplace", "Training Equipment & Accessories", "Gym Transfer & Sales"] },
+    { name: "Specialized Training", subcategories: ["Mixed Martial Arts (MMA)", "CrossFit", "Powerlifting"] }
 ];
 
 const CategoryPage = () => {
@@ -50,4 +50,5 @@ const CategoryPage = () => {
         </section>
     );
 };
+
 export default CategoryPage;

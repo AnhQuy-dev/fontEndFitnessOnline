@@ -284,28 +284,54 @@ export const usedPointChangCode = async (userId, point, promotionId, token) => {
 };
 
 
-// export const findCode = async (promotionCode, userId) => {
-//     try {
-//         const response = await axios.get(`${smartAPI}/promotionOfUser/${promotionCode}/${userId}`)
-//         return response.data;
-//     } catch (error) {
-//         if (error.response) {
-//             return error.response.data || 'An error occurred'
-//         } else {
-//             return error.message || 'An unexpected error occurred'
-//         }
-//     }
-// };
+export const findCode = async (promotionCode, userId, token) => {
+    try {
+        const response = await fetch(`${APIGetWay}/deal/promotionOfUser/${promotionCode}/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            credentials: "include"
+        })
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Lỗi ${response.status}: ${errorText}`);
+        }
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return await response.json();
+        } else {
+            return await response.text();
+        }
+    } catch (error) {
+        console.error("Lỗi khi tìm kiếm mã khuyến mãi:", error.message);
+        return `Lỗi: ${error.message}`;
+    }
+};
 
-// export const UsedPromotionCode = async (code, userId) => {
-//     try {
-//         const response = await axios.post(`${smartAPI}/promotionOfUser/usedCode/${userId}?promotionCode=${code}`);
-//         return response;
-//     } catch (error) {
-//         if (error.response) {
-//             return error.response.data || 'An error occurred';
-//         } else {
-//             return error.message || 'An unexpected error occurred';
-//         }
-//     }
-// };
+export const UsedPromotionCode = async (code, userId, token) => {
+    try {
+        const response = await fetch(`${APIGetWay}/deal/promotionOfUser/usedCode/${userId}?promotionCode=${code}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            credentials: "include"
+        })
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Lỗi ${response.status}: ${errorText}`);
+        }
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return await response.json();
+        } else {
+            return await response.text();
+        }
+    } catch (error) {
+        console.error("Lỗi khi tìm kiếm mã khuyến mãi:", error.message);
+        return `Lỗi: ${error.message}`;
+    }
+};

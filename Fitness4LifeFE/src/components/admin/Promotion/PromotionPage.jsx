@@ -76,8 +76,8 @@ const PromotionPage = () => {
     useEffect(() => {
         fetchPromotionsJson(); // Lấy danh sách JSON khuyến mãi
         fetchPromotions();
-        // pollingInterval.current = setInterval(fetchPromotions, 10000); // Tự động gọi lại API mỗi 30 giây
-        // return () => clearInterval(pollingInterval.current); // Dọn dẹp interval khi unmount
+        pollingInterval.current = setInterval(fetchPromotions, 10000); // Tự động gọi lại API mỗi 30 giây
+        return () => clearInterval(pollingInterval.current); // Dọn dẹp interval khi unmount
     }, []);
 
     // Hàm xử lý khi nhấn vào Title hoặc Description
@@ -209,7 +209,7 @@ const PromotionPage = () => {
                     type="danger"
                     onClick={() => handleDelete(record.id)}  // Truyền id của khuyến mãi cần xóa
                 >
-                    Xóa
+                    Delete
                 </Button>
             ),
         },

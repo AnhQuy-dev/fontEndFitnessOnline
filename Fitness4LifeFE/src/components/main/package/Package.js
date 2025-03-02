@@ -109,27 +109,28 @@ const PackageMain = () => {
     }
 
     const packageFeatures = [
-        { feature: "Tập luyện tại GT CLUB đã chọn", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Tham gia Yoga và Group X tại 01 CLUB đã chọn", packages: ["CLASSIC", "CLASSIC-PLUS"] },
-        { feature: "Tự do thay luyện tập tất cả các lớp GX trong hệ thống CITIGYM/VN", packages: ["CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Không giới hạn thời gian luyện tập", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Tham gia tất cả các lớp Yoga và Group X tại tất cả các CLB trong hệ thống CITIGYM", packages: ["CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "1 buổi định hướng luyện tập riêng biệt và tư vấn dinh dưỡng", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Được sử dụng dịch vụ thư giãn sau luyện tập (sauna và steamroom)", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Nước uống miễn phí", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Dịch vụ khăn tắm thể thao cao cấp", packages: ["CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Sử dụng khóa tủ thông minh đăng nhập số dự phòng Emergency Locker", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Được đặt trước 1 ngày trải nghiệm phòng tập công trạng bị cùng đồng phục và máy móc đầu tấn tiế nhất", packages: ["ROYAL"] },
-        { feature: "Được đặt trước 2 khách không có thẻ để tập cùng (người đi cùng được giảm chi phí ngày tập Signature/VIP)", packages: ["SIGNATURE"] },
-        { feature: "Ưu đãi đông băng - đề dàng cần đối", packages: ["SIGNATURE"] },
-        { feature: "Được đăng ký 1 người thay thế hội viên lý xuân tạm dừng", packages: ["SIGNATURE"] },
-        { feature: "01 lần chuyển nhượng cho người thân trong gia đinh (Cha, Mẹ, Vợ/Chồng, Con, Anh/Chị/Em ruột, Con dâu/rể) không mất phí", packages: ["SIGNATURE"] },
-        { feature: "Được ưu tiên đặt chỗ các lớp Yoga và Group trong 48 tiếng trước buổi tập qua ứng", packages: ["SIGNATURE"] },
-        { feature: "Được 10 buổi huấn luyện viên cá nhân Signature 15 buổi Signature Yoga cá nhân cơ bản và 5 buổi GMG/GMY và 5 buổi Personal Trainer (PT) đặc biệt dự Signature 15 tháng", packages: ["SIGNATURE"] },
-        { feature: "Là VIP check-in và tiếp đón riêng với Signature", packages: ["SIGNATURE"] },
-        { feature: "Phục vụ thêm tạp Yoga có logo Signature khi tham gia tập", packages: ["SIGNATURE"] },
-        { feature: "Sử dụng khu vực VIP riêng dành cho các hội viên Signature (Không áp dụng cho khách 3 lần)", packages: ["SIGNATURE"] }
+        { feature: "Workout at the selected GT CLUB", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "Join Yoga and Group X at one selected CLUB", packages: ["CLASSIC", "CLASSIC-PLUS"] },
+        { feature: "Freely participate in all GX classes across the CITIGYM/VN system", packages: ["CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "Unlimited workout time", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "Join all Yoga and Group X classes at all clubs within the CITIGYM system", packages: ["CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "One personalized training orientation session and nutrition consultation", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "Access to relaxation services after workouts (sauna and steam room)", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "Free drinking water", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "Premium sports towel service", packages: ["CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "Use of smart locker with emergency login", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "One-day advance booking to experience state-of-the-art gym facilities with the latest equipment", packages: ["ROYAL"] },
+        { feature: "Pre-booking for two guests without membership to work out together (guests receive a discount on Signature/VIP day passes)", packages: ["SIGNATURE"] },
+        { feature: "Priority membership benefits for flexibility and balance", packages: ["SIGNATURE"] },
+        { feature: "Ability to register a substitute member during temporary suspension", packages: ["SIGNATURE"] },
+        { feature: "One-time membership transfer to a family member (Father, Mother, Spouse, Child, Sibling, Son/Daughter-in-law) free of charge", packages: ["SIGNATURE"] },
+        { feature: "Priority booking for Yoga and Group classes up to 48 hours in advance via the app", packages: ["SIGNATURE"] },
+        { feature: "Includes 10 personal training sessions, 15 Signature Yoga sessions, 5 GMG/GMY sessions, and 5 special Personal Trainer (PT) sessions during a 15-month Signature membership", packages: ["SIGNATURE"] },
+        { feature: "VIP check-in and exclusive reception for Signature members", packages: ["SIGNATURE"] },
+        { feature: "Provided with a Signature-branded yoga towel during workouts", packages: ["SIGNATURE"] },
+        { feature: "Access to a private VIP area exclusively for Signature members (not applicable to three-time trial guests)", packages: ["SIGNATURE"] }
     ];
+
 
     const columns = [
         {

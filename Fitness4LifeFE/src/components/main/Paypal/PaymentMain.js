@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Card, Button, notification, Row, Col, Typography, Divider, Space, message } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { SyncOutlined, ArrowLeftOutlined, CreditCardOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import stickman from '../../../assets/images/Stickman.gif';
 import '../../../assets/css/Main/payMent.css';
@@ -70,13 +69,13 @@ const PaymentPage = () => {
       }
 
       const hide = message.loading('Processing payment...', 0);
-      
+
       try {
-        console.log("Payload",payload);
-        
-        const response = await ProceedToPayment(payload,tokenData.access_token);
-        console.log("response",response);
-        
+        console.log("Payload", payload);
+
+        const response = await ProceedToPayment(payload, tokenData.access_token);
+        console.log("response", response);
+
         hide();
 
         const approvalUrl = response.data?.approvalUrl;
@@ -148,7 +147,7 @@ const PaymentPage = () => {
 
               {/* Gym Info */}
               <div className="gym-info">
-                <Title level={4}>GT CLUB FITNESS</Title>
+                <Title level={4}>FITNESS4LIFE</Title>
                 <Text>123 Fitness Street, District 1, HCMC</Text>
                 <Text>Tel: (028) 1234-5678</Text>
               </div>
@@ -160,7 +159,6 @@ const PaymentPage = () => {
                 <Title level={5}>CUSTOMER INFORMATION</Title>
                 <div className="customer-details">
                   <Text><strong>Name:</strong> {userFullname || 'Guest User'}</Text>
-                  <Text><strong>Member ID:</strong> {userId || 'N/A'}</Text>
                   <Text><strong>Email:</strong> {userEmail || 'N/A'}</Text>
                 </div>
               </div>
@@ -176,7 +174,7 @@ const PaymentPage = () => {
                     <Text strong>{selectedPackage.packageName} Membership</Text>
                   </div>
                   <div className="item-price">
-                    <Text>{formattedPrice} VND/month</Text>
+                    <Text>{formattedPrice} USD</Text>
                   </div>
                 </div>
 
@@ -185,35 +183,35 @@ const PaymentPage = () => {
                   <div className="feature-highlights">
                     {selectedPackage.packageName === 'CLASSIC' && (
                       <>
-                        <div className="feature-item"><CheckCircleOutlined /> Tập luyện tại GT CLUB đã chọn</div>
-                        <div className="feature-item"><CheckCircleOutlined /> Tham gia Yoga và Group X tại 01 CLUB đã chọn</div>
+                        <div className="feature-item"><CheckCircleOutlined /> Workout at the selected GT CLUB</div>
+                        <div className="feature-item"><CheckCircleOutlined /> Participate in Yoga and Group X at one selected CLUB</div>
                       </>
                     )}
                     {selectedPackage.packageName === 'CLASSIC-PLUS' && (
                       <>
-                        <div className="feature-item"><CheckCircleOutlined /> Tập luyện tại GT CLUB đã chọn</div>
-                        <div className="feature-item"><CheckCircleOutlined /> Tham gia tất cả các lớp Yoga và Group X tại tất cả các CLB</div>
+                        <div className="feature-item"><CheckCircleOutlined /> Workout at the selected GT CLUB</div>
+                        <div className="feature-item"><CheckCircleOutlined /> Participate in all Yoga and Group X classes at all CLUBs</div>
                       </>
                     )}
                     {selectedPackage.packageName === 'CITIFITSPORT' && (
                       <>
-                        <div className="feature-item"><CheckCircleOutlined /> Tự do thay luyện tập tất cả các lớp GX trong hệ thống</div>
-                        <div className="feature-item"><CheckCircleOutlined /> Dịch vụ khăn tắm thể thao cao cấp</div>
+                        <div className="feature-item"><CheckCircleOutlined /> Unlimited access to all GX classes in the system</div>
+                        <div className="feature-item"><CheckCircleOutlined /> Premium sports towel service</div>
                       </>
                     )}
                     {selectedPackage.packageName === 'ROYAL' && (
                       <>
-                        <div className="feature-item"><CheckCircleOutlined /> Tự do thay luyện tập tất cả các lớp GX trong hệ thống</div>
-                        <div className="feature-item"><CheckCircleOutlined /> Được đặt trước 1 ngày trải nghiệm phòng tập công</div>
+                        <div className="feature-item"><CheckCircleOutlined /> Unlimited access to all GX classes in the system</div>
+                        <div className="feature-item"><CheckCircleOutlined /> One-day advance reservation for a premium gym experience</div>
                       </>
                     )}
                     {selectedPackage.packageName === 'SIGNATURE' && (
                       <>
-                        <div className="feature-item"><CheckCircleOutlined /> VIP check-in và tiếp đón riêng</div>
-                        <div className="feature-item"><CheckCircleOutlined /> Sử dụng khu vực VIP riêng</div>
+                        <div className="feature-item"><CheckCircleOutlined /> VIP check-in and exclusive reception</div>
+                        <div className="feature-item"><CheckCircleOutlined /> Access to private VIP area</div>
                       </>
                     )}
-                    <div className="feature-item"><CheckCircleOutlined /> Không giới hạn thời gian luyện tập</div>
+                    <div className="feature-item"><CheckCircleOutlined /> Unlimited workout time</div>
                   </div>
                 </div>
               </div>

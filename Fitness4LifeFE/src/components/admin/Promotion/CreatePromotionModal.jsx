@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Form, Input, Select, InputNumber, DatePicker, Button, notification, Row, Col } from 'antd';
 import dayjs from 'dayjs'; // Import dayjs
-import { getTokenData } from '../../../serviceToken/tokenUtils';
+import { getDecodedToken, getTokenData } from '../../../serviceToken/tokenUtils';
 import { createPromotions } from '../../../serviceToken/PromotionService';
 
 const { RangePicker } = DatePicker;
@@ -11,19 +11,22 @@ const CreatePromotionModal = ({ visible, onClose, onSuccess }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
 
+    const tokenData = getTokenData();//tokenData.access_token
+    const decotoken = getDecodedToken();
+
     const handleSubmit = async (values) => {
         setLoading(true);
         try {
             const [startDate, endDate] = values.dateRange;
             const newPromotion = {
                 ...values,
+                createdBy: decotoken.fullName,
                 startDate: dayjs(startDate).format('YYYY-MM-DD HH:mm:ss'),
                 endDate: dayjs(endDate).format('YYYY-MM-DD HH:mm:ss'),
             };
             console.log('new data: ', newPromotion);
 
 
-            const tokenData = getTokenData();//tokenData.access_token
 
             const response = await createPromotions(newPromotion, tokenData.access_token);
             if (response != null) {
@@ -147,7 +150,7 @@ const CreatePromotionModal = ({ visible, onClose, onSuccess }) => {
                     </Col>
                 </Row>
 
-                <Row gutter={[16, 16]}>
+                {/* <Row gutter={[16, 16]}>
                     <Col span={12}>
                         <Form.Item
                             name="createdBy"
@@ -157,7 +160,7 @@ const CreatePromotionModal = ({ visible, onClose, onSuccess }) => {
                             <Input placeholder="Enter creator name" />
                         </Form.Item>
                     </Col>
-                </Row>
+                </Row> */}
 
                 <Row gutter={[16, 16]}>
                     <Col span={12}>

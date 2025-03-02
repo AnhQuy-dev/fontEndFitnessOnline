@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { List, Typography, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
-import { getTokenData } from "../../../serviceToken/tokenUtils";
-import { GetAllQuestion } from "../../../serviceToken/ForumService";
+import { getTokenData } from "../../../../serviceToken/tokenUtils";
+import { GetAllQuestion } from "../../../../serviceToken/ForumService";
 
 const { Title, Text } = Typography;
 
@@ -53,7 +53,7 @@ const RecommendedArticles = () => {
                         dataSource={articles}
                         renderItem={(article) => (
                             <List.Item
-                                onClick={() => navigate(`/forum/${article.id}`)}
+                                onClick={() => navigate(`/forums/forum/post/${article.id}`)}
                                 style={{
                                     display: "flex",
                                     alignItems: "center",

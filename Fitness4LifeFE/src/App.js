@@ -9,7 +9,6 @@ import MainHeader from './components/main/MainHeader';
 import Blog from './components/main/blog/Blog';
 import BlogDetail from './components/main/blog/BlogDetail';
 import ContactForm from './components/main/contact/ContactForm';
-import Club from './components/admin/Club/Club'
 import Blogs from './components/admin/Blog/Blogs';
 import Users from './components/admin/User/Users';
 import Room from './components/admin/Room/Room';
@@ -22,16 +21,8 @@ import UserProfilePage from './components/main/user/UserProfilePage';
 import HistoryBooking from './components/main/user/HistoryBooking';
 import PostPage from './components/admin/Post/PostPage';
 import OTPVerification from './components/main/login/OTPVerification';
-import ForumPage from './components/main/forum/ForumPage';
-import ForumLayout from './components/main/forum/ForumLayout ';
-import CategoryPage from './components/main/forum/CategoryPage';
-import WhatsNew from './components/main/forum/WhatsNew';
-import PostNew from './components/main/forum/PostNew';
-import CreateNewPost from './components/main/forum/CreateNewPost';
-import DetailPage from './components/main/forum/DetailPage';
 import YourPostThread from './components/main/user/YourPostThread';
 import YourPostDetailPage from './components/main/user/YourPostDetailPage';
-import UpdateQuestion from './components/main/forum/UpdateQuestion';
 import OrderPage from './components/main/Paypal/Order';
 import ClubHome from './components/main/club/clubHome';
 import ClubDetails from './components/main/club/clubDetail';
@@ -45,6 +36,15 @@ import 'react-toastify/dist/ReactToastify.css';
 import PromotionPage from './components/admin/Promotion/PromotionPage';
 import YourPromotionPage from './components/main/promotion/YourPromotionPage';
 import Register from './components/main/login/Registration';
+import ForumLayout from './components/main/forum/layout/ForumLayout ';
+import ForumPage from './components/main/forum/ForumPage';
+import CategoryPage from './components/main/forum/CategoryPage';
+import WhatsNew from './components/main/forum/layout/WhatsNew';
+import PostNew from './components/main/forum/layout/PostNew';
+import CreateNewPost from './components/main/forum/process/CreateNewPost';
+import DetailPage from './components/main/forum/modal/DetailPage';
+import UpdateQuestion from './components/main/forum/process/UpdateQuestion';
+import Club from './components/admin/Club/Club';
 import BookingMain from './components/main/booking/Booking';
 
 const App = () => {
@@ -80,20 +80,22 @@ const App = () => {
             <Route path="/forums" element={<ForumLayout />}>
               <Route path="create-new-post" element={<CreateNewPost />} />
             </Route>
-            <Route path="forum/:id" element={<DetailPage />} />
-            <Route path="/your-posts" element={<YourPostThread />} />
-            <Route path="/post/:postId" element={<YourPostDetailPage />} />
-            <Route path="/update-question/:postId" element={<UpdateQuestion />} />
+            <Route path="/forums/forum/post/:id" element={<DetailPage />} />
+            <Route path="/profile/your-posts" element={<YourPostThread />} />
+            <Route path="/profile/post/:postId" element={<YourPostDetailPage />} />
+            <Route path="/profile/update-question/:postId" element={<UpdateQuestion />} />
             <Route path="/payment" element={<PaymentMain />} />
             <Route path="/order" element={<OrderPage />} />
-            <Route path='/user/profile/yourcode' element={<YourPromotionPage />} />
+            <Route path='/profile/yourcode' element={<YourPromotionPage />} />
+
+            <Route path="/profile" element={<UserProfilePage />} />
+            <Route path="/profile/history-booking" element={<HistoryBooking />} />
           </Route>
 
           {/* User-only Routes */}
-          <Route element={<UserRoute />}>
-            <Route path="/user/profile" element={<UserProfilePage />} />
-            <Route path="/history-booking" element={<HistoryBooking />} />
-          </Route>
+          {/* <Route element={<AuthenticatedRoute />}>
+
+          </Route> */}
         </Route>
 
         {/* Admin-only Routes */}

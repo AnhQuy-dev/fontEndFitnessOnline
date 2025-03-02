@@ -45,17 +45,17 @@ const PostPage = () => {
 
                 // message.success("Lấy danh sách bài viết thành công!");
             } else {
-                message.error(response.message || "Lấy danh sách thất bại!");
+                message.error(response.message || "Failed to get post list!");
             }
         } catch (error) {
-            message.error("Có lỗi xảy ra khi gọi API!");
+            message.error("An error occurred while calling API!");
         } finally {
             setLoading(false);
         }
     };
 
     const handleUpdate = (id) => {
-        message.info(`Cập nhật bài viết ID: ${id}`);
+        message.info(`Update post ID: ${id}`);
     };
 
     const handleDelete = async (id) => {
@@ -64,13 +64,13 @@ const PostPage = () => {
             const response = await deleteQuestion(id, tokenData.access_token);
             console.log("response: ", response);
             if (response.status === 200) {
-                message.success("Xóa bài viết thành công!");
-                // fetchQuestions(); // Tải lại danh sách bài viết sau khi xóa
+                message.success("Post deleted successfully!");
+                fetchQuestions();
             } else {
-                message.error(response.message || "Xóa bài viết thất bại!");
+                message.error(response.message || "Failed to delete post!");
             }
         } catch (error) {
-            message.error("Có lỗi xảy ra khi gọi API!");
+            message.error("An error occurred while calling API!");
         } finally {
             setLoading(false);
         }
@@ -79,41 +79,22 @@ const PostPage = () => {
     const handleStatusChange = async (questionId, newStatus) => {
         try {
             setLoading(true);
-
-            // Lấy trạng thái hiện tại của câu hỏi
             const currentQuestion = [...publicQuestions, ...privateQuestions].find(q => q.id === questionId);
-
-            // Kiểm tra nếu trạng thái mới không hợp lệ
-            if (currentQuestion.status === "PENDING" && newStatus === "UNDER_REVIEW") {
-                // Thực hiện thay đổi trạng thái
+            if (currentQuestion.status === "PENDING" && newStatus === "APPROVED") {
                 const changeStatus = { status: newStatus };
                 const response = await changePublished(questionId, changeStatus, tokenData.access_token);
                 console.log("response: ", response);
 
                 if (response.status === 201) {
-                    message.success("Cập nhật trạng thái bài viết thành công!");
-                    // fetchQuestions(); // Tải lại danh sách bài viết sau khi cập nhật trạng thái
+                    message.success("Post status updated successfully!");
                 } else {
-                    message.error(response.message || "Cập nhật trạng thái thất bại!");
-                }
-            } else if (currentQuestion.status === "UNDER_REVIEW" && newStatus === "APPROVED") {
-                // Thực hiện thay đổi trạng thái
-                const changeStatus = { status: newStatus };
-                const response = await changePublished(questionId, changeStatus, tokenData.access_token);
-                console.log("response: ", response);
-
-                if (response.status === 201) {
-                    message.success("Cập nhật trạng thái bài viết thành công!");
-                    // fetchQuestions(); // Tải lại danh sách bài viết sau khi cập nhật trạng thái
-                } else {
-                    message.error(response.message || "Cập nhật trạng thái thất bại!");
+                    message.error(response.message || "Failed to update status!");
                 }
             } else {
-                message.error("Không thể thay đổi trạng thái theo hướng này.");
+                message.error("Can only change status from PENDING to APPROVED.");
             }
-
         } catch (error) {
-            message.error("Có lỗi xảy ra khi cập nhật trạng thái!");
+            message.error("An error occurred while updating status!");
         } finally {
             setLoading(false);
         }
@@ -160,17 +141,17 @@ const PostPage = () => {
     return (
         <div className="post-page-container">
             <Title level={2} className="post-page-title">
-                Danh Sách Bài Viết
+                Post List
             </Title>
             <Tabs defaultActiveKey="1">
                 <TabPane tab="ADMIN" key="1">
                     <Button type="primary" onClick={onCreateQuestion}>
-                        Tạo Bài Viết
+                        Create Post
                     </Button>
 
                     {loading ? (
                         <div className="loading-container">
-                            <Spin tip="Đang tải dữ liệu..." size="large" />
+                            <Spin tip="Loading data..." size="large" />
                         </div>
                     ) : (
                         <div>
@@ -193,7 +174,7 @@ const PostPage = () => {
                                                 {question.author} -{" "}
                                                 {question.createdAt
                                                     ? moment(question.createdAt, "YYYY-MM-DD HH:mm:ss").format("LLL")
-                                                    : "Chưa có ngày tạo"}
+                                                    : "No creation date"}
                                             </Text>
                                             <Paragraph
                                                 ellipsis={{ rows: 2, expandable: false }}
@@ -228,12 +209,11 @@ const PostPage = () => {
                     <div className="filter-buttons">
                         <Button onClick={() => setFilterStatus("ALL")}>ALL</Button>
                         <Button onClick={() => setFilterStatus("PENDING")}>PENDING</Button>
-                        <Button onClick={() => setFilterStatus("UNDER_REVIEW")}>UNDER_REVIEW</Button>
                         <Button onClick={() => setFilterStatus("APPROVED")}>APPROVED</Button>
                     </div>
                     {loading ? (
                         <div className="loading-container">
-                            <Spin tip="Đang tải dữ liệu..." size="large" />
+                            <Spin tip="Loading data..." size="large" />
                         </div>
                     ) : (
                         <div>
@@ -256,7 +236,7 @@ const PostPage = () => {
                                                 {question.author} -{" "}
                                                 {question.createdAt
                                                     ? moment(question.createdAt, "YYYY-MM-DD HH:mm:ss").format("LLL")
-                                                    : "Chưa có ngày tạo"}
+                                                    : "No creation date"}
                                             </Text>
                                             <Paragraph
                                                 ellipsis={{ rows: 2, expandable: false }}
@@ -265,15 +245,14 @@ const PostPage = () => {
                                                 {question.content}
                                             </Paragraph>
                                             <div className="post-card-actions">
-                                                {/* Thêm select dropdown cho các bài post có trạng thái "PENDING" và "UNDER_REVIEW" */}
-                                                {(question.status === "PENDING" || question.status === "UNDER_REVIEW") && (
+                                                {/* Thêm select dropdown cho các bài post có trạng thái "PENDING" */}
+                                                {question.status === "PENDING" && (
                                                     <Select
                                                         value={question.status}
                                                         onChange={(value) => handleStatusChange(question.id, value)}
                                                         style={{ width: 120 }}
                                                     >
                                                         <Option value="PENDING">PENDING</Option>
-                                                        <Option value="UNDER_REVIEW">UNDER_REVIEW</Option>
                                                         <Option value="APPROVED">APPROVED</Option>
                                                     </Select>
                                                 )}
@@ -305,7 +284,7 @@ const PostPage = () => {
             <CreateQuestionModal
                 isOpen={isCreateModalOpen}
                 onClose={onCloseCreateModal}
-            // onQuestionCreated={fetchQuestions}
+                onQuestionCreated={fetchQuestions}
             />
         </div>
     );

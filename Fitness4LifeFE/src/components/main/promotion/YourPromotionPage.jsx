@@ -1,9 +1,18 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Card, Tag, Spin, Alert, Button, Col, Row, Typography, Tabs, notification } from "antd";
+import React, { useEffect, useState } from "react";
+import { Card, Spin, Button, Col, Row, Typography, Tabs, notification } from "antd";
+import {
+    GiftOutlined,
+    ShoppingOutlined,
+    CalendarOutlined,
+    DollarOutlined,
+    TrophyOutlined,
+    InfoCircleOutlined
+} from "@ant-design/icons";
 import PromotionDetailsModal from "../../admin/Promotion/PromotionDetailsModal";
 import { getAllPromotionsInJson, getPromotionUser, usedPointChangCode } from "../../../serviceToken/PromotionService";
 import { getDecodedToken, getTokenData } from "../../../serviceToken/tokenUtils";
 import { getUserPoint } from "../../../serviceToken/FitnessgoalService";
+import "../../../assets/css/yourPromotion.css";
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -14,14 +23,13 @@ const YourPromotionPage = () => {
     const [loading, setLoading] = useState(false);
     const [loadingJson, setLoadingJson] = useState(false);
     const [error, setError] = useState("");
-    const [selectedPromotion, setSelectedPromotion] = useState(null); // Chọn mã giảm giá hiện tại
-    const [isModalVisible, setIsModalVisible] = useState(false); // Trạng thái hiển thị modal
-    const [userPoints, setUserPoints] = useState(null); // Lưu trữ điểm người dùng
+    const [selectedPromotion, setSelectedPromotion] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [userPoints, setUserPoints] = useState(null);
     const tokenData = getTokenData();
     const decotoken = getDecodedToken();
 
     useEffect(() => {
-
         fetchPromotions();
         fetchUserPoints();
         fetchPromotionsJson();
@@ -73,8 +81,6 @@ const YourPromotionPage = () => {
         }
     };
 
-
-
     const handleRowClick = (promotion) => {
         setSelectedPromotion(promotion);
         setIsModalVisible(true);
@@ -121,134 +127,182 @@ const YourPromotionPage = () => {
             });
         }
     };
+
     useEffect(() => {
     }, [userPoints]);
 
-
     return (
-        <section id="services">
-            <div style={{ padding: "20px" }}>
-                <Title level={1}>Your Promotions</Title>
-                <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
-                    {/* Hiển thị thông tin điểm người dùng và nút Voucher */}
-                    <Col span={12}>
-                        {userPoints && (
-                            <div>
-                                <Text strong>Total Points: </Text>
-                                <Text>{userPoints.totalPoints}</Text>
-                            </div>
-                        )}
-                    </Col>
-                </Row>
-
-                {/* Tabs cho nội dung */}
-                <Tabs defaultActiveKey="1" style={{ marginBottom: "20px" }}>
-                    {/* Tab YourVoucher */}
-                    <TabPane tab="YourVoucher" key="1">
-                        {/* Hiển thị thông tin về khuyến mãi */}
-                        {loading ? (
-                            <Spin tip="Loading...">
-                                <Alert message="Fetching your promotions" type="info" />
-                            </Spin>
-                        ) : promotions.length === 0 ? (
-                            <div style={{ textAlign: "center", padding: "20px" }}>
-                                <img
-                                    src="https://cdn.tgdd.vn/News/1062931/bi-quyet-chup-anh-01-01-01-1280x720.jpg"
-                                    alt="No Vouchers"
-                                    style={{ maxWidth: "100%", borderRadius: "10px" }}
-                                />
-                                <p>Bạn chưa có mã giảm giá nào.</p>
-                            </div>
-                        ) : (
-                            <Row gutter={[16, 16]}>
-                                {promotions.map((promotion) => (
-                                    <Col span={6} key={promotion.id}>
-                                        <Card
-                                            hoverable
-                                            cover={<img alt="promotion" src="https://cdn.tgdd.vn/News/1062931/bi-quyet-chup-anh-01-01-01-1280x720.jpg" />}
-                                            actions={[
-                                                <Button key="viewDetails" type="link" onClick={() => handleRowClick(promotion)}>
-                                                    điều kiện
-                                                </Button>,
-                                            ]}
-                                        >
-                                            <Card.Meta
-                                                title={promotion.title}
-                                                description={
-                                                    <div>
-                                                        <Tag color={promotion.isUsed ? "red" : "green"}>
-                                                            {promotion.isUsed ? "Used" : "Available"}
-                                                        </Tag>
-                                                        <p>Discount: {promotion.discountValue}%</p>
-                                                        <p>Valid: {promotion.startDate} - {promotion.endDate}</p>
-                                                    </div>
-                                                }
-                                            />
-                                        </Card>
-                                    </Col>
-                                ))}
-                            </Row>
-                        )}
-
-                    </TabPane>
-
-                    {/* Tab Voucher */}
-                    <TabPane tab="Voucher" key="2">
-                        {/* Nội dung khi nhấn vào tab Voucher */}
-                        {loadingJson ? (
-                            <Spin tip="Loading vouchers...">
-                                <Alert message="Fetching vouchers" type="info" />
-                            </Spin>
-                        ) : (
-                            <Row gutter={[16, 16]}>
-                                {promotionsJson.map((promotion) => (
-                                    <Col span={6} key={promotion.id}>
-                                        <Card
-                                            hoverable
-                                            cover={<img alt="promotion" src={"https://cdn.tgdd.vn/News/1062931/bi-quyet-chup-anh-01-01-01-1280x720.jpg"} />}
-                                            actions={[
-                                                <Button key="viewDetails" type="link" onClick={() => handleRowClick(promotion)}>
-                                                    View Details
-                                                </Button>,
-                                                // Thêm nút Đổi Voucher
-                                                <Button
-                                                    key="exchangeVoucher"
-                                                    type="primary"
-                                                    onClick={() => handleExchangeVoucher(promotion)}
-                                                >
-                                                    Đổi Voucher
-                                                </Button>,
-                                            ]}
-                                            style={{ borderRadius: "10px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}
-                                        >
-                                            <Card.Meta
-                                                title={promotion.title}
-                                                description={(
-                                                    <div>
-                                                        <Tag color={promotion.isActive ? "green" : "red"}>
-                                                            {promotion.isActive ? "Active" : "Inactive"}
-                                                        </Tag>
-                                                        <p>Discount: {promotion.discountValue}%</p>
-                                                        <p>Min Value: ${promotion.minValue}</p>
-                                                        <p>Points: {promotion.points}</p>
-                                                    </div>
-                                                )}
-                                            />
-                                        </Card>
-                                    </Col>
-                                ))}
-                            </Row>
-                        )}
-                    </TabPane>
-
-                </Tabs>
-                {/* Modal hiển thị chi tiết khuyến mãi */}
-                <PromotionDetailsModal
-                    visible={isModalVisible}
-                    onClose={() => setIsModalVisible(false)}
-                    promotion={selectedPromotion}
-                />
+        <section className="promotion-container">
+            <div className="promotion-header">
+                <Title level={1} className="promotion-title">
+                    <GiftOutlined style={{ marginRight: 12 }} />
+                    Promotion Center
+                </Title>
+                <Text style={{ color: 'white', fontSize: '16px' }}>
+                    Discover and redeem exclusive vouchers with your points
+                </Text>
             </div>
+
+            {userPoints && (
+                <div className="points-card">
+                    <Text className="points-label">Your Available Points</Text>
+                    <div className="points-value">
+                        <TrophyOutlined style={{ marginRight: 8 }} />
+                        {userPoints.totalPoints} Points
+                    </div>
+                </div>
+            )}
+
+            <Tabs defaultActiveKey="1" className="promotion-tabs">
+                <TabPane
+                    tab={<span><ShoppingOutlined />Your Vouchers</span>}
+                    key="1"
+                >
+                    {loading ? (
+                        <div className="loading-container">
+                            <Spin size="large" />
+                            <Text>Loading your vouchers...</Text>
+                        </div>
+                    ) : promotions.length === 0 ? (
+                        <div className="empty-state">
+                            <img
+                                src="https://cdn.tgdd.vn/News/1062931/bi-quyet-chup-anh-01-01-01-1280x720.jpg"
+                                alt="No Vouchers"
+                            />
+                            <Title level={4}>No Vouchers Yet</Title>
+                            <Text className="empty-state-text">
+                                Check out available vouchers in the Voucher tab and start redeeming!
+                            </Text>
+                        </div>
+                    ) : (
+                        <Row gutter={[16, 16]} className="voucher-grid">
+                            {promotions.map((promotion) => (
+                                <Col xs={24} sm={12} md={8} lg={6} key={promotion.id}>
+                                    <Card
+                                        className="voucher-card"
+                                        hoverable
+                                        cover={
+                                            <img
+                                                alt="promotion"
+                                                src="https://cdn.tgdd.vn/News/1062931/bi-quyet-chup-anh-01-01-01-1280x720.jpg"
+                                            />
+                                        }
+                                    >
+                                        <Card.Meta
+                                            title={promotion.title}
+                                            description={
+                                                <div className="voucher-details">
+                                                    <span className={`voucher-tag ${promotion.isUsed ? 'tag-used' : 'tag-available'}`}>
+                                                        {promotion.isUsed ? 'Used' : 'Available'}
+                                                    </span>
+
+                                                    <div className="voucher-info">
+                                                        <DollarOutlined />
+                                                        <Text>Discount: {promotion.discountValue}%</Text>
+                                                    </div>
+
+                                                    <div className="voucher-info">
+                                                        <CalendarOutlined />
+                                                        <Text>Valid: {promotion.startDate} - {promotion.endDate}</Text>
+                                                    </div>
+
+                                                    <div className="voucher-actions">
+                                                        <Button
+                                                            type="primary"
+                                                            icon={<InfoCircleOutlined />}
+                                                            onClick={() => handleRowClick(promotion)}
+                                                        >
+                                                            View Details
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        />
+                                    </Card>
+                                </Col>
+                            ))}
+                        </Row>
+                    )}
+                </TabPane>
+
+                <TabPane
+                    tab={<span><GiftOutlined />Available Vouchers</span>}
+                    key="2"
+                >
+                    {loadingJson ? (
+                        <div className="loading-container">
+                            <Spin size="large" />
+                            <Text>Loading available vouchers...</Text>
+                        </div>
+                    ) : (
+                        <Row gutter={[16, 16]} className="voucher-grid">
+                            {promotionsJson.map((promotion) => (
+                                <Col xs={24} sm={12} md={8} lg={6} key={promotion.id}>
+                                    <Card
+                                        className="voucher-card"
+                                        hoverable
+                                        cover={
+                                            <img
+                                                alt="promotion"
+                                                src="https://cdn.tgdd.vn/News/1062931/bi-quyet-chup-anh-01-01-01-1280x720.jpg"
+                                            />
+                                        }
+                                    >
+                                        <Card.Meta
+                                            title={promotion.title}
+                                            description={
+                                                <div className="voucher-details">
+                                                    <span className={`voucher-tag ${promotion.isActive ? 'tag-active' : 'tag-inactive'}`}>
+                                                        {promotion.isActive ? 'Active' : 'Inactive'}
+                                                    </span>
+
+                                                    <div className="voucher-info">
+                                                        <DollarOutlined />
+                                                        <Text>Discount: {promotion.discountValue}%</Text>
+                                                    </div>
+
+                                                    <div className="voucher-info">
+                                                        <ShoppingOutlined />
+                                                        <Text>Min Value: ${promotion.minValue}</Text>
+                                                    </div>
+
+                                                    <div className="voucher-info">
+                                                        <TrophyOutlined />
+                                                        <Text>Points Required: {promotion.points}</Text>
+                                                    </div>
+
+                                                    <div className="voucher-actions">
+                                                        <Button
+                                                            type="primary"
+                                                            onClick={() => handleRowClick(promotion)}
+                                                            icon={<InfoCircleOutlined />}
+                                                        >
+                                                            Details
+                                                        </Button>
+                                                        <Button
+                                                            type="primary"
+                                                            onClick={() => handleExchangeVoucher(promotion)}
+                                                            icon={<GiftOutlined />}
+                                                        >
+                                                            Redeem
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        />
+                                    </Card>
+                                </Col>
+                            ))}
+                        </Row>
+                    )}
+                </TabPane>
+            </Tabs>
+
+            <PromotionDetailsModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                promotion={selectedPromotion}
+            />
         </section>
     );
 };

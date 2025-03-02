@@ -7,7 +7,7 @@ import { getTokenData } from "../../../serviceToken/tokenUtils";
 const { Title, Text } = Typography;
 
 const ViewClubDetail = (props) => {
-  const { dataDetail, setDataDetail, isDataDetailOpen, setIsDataDetailOpen } = props;
+  const { dataDetail, setDataDetail, isDataDetailOpen, setIsDataDetailOpen, loadClubs } = props;
   const tokenData = getTokenData();//tokenData.access_token
 
 
@@ -86,128 +86,154 @@ const ViewClubDetail = (props) => {
   };
 
   const handleSubmitAddImages = async () => {
-    const formData = new FormData();
-    formData.append("clubId", dataDetail.id); // Gán đúng ID club đã chọn
+    try {
+      const formData = new FormData();
+      formData.append("clubId", dataDetail.id); // Gán đúng ID club đã chọn
 
-    uploadedImages.forEach((image) => {
-      formData.append("file", image.file);
-    });
-
-    const reponse = await AddMoreImageClub(formData, tokenData.access_token)
-    if (reponse != null) {
-      notification.success({
-        message: "add imageClub",
-        description: "imageClub add successfully."
+      uploadedImages.forEach((image) => {
+        formData.append("file", image.file);
       });
-    } else {
+
+      const reponse = await AddMoreImageClub(formData, tokenData.access_token);
+      
+      if (reponse != null) {
+        notification.success({
+          message: "Add Image Club",
+          description: "Image club added successfully."
+        });
+        
+        // Reset states and reload clubs
+        setUploadedImages([]);
+        setIsAddingImage(false);
+        await loadClubs();
+      } else {
+        notification.error({
+          message: "Error Adding Club Images",
+          description: JSON.stringify(reponse?.message || "Unknown error")
+        });
+      }
+    } catch (error) {
+      console.error("Error adding images:", error);
       notification.error({
-        message: "Error Creating Club",
-        description: JSON.stringify(reponse.message)
+        message: "Error Adding Club Images",
+        description: error.message || "An unexpected error occurred"
       });
     }
-
-    setUploadedImages([]);
-    setIsAddingImage(false);
   };
 
   const handleSubmitUpdateImages = async () => {
-    if (!selectedImage) {
-      notification.warning({
-        message: "No Image Selected",
-        description: "Please select an image to update.",
-      });
-      return;
-    }
+    try {
+      if (!selectedImage) {
+        notification.warning({
+          message: "No Image Selected",
+          description: "Please select an image to update.",
+        });
+        return;
+      }
 
-    const formData = new FormData();
-    formData.append("clubId", dataDetail.id); // Gán đúng ID club đã chọn
-    uploadedImages.forEach((image) => { formData.append("file", image.file); });
-    // console.log("🚀 Club ID:", dataDetail.id);
-    // console.log("📸 Uploaded Images:", uploadedImages.map(img => img.file.name));
-    // console.log("selectedImage in handleSubmitUpdateImages: ", selectedImage);
-
-    const reponse = await UpdateImageClub(selectedImage, formData, tokenData.access_token)
-    if (reponse != null) {
-      notification.success({
-        message: "update imageClub",
-        description: "imageClub update successfully."
+      const formData = new FormData();
+      formData.append("clubId", dataDetail.id); // Gán đúng ID club đã chọn
+      uploadedImages.forEach((image) => { 
+        formData.append("file", image.file); 
       });
-    } else {
+
+      const reponse = await UpdateImageClub(selectedImage, formData, tokenData.access_token);
+      
+      if (reponse != null) {
+        notification.success({
+          message: "Update Image Club",
+          description: "Image club updated successfully."
+        });
+        
+        // Reset states and reload clubs
+        setUploadedImages([]);
+        setIsAddingImage(false);
+        setIsUpdating(false);
+        setSelectedImage(null);
+        await loadClubs();
+      } else {
+        notification.error({
+          message: "Error Updating Club Images",
+          description: JSON.stringify(reponse?.message || "Unknown error")
+        });
+      }
+    } catch (error) {
+      console.error("Error updating images:", error);
       notification.error({
-        message: "Error updating Club",
-        description: JSON.stringify(reponse.message)
+        message: "Error Updating Club Images",
+        description: error.message || "An unexpected error occurred"
       });
     }
-
-    setUploadedImages([]);
-    setIsAddingImage(false);
-    setIsUpdating(false);
   };
 
 
   const handleChoosePrimaryImage = async () => {
-    if (!selectedImage) {
-      notification.warning({
-        message: "No Image Selected",
-        description: "Please select an image to set as primary.",
-      });
-      return;
-    }
     try {
-      // Gọi API cập nhật ảnh primary
+      if (!selectedImage) {
+        notification.warning({
+          message: "No Image Selected",
+          description: "Please select an image to set as primary.",
+        });
+        return;
+      }
+      
       const response = await ChosePrimaryImage(selectedImage, tokenData.access_token);
 
-      console.log("🚀 ChosePrimaryImage:", response);
-
-      if (response.status == 200) {
+      if (response && response.status === 200) {
         notification.success({
           message: "Primary Image Updated",
           description: "The selected image is now the primary image.",
         });
+        
+        // Reset states and reload clubs
+        setchoseImage(false);
+        setSelectedImage(null);
+        await loadClubs();
       } else {
         throw new Error("Failed to update primary image.");
       }
     } catch (error) {
+      console.error("Error setting primary image:", error);
       notification.error({
         message: "Error",
-        description: error.message || "Something went wrong while setting primary image.",
+        description: error.message || "Something went wrong while setting primary image."
       });
     }
-
   };
 
 
   const handleDeleteImage = async () => {
-    if (!selectedImage) {
-      notification.warning({
-        message: "No Image Selected",
-        description: "Please select an image to set as primary.",
-      });
-      return;
-    }
-    console.log("selectedImage in handleDeleteImage: ", selectedImage);
-
     try {
-      // Gọi API cập nhật ảnh primary
+      if (!selectedImage) {
+        notification.warning({
+          message: "No Image Selected",
+          description: "Please select an image to delete.",
+        });
+        return;
+      }
+      
       const response = await DeleteImageClub(selectedImage, tokenData.access_token);
 
-      // console.log("🚀 DeleteImageClub:", response);
-
-      if (response.status == 200) {
+      if (response && response.status === 200) {
         notification.success({
-          message: "delete imageClub successfully",
-          description: "delete imageClub successfully.",
+          message: "Delete Image Club",
+          description: "Image deleted successfully.",
         });
+        
+        // Reset states and reload clubs
+        setDeleteImage(false);
+        setSelectedImage(null);
+        await loadClubs();
       } else {
-        throw new Error("Failed to delete imageClub.");
+        throw new Error("Failed to delete image club.");
       }
     } catch (error) {
+      console.error("Error deleting image:", error);
       notification.error({
         message: "Error",
-        description: error.message || "Something went wrong while delete imageClub.",
+        description: error.message || "Something went wrong while deleting image."
       });
     }
-
   };
 
   return (
@@ -216,11 +242,14 @@ const ViewClubDetail = (props) => {
       onClose={() => {
         setDataDetail(null);
         setIsDataDetailOpen(false);
-        setIsUpdating(false); // Reset trạng thái cập nhật ảnh
-        setIsAddingImage(false); // Reset trạng thái thêm ảnh
+        setIsUpdating(false);
+        setIsAddingImage(false);
         setDeleteImage(false);
         setchoseImage(false);
         setSelectedImage(null);
+        
+        // Reload clubs when drawer is closed to ensure fresh data
+        loadClubs();
       }}
       open={isDataDetailOpen}
       width={1200}
@@ -290,7 +319,7 @@ const ViewClubDetail = (props) => {
                       disabled={!selectedImage}
                       style={{ marginLeft: "10px" }}
                     >
-                      delete
+                      Delete
                     </Button>
                   </>
                 )}

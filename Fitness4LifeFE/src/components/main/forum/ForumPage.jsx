@@ -1,4 +1,4 @@
-import "../../../assets/css/ForumPage.css"; // Custom CSS nếu cần
+import "../../../assets/css/ForumPage.css"; // Custom CSS if needed
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Spin, Typography, message } from "antd";
@@ -9,17 +9,17 @@ import { getTokenData } from "../../../serviceToken/tokenUtils";
 const { Title, Paragraph, Text } = Typography;
 
 const ForumPage = () => {
-    const [questions, setQuestions] = useState([]); // State lưu danh sách câu hỏi
-    const [loading, setLoading] = useState(false); // Trạng thái tải dữ liệu
+    const [questions, setQuestions] = useState([]); // State to store questions list
+    const [loading, setLoading] = useState(false); // Loading state
     const location = useLocation();
     const navigate = useNavigate();
     const tokenData = getTokenData();
-    // Lấy category từ URL
+    // Get category from URL
     const searchParams = new URLSearchParams(location.search);
     const categoryParam = searchParams.get("category");
     const category = categoryParam ? decodeURIComponent(categoryParam) : null;
 
-    // Hàm fetch dữ liệu từ API
+    // Function to fetch data from API
     const fetchQuestions = async () => {
         try {
             setLoading(true);
@@ -29,11 +29,11 @@ const ForumPage = () => {
             if (response.status === 200) {
                 const allQuestions = response.data;
 
-                // Lọc bài viết có status = APPROVED
+                // Filter posts with status = APPROVED
                 const approvedQuestions = allQuestions.filter(
                     (q) => q.status === "APPROVED"
                 );
-                // Lọc dữ liệu theo category nếu có
+                // Filter data by category if exists
                 const filteredQuestions = category
                     ? approvedQuestions.filter(
                         (q) =>
@@ -44,13 +44,13 @@ const ForumPage = () => {
 
                 setQuestions(filteredQuestions);
                 // console.log("Filtered Questions:", filteredQuestions);
-                // message.success("Lấy danh sách bài viết thành công!");
+                // message.success("Successfully retrieved posts!");
             } else {
-                message.error(response.message || "Lấy danh sách thất bại!");
+                message.error(response.message || "Failed to retrieve posts!");
             }
         } catch (error) {
             console.error("Error fetching questions:", error);
-            message.error("Có lỗi xảy ra khi gọi API!");
+            message.error("An error occurred while calling the API!");
         } finally {
             setLoading(false);
         }
@@ -65,12 +65,12 @@ const ForumPage = () => {
         <section id="services">
             <div className="forum-container">
                 <Title level={2} className="forum-title">
-                    {category ? `Danh sách bài viết: ${category}` : "Danh Sách Bài Viết"}
+                    {category ? `Posts List: ${category}` : "Posts List"}
                 </Title>
 
                 {loading ? (
                     <div className="spinner-container">
-                        <Spin tip="Đang tải dữ liệu..." size="large">
+                        <Spin tip="Loading data..." size="large">
                             <div style={{ padding: "50px" }} />
                         </Spin>
                     </div>
@@ -81,7 +81,7 @@ const ForumPage = () => {
                                 <div
                                     key={question.id}
                                     className="forum-item"
-                                    onClick={() => navigate(`/forum/${question.id}`)}
+                                    onClick={() => navigate(`/forums/forum/post/${question.id}`)}
                                     style={{ cursor: "pointer" }}
                                 >
                                     <div className="forum-image">
@@ -102,7 +102,7 @@ const ForumPage = () => {
                                             {question.author} -{" "}
                                             {question.createdAt
                                                 ? moment(question.createdAt, "YYYY-MM-DD HH:mm:ss").format("LLL")
-                                                : "Chưa có ngày tạo"}
+                                                : "No creation date"}
                                         </Text>
                                         <Paragraph ellipsis={{ rows: 2 }}>
                                             {question.content}
@@ -112,7 +112,7 @@ const ForumPage = () => {
                             ))
                         ) : (
                             <div style={{ textAlign: "center", marginTop: "20px" }}>
-                                <Text type="secondary">Không có bài viết nào phù hợp.</Text>
+                                <Text type="secondary">No matching posts found.</Text>
                             </div>
                         )}
                     </div>

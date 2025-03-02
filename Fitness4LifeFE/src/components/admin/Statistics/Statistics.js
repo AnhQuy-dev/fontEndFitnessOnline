@@ -251,9 +251,9 @@ const StatisticsPage = () => {
               <TrophyOutlined style={{ fontSize: '32px', color: getRankColor(1), marginBottom: '8px' }} />
               <h2 style={{ margin: '0', fontSize: '24px', color: getRankColor(1) }}>Top 1</h2>
               <h3 style={{ fontSize: '20px', margin: '12px 0' }}>{top3Rooms[0]?.roomName}</h3>
-              <Statistic 
-                value={top3Rooms[0]?.bookingCount} 
-                suffix="lượt đặt phòng" 
+              <Statistic
+                value={top3Rooms[0]?.bookingCount}
+                suffix="lượt đặt phòng"
                 valueStyle={{ color: '#1890ff', fontSize: '18px' }}
               />
             </Card>
@@ -276,9 +276,9 @@ const StatisticsPage = () => {
                 <TrophyOutlined style={{ fontSize: '24px', color: getRankColor(room.rank), marginBottom: '8px' }} />
                 <h3 style={{ margin: '0', fontSize: '18px', color: getRankColor(room.rank) }}>Top {room.rank}</h3>
                 <h4 style={{ fontSize: '16px', margin: '8px 0' }}>{room.roomName}</h4>
-                <Statistic 
-                  value={room.bookingCount} 
-                  suffix="lượt đặt" 
+                <Statistic
+                  value={room.bookingCount}
+                  suffix="lượt đặt"
                   valueStyle={{ color: '#1890ff', fontSize: '16px' }}
                 />
               </Card>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Typography, Button, Input, Form, message, Modal } from "antd";
 import moment from "moment";
-import { getDecodedToken, getTokenData } from "../../../serviceToken/tokenUtils";
-import { createComment, deleteComment, GetCommentByQuestionId, updateComment } from "../../../serviceToken/ForumService";
+import { getDecodedToken, getTokenData } from "../../../../serviceToken/tokenUtils";
+import { createComment, deleteComment, GetCommentByQuestionId, updateComment } from "../../../../serviceToken/ForumService";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -10,7 +10,8 @@ const CreateComment = ({ questionId }) => {
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [activeReplyForm, setActiveReplyForm] = useState(null);
-    const [form] = Form.useForm();
+    const [mainForm] = Form.useForm();
+    const [replyForm] = Form.useForm();
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editingContent, setEditingContent] = useState("");
     const [activeMenu, setActiveMenu] = useState(null); // Lưu trạng thái nút 3 chấm
@@ -38,11 +39,11 @@ const CreateComment = ({ questionId }) => {
 
                 setComments(sortedComments);
             } else {
-                message.error("Không tìm thấy comment!");
+                message.error("Comment not found!");
             }
         } catch (error) {
             console.error("API error:", error);
-            message.error("Có lỗi xảy ra khi tải comment!");
+            message.error("An error occurred while loading comments!");
         } finally {
             setLoading(false);
         }
@@ -64,13 +65,13 @@ const CreateComment = ({ questionId }) => {
 
 
             if (response && response.status === 200 || response.status === 201) {
-                form.resetFields();
+                // Reset the appropriate form based on whether it's a reply or main comment
+                if (values.parentCommentId) {
+                    replyForm.resetFields();
+                } else {
+                    mainForm.resetFields();
+                }
                 setActiveReplyForm(null);
-
-                // setComments((prevComments) => [
-                //     ...prevComments,
-                //     { ...commentData, id: response.data.id, createdAt: new Date() },
-                // ]);
 
                 setTimeout(() => {
                     fetchComments();
@@ -110,7 +111,7 @@ const CreateComment = ({ questionId }) => {
     const handleEditComment = async (commentId) => {
         const comment = comments.find((c) => c.id === commentId); // Lấy comment cần chỉnh sửa
         if (comment.userId !== decotoken.id || comment.userName !== decotoken.fullName) {
-            message.error("Bạn không có quyền chỉnh sửa bình luận này!");
+            message.error("You don't have permission to edit this comment!");
             return;
         }
         const updatedCommentData = {
@@ -120,7 +121,7 @@ const CreateComment = ({ questionId }) => {
         try {
             const response = await updateComment(commentId, updatedCommentData, tokenData.access_token);
             if (response && response.status === 200) {
-                message.success("Cập nhật bình luận thành công!");
+                message.success("Comment updated successfully!");
                 setEditingCommentId(null); // Đóng form chỉnh sửa
                 fetchComments(); // Làm mới danh sách bình luận
             } else if (response && response.status === 400) {
@@ -151,7 +152,7 @@ const CreateComment = ({ questionId }) => {
     const handleDeleteComment = async (idComment) => {
         const comment = comments.find((c) => c.id === idComment); // Lấy comment cần xóa
         if (comment.userId !== decotoken.id || comment.userName !== decotoken.fullName) {
-            message.error("Bạn không có quyền xóa bình luận này!");
+            message.error("You don't have permission to delete this comment!");
             return;
         }
         try {
@@ -289,17 +290,17 @@ const CreateComment = ({ questionId }) => {
                             rows={2}
                             value={editingContent}
                             onChange={(e) => setEditingContent(e.target.value)}
-                            placeholder="Chỉnh sửa nội dung bình luận"
+                            placeholder="Edit comment content"
                         />
                         <div style={{ marginTop: "5px", display: "flex", gap: "10px" }}>
                             <Button type="primary" size="small" onClick={() => handleEditComment(comment.id)}>
-                                Lưu
+                                Save
                             </Button>
                             <Button
                                 size="small"
                                 onClick={() => setEditingCommentId(null)}
                             >
-                                Hủy
+                                Cancel
                             </Button>
                         </div>
                     </div>
@@ -309,7 +310,7 @@ const CreateComment = ({ questionId }) => {
                 {activeReplyForm === comment.id && (
                     <div style={{ marginTop: "10px" }}>
                         <Form
-                            form={form}
+                            form={replyForm}
                             layout="inline"
                             style={{ marginTop: "5px" }}
                             onFinish={(values) =>
@@ -318,9 +319,9 @@ const CreateComment = ({ questionId }) => {
                         >
                             <Form.Item
                                 name="content"
-                                rules={[{ required: true, message: "Hãy nhập nội dung bình luận" }]}
+                                rules={[{ required: true, message: "Please enter comment content" }]}
                             >
-                                <Input placeholder="Trả lời bình luận này" />
+                                <Input placeholder="Reply to this comment" />
                             </Form.Item>
                             <Form.Item>
                                 <Button type="primary" htmlType="submit" size="small">
@@ -351,28 +352,28 @@ const CreateComment = ({ questionId }) => {
 
     return (
         <div style={{ padding: "20px", maxWidth: "800px", margin: "auto", marginTop: "20px" }}>
-            <Title level={3}>Bình luận</Title>
+            <Title level={3}>Comments</Title>
 
             {/* Form tạo comment mới */}
             <Form
-                form={form}
+                form={mainForm}
                 onFinish={handleCreateComment}
                 layout="vertical"
                 style={{ marginBottom: 20 }}>
                 <Form.Item
                     name="content"
-                    label="Nội dung bình luận"
-                    rules={[{ required: true, message: "Hãy nhập nội dung bình luận" }]}
+                    label="Comment content"
+                    rules={[{ required: true, message: "Please enter comment content" }]}
                 >
-                    <Input.TextArea rows={3} placeholder="Nhập bình luận của bạn" />
+                    <Input.TextArea rows={3} placeholder="Enter your comment" />
                 </Form.Item>
                 <Button type="primary" htmlType="submit" loading={loading}>
-                    Gửi bình luận
+                    Send comment
                 </Button>
             </Form>
 
             {/* Hiển thị danh sách comment */}
-            {commentTree.length > 0 ? renderComments(commentTree) : <Text>Chưa có bình luận nào.</Text>}
+            {commentTree.length > 0 ? renderComments(commentTree) : <Text>No comments yet.</Text>}
         </div>
     );
 };

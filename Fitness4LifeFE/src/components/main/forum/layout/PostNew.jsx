@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import { List, Typography, Spin, Button } from "antd";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import CategoryModal from "./CategoryModal"; // Import CategoryModal
-import { GetAllQuestion } from "../../../serviceToken/ForumService";
-import { getTokenData } from "../../../serviceToken/tokenUtils";
+import CategoryModal from "../modal/CategoryModal"; // Import CategoryModal
+import { GetAllQuestion } from "../../../../serviceToken/ForumService";
+import { getTokenData } from "../../../../serviceToken/tokenUtils";
 
 const { Title, Text, Paragraph } = Typography;
 
 const PostNew = () => {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [isModalVisible, setIsModalVisible] = useState(false); // Trạng thái hiển thị modal
+    const [isModalVisible, setIsModalVisible] = useState(false); // State for modal visibility
     const navigate = useNavigate();
     const tokenData = getTokenData();
 
@@ -25,7 +25,7 @@ const PostNew = () => {
                         (q) => q.status === "APPROVED"
                     );
 
-                    // Sắp xếp các bài viết theo thời gian (từ mới đến cũ)
+                    // Sort articles by time (newest to oldest)
                     const sortedArticles = approvedQuestions.sort((a, b) =>
                         moment(b.createdAt, "YYYY-MM-DD HH:mm:ss").diff(moment(a.createdAt, "YYYY-MM-DD HH:mm:ss"))
                     );
@@ -42,7 +42,7 @@ const PostNew = () => {
         fetchAllArticles();
     }, []);
 
-    // Hàm rút gọn nội dung
+    // Function to truncate content
     const truncateContent = (content, maxLength) => {
         if (content.length <= maxLength) return content;
         return `${content.substring(0, maxLength)}... `;
@@ -51,19 +51,19 @@ const PostNew = () => {
     return (
         <section id="services">
             <div style={{ padding: "16px", position: "relative" }}>
-                {/* Nút "Post Thread..." */}
+                {/* Post Thread button */}
                 <Button
                     type="primary"
                     style={{ position: "absolute", right: 0, top: 0 }}
-                    onClick={() => setIsModalVisible(true)} // Mở modal
+                    onClick={() => setIsModalVisible(true)} // Open modal
                 >
                     Post Thread...
                 </Button>
 
-                {/* Tiêu đề */}
-                <Title level={2}>Bài Viết Mới Nhất</Title>
+                {/* Title */}
+                <Title level={2}>Latest Posts</Title>
 
-                {/* Hiển thị danh sách bài viết */}
+                {/* Display posts list */}
                 {loading ? (
                     <Spin size="large" />
                 ) : (
@@ -74,44 +74,44 @@ const PostNew = () => {
                                 style={{
                                     borderBottom: "1px solid #f0f0f0",
                                     padding: "16px 0",
-                                    display: "block" // Hiển thị các hàng theo cột
+                                    display: "block" // Display rows in column
                                 }}
                             >
-                                {/* Hàng 1: Title */}
+                                {/* Row 1: Title */}
                                 <Title
                                     level={4}
                                     style={{ marginBottom: "8px", cursor: "pointer", color: "#1890ff" }}
-                                    onClick={() => navigate(`/forum/${article.id}`)} // Điều hướng khi click
+                                    onClick={() => navigate(`/forum/${article.id}`)} // Navigate on click
                                 >
                                     {article.title}
                                 </Title>
 
-                                {/* Hàng 2: Author */}
+                                {/* Row 2: Author */}
                                 <Text type="secondary" style={{ marginBottom: "8px", display: "block" }}>
-                                    <strong>Tác giả:</strong> {article.author}
+                                    <strong>Author:</strong> {article.author}
                                 </Text>
 
-                                {/* Hàng 3: Category */}
+                                {/* Row 3: Category */}
                                 <Text type="secondary" style={{ marginBottom: "8px", display: "block" }}>
-                                    <strong>Chủ đề:</strong> {article.category}
+                                    <strong>Category:</strong> {article.category}
                                 </Text>
 
-                                {/* Hàng 4: Content */}
+                                {/* Row 4: Content */}
                                 <Paragraph style={{ marginBottom: "8px" }}>
                                     {truncateContent(article.content, 300)}
 
                                     <span
-                                        onClick={() => navigate(`/forum/${article.id}`)} // Điều hướng khi click
+                                        onClick={() => navigate(`/forum/${article.id}`)} // Navigate on click
                                         style={{
                                             cursor: "pointer",
                                             color: "#1890ff"
                                         }}
                                     >
-                                        ... xem thêm
+                                        ... read more
                                     </span>
                                 </Paragraph>
 
-                                {/* Hàng 5: Hình ảnh + Ngày tạo */}
+                                {/* Row 5: Image + Creation date */}
                                 <div style={{ display: "flex", alignItems: "center", marginBottom: "8px", gap: "16px" }}>
                                     {article.questionImage?.[0]?.imageUrl && (
                                         <img
@@ -126,14 +126,14 @@ const PostNew = () => {
                                         />
                                     )}
                                     <Text type="secondary">
-                                        <strong>Ngày tạo:</strong>{" "}
+                                        <strong>Created:</strong>{" "}
                                         {moment(article.createdAt, "YYYY-MM-DD HH:mm:ss").format("LLL")}
                                     </Text>
                                 </div>
 
-                                {/* Hàng 6: Lượt xem, Like, Dislike */}
+                                {/* Row 6: Views, Like, Dislike */}
                                 <Text type="secondary" style={{ display: "block" }}>
-                                    <strong>Lượt xem:</strong> {article.viewCount} |
+                                    <strong>Views:</strong> {article.viewCount} |
                                     <strong> Like:</strong> {article.upvote} |
                                     <strong> Dislike:</strong> {article.downVote}
                                 </Text>
@@ -142,10 +142,10 @@ const PostNew = () => {
                     />
                 )}
 
-                {/* Modal hiển thị danh mục */}
+                {/* Category selection modal */}
                 <CategoryModal
                     visible={isModalVisible}
-                    onClose={() => setIsModalVisible(false)} // Đóng modal
+                    onClose={() => setIsModalVisible(false)} // Close modal
                 />
             </div>
         </section>

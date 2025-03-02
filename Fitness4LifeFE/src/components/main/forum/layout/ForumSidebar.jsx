@@ -7,9 +7,9 @@ import { useNavigate } from "react-router-dom";
 const { Title } = Typography;
 
 const forumMenuItems = [
-    { key: "1", label: "CÓ GÌ MỚI", path: "/forums/whats-new" },
-    { key: "2", label: "BÀI VIẾT MỚI", path: "/forums/post-new" },
-    { key: "3", label: "LATEST ACTIVITY", path: "/forum?category=Kiến Thức Thể Hình" },
+    { key: "1", label: "WHAT'S NEW", path: "/forums/whats-new" },
+    { key: "2", label: "NEW POSTS", path: "/forums/post-new" },
+    { key: "3", label: "LATEST ACTIVITY", path: "/forum?category=Fitness Knowledge" },
     { key: "4", label: "FORUM-HOME", path: "/forums" },
     { key: "5", label: "...", path: "/forum?##" }
 ];
@@ -18,13 +18,13 @@ const ForumSidebar = () => {
     const navigate = useNavigate();
 
     const handleMenuClick = (menuItem) => {
-        navigate(menuItem.path); // Điều hướng đến đường dẫn của menu
+        navigate(menuItem.path); // Navigate to the menu path
     };
 
     return (
         <section id="services">
             <div style={{ height: "100%", background: "#fff", padding: "16px" }}>
-                <Title level={4} style={{ textAlign: "center" }}>Menu Diễn Đàn</Title>
+                <Title level={4} style={{ textAlign: "center" }}>Forum Menu</Title>
                 <Menu
                     mode="inline"
                     onClick={(item) =>

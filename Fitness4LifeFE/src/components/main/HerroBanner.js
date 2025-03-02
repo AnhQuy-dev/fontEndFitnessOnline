@@ -13,7 +13,7 @@ const HeroBanner = () => {
               <p>
                 Lorem ipsum dolor sit amet, consectetur adipisici <br /> Praesent eget risus.
               </p>
-              <a className="btn btn-primary btn-lg" href="#">
+              <a className="btn btn-primary btn-lg" href="/bookingMain">
                 Start Now
               </a>
             </div>

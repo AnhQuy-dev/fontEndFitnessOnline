@@ -75,10 +75,10 @@ const LoginToken = () => {
         setTimeout(() => {
           switch (decodedToken.role) {
             case 'ADMIN':
-              navigate('/admin/profile');
+              navigate('/admin/Statistics');
               break;
             case 'USER':
-              navigate('/user/profile');
+              navigate('/profile');
               break;
             default:
               toast.error('You have not been granted permission to access the system.');

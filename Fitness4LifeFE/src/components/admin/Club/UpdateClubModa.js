@@ -81,12 +81,7 @@ const UpdateClubModa = ({ isModalUpdateOpen, setIsModalUpdateOpen, dataUpdate, s
                 layout="vertical"
                 onFinish={handleSubmit}
             >
-                <Form.Item
-                    label="ID"
-                    name="id"
-                >
-                    <Input disabled />
-                </Form.Item>
+                    <Input hidden />
 
                 <Form.Item
                     label="Club Name"

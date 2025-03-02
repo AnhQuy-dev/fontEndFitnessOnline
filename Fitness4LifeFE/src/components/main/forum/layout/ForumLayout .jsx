@@ -1,9 +1,9 @@
 import React from "react";
 import { Layout, Row, Col } from "antd";
 import ForumSidebar from "./ForumSidebar";
-import RecommendedArticles from "./RecommendedArticles";
 import { Outlet, useLocation } from "react-router-dom";
-import AdDisplay from "./AdDisplay";
+import AdDisplay from "../modal/AdDisplay";
+import RecommendedArticles from "./RecommendedArticles";
 const { Sider, Content } = Layout;
 
 const ForumLayout = () => {

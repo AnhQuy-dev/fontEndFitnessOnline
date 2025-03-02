@@ -33,7 +33,6 @@ const categoryOptions = [
 
 const statusOptions = [
     { value: "PENDING", label: "Pending (Chờ xử lý)" },
-    { value: "UNDER_REVIEW", label: "Under Review (Đang duyệt)" },
     { value: "APPROVED", label: "Approved (Đã duyệt)" },
 ];
 
@@ -82,7 +81,7 @@ const CreateQuestionModal = ({ isOpen, onClose, onQuestionCreated }) => {
             if (response.status === 201) {
                 message.success("Tạo bài viết thành công!");
                 form.resetFields();
-                onQuestionCreated(); // Làm mới danh sách bài viết
+                onQuestionCreated(true); // Làm mới danh sách bài viết
                 onClose(); // Đóng modal
             } else {
                 message.error(response.message || "Tạo bài viết thất bại!");

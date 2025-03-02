@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Typography, Divider, Spin, notification, Button } from "antd";
+import { Typography, Divider, Spin, notification, Button, Tag, Space } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
 import { GetAllQuestion } from "../../../serviceToken/ForumService";
+import { EditOutlined, ClockCircleOutlined, UserOutlined, TagOutlined, FolderOutlined } from "@ant-design/icons";
+import moment from "moment";
+import "../../../assets/css/postDetail.css";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -23,14 +26,14 @@ const YourPostDetailPage = () => {
                     setPost(foundPost || null);
                 } else {
                     notification.error({
-                        message: "Lỗi",
-                        description: response.message || "Không thể tải chi tiết bài viết.",
+                        message: "Error",
+                        description: response.message || "Could not load post details.",
                     });
                 }
             } catch (error) {
                 notification.error({
-                    message: "Lỗi",
-                    description: "Không thể kết nối với máy chủ.",
+                    message: "Error",
+                    description: "Could not connect to server.",
                 });
             } finally {
                 setLoading(false);
@@ -38,48 +41,109 @@ const YourPostDetailPage = () => {
         };
 
         fetchPostDetail();
-    }, [postId]);
+    }, [postId, tokenData.access_token]);
 
-    // console.log("data: ", post);
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <Spin size="large" tip="Loading post details..." />
+            </div>
+        );
+    }
 
-    if (loading) return <Spin size="large" />;
-    if (!post) return <Text>Không tìm thấy bài viết.</Text>;
+    if (!post) {
+        return (
+            <div className="error-message">
+                <Title level={4}>Post not found</Title>
+                <Button type="primary" onClick={() => navigate("/profile/your-posts")}>
+                    Back to Posts
+                </Button>
+            </div>
+        );
+    }
 
     return (
-        <section id="services">
-            <div style={{ padding: "24px", maxWidth: "800px", margin: "0 auto" }}>
-                <Title level={3}>{post.title}</Title>
-                <Text type="secondary">Tác giả: {post.author}</Text>
-                <Divider />
+        <section className="post-detail-container" id="services">
+            <div className="post-detail-header">
+                <Title level={2} className="post-title">
+                    {post.title}
+                </Title>
+
+                <div className="post-meta">
+                    <Space>
+                        <UserOutlined />
+                        <Text type="secondary">Author: {post.author}</Text>
+                    </Space>
+                    <Divider type="vertical" />
+                    <Space>
+                        <ClockCircleOutlined />
+                        <Text type="secondary">
+                            {post.createdAt ? moment(post.createdAt).format("MMMM Do YYYY, h:mm a") : "Date not available"}
+                        </Text>
+                    </Space>
+                </div>
+            </div>
+
+            <div className="post-content">
                 <Paragraph>{post.content}</Paragraph>
-                <Divider />
-                <Text type="secondary">Từ khóa: {post.tag}</Text>
-                <br />
-                <Text type="secondary">Danh mục: {post.category?.join(", ")}</Text>
-                <Divider />
-                {post.questionImage?.length > 0 && (
-                    <div>
-                        <Title level={5}>Hình ảnh:</Title>
-                        {post.questionImage.map((image, index) => (
-                            <img
-                                key={index}
-                                src={image.imageUrl}
-                                alt={`Hình ảnh ${index + 1}`}
-                                style={{ maxWidth: "100%", marginBottom: "16px" }}
-                            />
-                        ))}
+            </div>
+
+            <div className="post-tags">
+                <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+                    <div className="post-tag-item">
+                        <Space>
+                            <TagOutlined />
+                            <Text strong>Tags:</Text>
+                            {post.tag?.split(",").map((tag, index) => (
+                                <Tag key={index} color="blue">{tag.trim()}</Tag>
+                            ))}
+                        </Space>
                     </div>
-                )}
+
+                    <div className="post-tag-item">
+                        <Space>
+                            <FolderOutlined />
+                            <Text strong>Categories:</Text>
+                            {post.category?.map((cat, index) => (
+                                <Tag key={index} color="green">{cat}</Tag>
+                            ))}
+                        </Space>
+                    </div>
+                </Space>
+            </div>
+
+            {post.questionImage?.length > 0 && (
+                <div className="post-images">
+                    <Title level={4}>Images</Title>
+                    {post.questionImage.map((image, index) => (
+                        <img
+                            key={index}
+                            src={image.imageUrl}
+                            alt={`Post image ${index + 1}`}
+                            className="post-image"
+                        />
+                    ))}
+                </div>
+            )}
+
+            <div className="action-buttons">
                 <Button
                     type="primary"
-                    style={{ marginTop: "16px" }}
+                    icon={<EditOutlined />}
+                    size="large"
                     onClick={() =>
-                        navigate(`/update-question/${postId}`, {
-                            state: { post }, // Truyền dữ liệu bài viết qua route
+                        navigate(`/profile/update-question/${postId}`, {
+                            state: { post },
                         })
                     }
                 >
-                    Update Question
+                    Edit Post
+                </Button>
+                <Button
+                    size="large"
+                    onClick={() => navigate("/profile/your-posts")}
+                >
+                    Back to Posts
                 </Button>
             </div>
         </section>

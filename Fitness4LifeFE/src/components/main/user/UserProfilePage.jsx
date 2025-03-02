@@ -221,7 +221,7 @@ const UserProfilePage = () => {
                                         type="dashed"
                                         icon={<FileTextOutlined />}
                                         style={styles.actionButton}
-                                        onClick={() => navigate("/your-posts")}
+                                        onClick={() => navigate("/profile/your-posts")}
                                     >
                                         Your Posts
                                     </Button>
@@ -229,7 +229,7 @@ const UserProfilePage = () => {
                                         type="default"
                                         icon={<HistoryOutlined />}
                                         style={styles.actionButton}
-                                        onClick={() => navigate("/history-booking")}
+                                        onClick={() => navigate("/profile/history-booking")}
                                     >
                                         Booking History
                                     </Button>
@@ -237,7 +237,7 @@ const UserProfilePage = () => {
                                         type="dashed"
                                         icon={<HistoryOutlined />}
                                         style={styles.actionButton}
-                                        onClick={() => navigate("/user/profile/yourcode")}
+                                        onClick={() => navigate("/profile/yourcode")}
                                     >
                                         YourPromotion
                                     </Button>

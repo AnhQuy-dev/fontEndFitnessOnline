@@ -11,7 +11,7 @@ const Sidebar = ({ setMenuItems, isCollapsed }) => {
 
 
   const menuItems = useMemo(() => [
-    { label: 'Dashboard', icon: 'bxs-dashboard', path: '/admin/dashboard' },
+    { label: 'Dashboard', icon: 'bxs-hand-up', path: '/admin/Statistics' },
     { label: 'User', icon: 'bxs-user-rectangle', path: '/admin/users' },
     // { label: 'Blogs', icon: 'bx-analyse', path: '/admin/Blogs' },
     { label: 'Club', icon: 'bx-buildings', path: '/admin/Club' },
@@ -22,8 +22,8 @@ const Sidebar = ({ setMenuItems, isCollapsed }) => {
     { label: 'Package', icon: 'bx-message-square-dots', path: '/admin/Package' },
     { label: 'Promotion', icon: 'bx-cog', path: '/admin/Promotion' },
     { label: 'Post', icon: 'bx-cog', path: '/admin/post' },
-    { label: 'Settings', icon: 'bx-cog', path: '/admin/home' },
-    { label: 'Statistics', icon: 'bxs-hand-up', path: '/admin/Statistics' },
+    // { label: 'Settings', icon: 'bx-cog', path: '/admin/home' },
+    // { label: 'Dashboard', icon: 'bxs-dashboard', path: '/admin/dashboard' },
 
 
   ], []); // Menu items

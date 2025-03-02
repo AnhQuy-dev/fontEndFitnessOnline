@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { List, Typography, Spin, Button } from "antd";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
-import { getTokenData } from "../../../serviceToken/tokenUtils";
-import { GetAllQuestion } from "../../../serviceToken/ForumService";
+import { getTokenData } from "../../../../serviceToken/tokenUtils";
+import { GetAllQuestion } from "../../../../serviceToken/ForumService";
 
 const { Title, Text } = Typography;
 
 const WhatsNew = () => {
     const [articles, setArticles] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showAll, setShowAll] = useState(false); // Trạng thái hiển thị tất cả bài viết
+    const [showAll, setShowAll] = useState(false); // State for showing all posts
     const navigate = useNavigate();
     const tokenData = getTokenData();//tokenData.access_token
 
@@ -24,7 +24,7 @@ const WhatsNew = () => {
                     const approvedQuestions = allArticles.filter(
                         (q) => q.status === "APPROVED"
                     );
-                    // Sắp xếp các bài viết theo thời gian (từ mới đến cũ)
+                    // Sort articles by time (newest to oldest)
                     const sortedArticles = approvedQuestions.sort((a, b) =>
                         moment(b.createdAt, "YYYY-MM-DD HH:mm:ss").diff(moment(a.createdAt, "YYYY-MM-DD HH:mm:ss"))
                     );
@@ -41,13 +41,13 @@ const WhatsNew = () => {
         fetchAllArticles();
     }, []);
 
-    // Lấy danh sách bài viết hiển thị (giới hạn 3 bài nếu không showAll)
+    // Get displayed articles list (limit to 3 if not showAll)
     const displayedArticles = showAll ? articles : articles.slice(0, 3);
 
     return (
         <section id="services">
             <div style={{ padding: "16px" }}>
-                <Title level={2}>Bài Viết Mới Nhất</Title>
+                <Title level={2}>Latest Posts</Title>
                 {loading ? (
                     <Spin size="large" />
                 ) : (
@@ -65,22 +65,22 @@ const WhatsNew = () => {
                                         <Title
                                             level={4}
                                             style={{ marginBottom: "8px", cursor: "pointer", color: "#1890ff" }}
-                                            onClick={() => navigate(`/forum/${article.id}`)} // Điều hướng khi click
+                                            onClick={() => navigate(`/forum/${article.id}`)} // Navigate on click
                                         >
                                             {article.title}
                                         </Title>
                                         <Text type="secondary">
-                                            <strong>Tác giả:</strong> {article.author}
+                                            <strong>Author:</strong> {article.author}
                                         </Text>
                                         <br />
                                         <Text type="secondary">
-                                            <strong>Ngày tạo:</strong>{" "}
+                                            <strong>Created:</strong>{" "}
                                             {moment(article.createdAt, "YYYY-MM-DD HH:mm:ss").format("LLL")} |
-                                            <strong> Chủ đề:</strong> {article.category}
+                                            <strong> Category:</strong> {article.category}
                                         </Text>
                                         <br />
                                         <Text type="secondary">
-                                            <strong>Lượt xem:</strong> {article.viewCount} |
+                                            <strong>Views:</strong> {article.viewCount} |
                                             <strong> Like:</strong> {article.upvote} |
                                             <strong> Dislike:</strong> {article.downVote}
                                         </Text>
@@ -88,7 +88,7 @@ const WhatsNew = () => {
                                 </List.Item>
                             )}
                         />
-                        {/* Hiển thị nút Show More nếu chưa show all */}
+                        {/* Show More button if not showing all */}
                         {!showAll && articles.length > 3 && (
                             <div style={{ textAlign: "center", marginTop: "16px" }}>
                                 <Button type="primary" onClick={() => setShowAll(true)}>

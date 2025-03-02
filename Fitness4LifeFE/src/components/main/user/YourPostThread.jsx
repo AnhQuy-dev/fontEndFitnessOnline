@@ -1,161 +1,243 @@
-import React, { useEffect, useState } from "react";
-import { Card, Button, Typography, List, notification } from "antd";
+import React, { useState, useEffect } from "react";
+import {
+    Typography,
+    Card,
+    Button,
+    Spin,
+    notification,
+    Space,
+    Select,
+    Empty,
+    Tag,
+    Pagination,
+    Input,
+} from "antd";
 import { useNavigate } from "react-router-dom";
-import { getDecodedToken, getTokenData } from "../../../serviceToken/tokenUtils";
-import { GetAllQuestion } from "../../../serviceToken/ForumService";
+import {
+    EditOutlined,
+    DeleteOutlined,
+    PlusOutlined,
+    SearchOutlined,
+    InboxOutlined,
+    ClockCircleOutlined,
+    UserOutlined,
+} from "@ant-design/icons";
+import moment from "moment";
+import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { GetAllQuestion, deleteQuestion } from "../../../serviceToken/ForumService";
+import "../../../assets/css/postThread.css";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
+const { Option } = Select;
 
 const YourPostThread = () => {
-    const [posts, setPosts] = useState([]);
-    const [filteredPosts, setFilteredPosts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [filterStatus, setFilterStatus] = useState("ALL"); // "ALL", "PENDING", "UNDER_REVIEW", "APPROVED"
     const navigate = useNavigate();
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize] = useState(8);
+    const [searchText, setSearchText] = useState("");
+    const [statusFilter, setStatusFilter] = useState("ALL");
     const tokenData = getTokenData();
-    const decotoken = getDecodedToken();
-    useEffect(() => {
-        const fetchUserPosts = async () => {
-            try {
-                const response = await GetAllQuestion(tokenData.access_token);
-                if (response.status === 200) {
-                    const allPosts = response.data;
 
-                    if (!Array.isArray(allPosts)) {
-                        throw new Error("Invalid API data format. Expected an array.");
-                    }
-
-                    if (!decotoken?.id || !decotoken?.fullName) {
-                        throw new Error("User data is missing or invalid.");
-                    }
-
-                    const userPosts = allPosts.filter(
-                        (post) =>
-                            post.author?.trim().toLowerCase() === decotoken?.fullName.trim().toLowerCase()
-                    );
-
-                    setPosts(userPosts);
-                    setFilteredPosts(userPosts);
-                } else {
-                    notification.error({
-                        message: "Lỗi",
-                        description: response.message || "Không thể tải bài viết.",
-                    });
-                }
-            } catch (error) {
+    const fetchPosts = async () => {
+        try {
+            setLoading(true);
+            const response = await GetAllQuestion(tokenData.access_token);
+            if (response.status === 200) {
+                setPosts(response.data);
+            } else {
                 notification.error({
-                    message: "Lỗi",
-                    description: "Không thể kết nối với máy chủ.",
+                    message: "Error",
+                    description: response.message || "Failed to load posts",
                 });
-            } finally {
-                setLoading(false);
             }
-        };
+        } catch (error) {
+            notification.error({
+                message: "Error",
+                description: "Could not connect to server",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        fetchUserPosts();
+    useEffect(() => {
+        fetchPosts();
     }, []);
 
-    const handlePostClick = (postId) => {
-        navigate(`/post/${postId}`); // Điều hướng đến trang chi tiết bài viết
+    console.log("posts: ", posts);
+
+    const handleDelete = async (id) => {
+        try {
+            setLoading(true);
+            const response = await deleteQuestion(id, tokenData.access_token);
+            if (response.status === 200) {
+                notification.success({
+                    message: "Success",
+                    description: "Post deleted successfully",
+                });
+                fetchPosts();
+            } else {
+                notification.error({
+                    message: "Error",
+                    description: response.message || "Failed to delete post",
+                });
+            }
+        } catch (error) {
+            notification.error({
+                message: "Error",
+                description: "Could not connect to server",
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const truncateContent = (content, length = 40) => {
-        if (content.length > length) {
-            return `${content.substring(0, length)}...`;
+    const filteredPosts = posts
+        .filter((post) => {
+            const matchesSearch = post.title.toLowerCase().includes(searchText.toLowerCase()) ||
+                post.content.toLowerCase().includes(searchText.toLowerCase());
+            const matchesStatus = statusFilter === "ALL" || post.status === statusFilter;
+            return matchesSearch && matchesStatus;
+        });
+
+    const paginatedPosts = filteredPosts.slice(
+        (currentPage - 1) * pageSize,
+        currentPage * pageSize
+    );
+
+    const getStatusTag = (status) => {
+        switch (status) {
+            case "PENDING":
+                return <Tag className="post-status status-pending">Pending</Tag>;
+            case "APPROVED":
+                return <Tag className="post-status status-approved">Approved</Tag>;
+            default:
+                return null;
         }
-        return content;
     };
 
-    const handleFilterChange = (status) => {
-        setFilterStatus(status);
-        if (status === "ALL") {
-            setFilteredPosts(posts);
-        } else {
-            setFilteredPosts(posts.filter((post) => post.status === status));
-        }
-    };
+    if (loading) {
+        return (
+            <div className="loading-container">
+                <Spin size="large" tip="Loading posts..." />
+            </div>
+        );
+    }
 
     return (
-        <div style={{ padding: "24px", maxWidth: "800px", margin: "0 auto" }}>
-            <Title level={2}>Bài Viết Của Bạn</Title>
-
-            {/* Nút lọc */}
-            <div style={{ marginBottom: "16px" }}>
-                <Button
-                    type={filterStatus === "ALL" ? "primary" : "default"}
-                    onClick={() => handleFilterChange("ALL")}
-                >
-                    Tất cả
-                </Button>
-                <Button
-                    type={filterStatus === "PENDING" ? "primary" : "default"}
-                    onClick={() => handleFilterChange("PENDING")}
-                    style={{ marginLeft: "8px" }}
-                >
-                    Chờ xử lý
-                </Button>
-                <Button
-                    type={filterStatus === "UNDER_REVIEW" ? "primary" : "default"}
-                    onClick={() => handleFilterChange("UNDER_REVIEW")}
-                    style={{ marginLeft: "8px" }}
-                >
-                    Đang duyệt
-                </Button>
-                <Button
-                    type={filterStatus === "APPROVED" ? "primary" : "default"}
-                    onClick={() => handleFilterChange("APPROVED")}
-                    style={{ marginLeft: "8px" }}
-                >
-                    Đã duyệt
-                </Button>
+        <section className="thread-container">
+            <div className="thread-header">
+                <Title level={2} className="thread-title">
+                    Your Posts
+                </Title>
+                <Text className="thread-description">
+                    Manage and track all your posts in one place
+                </Text>
             </div>
 
-            {loading ? (
-                <div>Loading...</div>
-            ) : filteredPosts.length > 0 ? (
-                <List
-                    dataSource={filteredPosts}
-                    renderItem={(post) => (
-                        <List.Item>
-                            <Card
-                                title={post.title}
-                                extra={
-                                    <Button type="link" onClick={() => handlePostClick(post.id)}>
-                                        Xem chi tiết
-                                    </Button>
-                                }
-                                style={{ width: "100%" }}
-                            >
-                                <Text ellipsis style={{ display: "block", marginBottom: "8px" }}>
-                                    {truncateContent(post.content)}{" "}
-                                    {post.content.length > 40 && (
-                                        <Button
-                                            type="link"
-                                            style={{ padding: 0 }}
-                                            onClick={() => handlePostClick(post.id)}
-                                        >
-                                            Xem thêm
-                                        </Button>
-                                    )}
-                                </Text>
-                                <Text type="secondary">
-                                    <strong>Danh mục:</strong>{" "}
-                                    {Array.isArray(post.category)
-                                        ? post.category.join(", ")
-                                        : post.category || "Không có danh mục"}
-                                </Text>
-                                <br />
-                                <Text type="secondary">
-                                    <strong>Trạng thái:</strong> {post.status}
-                                </Text>
-                            </Card>
-                        </List.Item>
-                    )}
-                />
+            <div className="thread-filters">
+                <div className="filter-group">
+                    <Input
+                        placeholder="Search posts..."
+                        prefix={<SearchOutlined />}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        style={{ width: 200 }}
+                    />
+                    <Select
+                        defaultValue="ALL"
+                        style={{ width: 150 }}
+                        onChange={setStatusFilter}
+                    >
+                        <Option value="ALL">All Status</Option>
+                        <Option value="PENDING">Pending</Option>
+                        <Option value="APPROVED">Approved</Option>
+                    </Select>
+
+                </div>
+            </div>
+
+            {paginatedPosts.length === 0 ? (
+                <div className="empty-state">
+                    <InboxOutlined className="empty-state-icon" />
+                    <Title level={4}>No Posts Found</Title>
+                    <Text type="secondary">
+                        Start by creating your first post or try different search criteria
+                    </Text>
+                </div>
             ) : (
-                <Text>Không có bài viết nào.</Text>
+                <div className="post-grid">
+                    {paginatedPosts.map((post) => (
+                        <Card key={post.id} className="post-card" hoverable>
+                            <div className="post-card-content">
+                                <Title
+                                    level={4}
+                                    className="post-card-title"
+                                    onClick={() => navigate(`/profile/post/${post.id}`)}
+                                >
+                                    {post.title}
+                                </Title>
+
+                                <div className="post-card-meta">
+                                    <Space>
+                                        <UserOutlined />
+                                        <Text type="secondary">{post.author}</Text>
+                                    </Space>
+                                    <Space>
+                                        <ClockCircleOutlined />
+                                        <Text type="secondary">
+                                            {moment(post.createdAt).format("MMM DD, YYYY")}
+                                        </Text>
+                                    </Space>
+                                </div>
+
+                                <Paragraph
+                                    className="post-card-description"
+                                    ellipsis={{ rows: 2 }}
+                                >
+                                    {post.content}
+                                </Paragraph>
+
+                                <div className="post-card-footer">
+                                    {getStatusTag(post.status)}
+                                    <div className="post-actions">
+                                        <Button
+                                            type="primary"
+                                            icon={<EditOutlined />}
+                                            onClick={() =>
+                                                navigate(`/profile/update-question/${post.id}`, {
+                                                    state: { post },
+                                                })
+                                            }
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            danger
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => handleDelete(post.id)}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
             )}
-        </div>
+
+            <div className="pagination-container">
+                <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={filteredPosts.length}
+                    onChange={setCurrentPage}
+                    showSizeChanger={false}
+                />
+            </div>
+        </section>
     );
 };
 
