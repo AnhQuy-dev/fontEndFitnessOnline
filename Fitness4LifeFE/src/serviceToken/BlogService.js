@@ -12,9 +12,9 @@ export const fetchAllBlogs = async () => {
         Authorization: tokenData ? `Bearer ${tokenData.access_token}` : ''
       }
     };
-    
+  
     const response = await axios.get(`${API_URL}/deal/blogs`, config);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Error fetching blogs:', error);
     throw error;

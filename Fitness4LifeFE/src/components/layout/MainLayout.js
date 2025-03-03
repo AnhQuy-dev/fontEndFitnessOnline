@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MainHeader from '../main/MainHeader';
 import { Outlet } from 'react-router-dom';
 import Footer from '../main/Footer';
@@ -14,10 +14,15 @@ import Portfolio from '../main/Portfolio';
 import PricingSection from '../main/PricingSection';
 import Contact from '../main/Contact';
 import { toast, ToastContainer } from 'react-toastify';
+import Chatbot from '../main/chat/Chatbot';
 
 function MainLayout(props) {
 
+  const [showChatbot, setShowChatbot] = useState(false);
 
+  const toggleChatbot = () => {
+    setShowChatbot(prevState => !prevState);
+  };
   // Hiển thị thông báo khi trạng thái notificationMessage thay đổi
   useEffect(() => {
 
@@ -50,6 +55,13 @@ function MainLayout(props) {
       </main>
       <Footer />
 
+      {/* Nút mở chatbot */}
+      <button className="chatbot-toggle" onClick={toggleChatbot}>
+        💬
+      </button>
+
+      {/* Hiển thị chatbot nếu showChatbot = true */}
+      {showChatbot && <Chatbot />}
     </div>
   );
 }
