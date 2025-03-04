@@ -15,13 +15,14 @@ const Blog = () => {
       .then((response) => {
         // Đảm bảo lấy đúng dữ liệu từ response
         const data = response.data || response;
-        console.log(data);
         const sortedBlogs = data.sort((a, b) => {
           const dateA = new Date(a.createdAt[0], a.createdAt[1] - 1, a.createdAt[2], a.createdAt[3], a.createdAt[4], a.createdAt[5]);
           const dateB = new Date(b.createdAt[0], b.createdAt[1] - 1, b.createdAt[2], b.createdAt[3], b.createdAt[4], b.createdAt[5]);
           return dateB - dateA; // Sort in descending order (latest first)
         });
         setBlogs(sortedBlogs);
+        console.log("bloogf",blogs);
+        
         setLoading(false); 
       })
       .catch((error) => {
