@@ -7,7 +7,6 @@ import MainHeader from './components/main/MainHeader';
 import Blog from './components/main/blog/Blog';
 import BlogDetail from './components/main/blog/BlogDetail';
 import ContactForm from './components/main/contact/ContactForm';
-import Blogs from './components/admin/Blog/Blogs';
 import Users from './components/admin/User/Users';
 import Room from './components/admin/Room/Room';
 import Branch from './components/admin/Branch/Branch';
@@ -45,6 +44,7 @@ import UpdateQuestion from './components/main/forum/process/UpdateQuestion';
 import Club from './components/admin/Club/Club';
 import BookingMain from './components/main/booking/Booking';
 import Order from './components/admin/Orders/Orders';
+import BlogAdmin from './components/admin/Blog/BlogAdmin';
 
 const App = () => {
   return (
@@ -101,7 +101,7 @@ const App = () => {
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="Users" element={<Users />} />
-            <Route path="Blogs" element={<Blogs />} />
+            <Route path="Blogs" element={<BlogAdmin />} />
             <Route path="Club" element={<Club />} />
             <Route path="Room" element={<Room />} />
             <Route path="Branch" element={<Branch />} />
