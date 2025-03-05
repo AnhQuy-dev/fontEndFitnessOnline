@@ -159,7 +159,7 @@ const MainHeader = () => {
         </Menu.Item>
       )}
       <Menu.Item key="history-booking">
-        <Link to="/history-booking">Booking History</Link>
+        <Link to="/profile/history-booking">Booking History</Link>
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="logout" onClick={confirmLogout}>
@@ -184,14 +184,8 @@ const MainHeader = () => {
 
   const menuB = (
     <Menu>
-      <Menu.Item key="trainers">
-        <a href="#our-team">Trainers</a>
-      </Menu.Item>
       <Menu.Item key="clubs">
-        <Link to="/clubs">Clubs</Link>
-      </Menu.Item>
-      <Menu.Item key="gallery">
-        <a href="#portfolio">Gallery</a>
+
       </Menu.Item>
     </Menu>
   );
@@ -231,11 +225,7 @@ const MainHeader = () => {
                 <a href="/">Home</a>
               </li>
               <li className="scroll">
-                <Dropdown overlay={menuB} trigger={['click']}>
-                  <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
-                    Branches <span className="caret"></span>
-                  </a>
-                </Dropdown>
+                <Link to="/clubs">Clubs</Link>
               </li>
               <li className="scroll">
                 <Link to="/bookingMain">Booking</Link>
