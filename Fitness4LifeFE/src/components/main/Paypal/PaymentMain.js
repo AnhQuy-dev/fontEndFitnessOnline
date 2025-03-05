@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Card, Button, notification, Row, Col, Typography, Divider, Space, message } from 'antd';
+import { Card, Button, notification, Row, Col, Typography, Divider, Space, message, Input } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SyncOutlined, ArrowLeftOutlined, CreditCardOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import stickman from '../../../assets/images/Stickman.gif';
 import '../../../assets/css/Main/payMent.css';
 import { getDecodedToken, getTokenData } from '../../../serviceToken/tokenUtils';
 import { ProceedToPayment } from '../../../serviceToken/PaymentService';
+import { findCode } from '../../../serviceToken/PromotionService';
 
 const { Title, Text } = Typography;
 
@@ -15,7 +16,7 @@ const PaymentPage = () => {
   const { package: selectedPackage } = location.state || {};
   const [isLoading, setIsLoading] = useState(false);
   const [couponCode, setCouponCode] = useState('');
-  const [discountedPrice, setDiscountedPrice] = useState(null);
+  const [discountedPrice, setDiscountedPrice] = useState();
 
   const tokenData = getTokenData();
   const decodeToken = getDecodedToken();
@@ -41,6 +42,7 @@ const PaymentPage = () => {
 
   const handleSubmitPayment = async () => {
     setIsLoading(true);
+
     try {
       // Validate required data
       if (!selectedPackage?.id || !userId) {
@@ -60,7 +62,20 @@ const PaymentPage = () => {
         successUrl: "http://localhost:3000/order",
         currency: "USD",
         intent: "Sale",
+        transactions: [
+          {
+            amount: {
+              total: discountedPrice, // Format số tiền
+              currency: "USD",
+            },
+            description: "Payment for Gym Membership",
+          }
+        ],
       };
+
+      console.log("payload: ", payload);
+
+
 
       if (!tokenData) {
         notification.error({
@@ -130,26 +145,52 @@ const PaymentPage = () => {
   // Format the price
   const formattedPrice = selectedPackage.price?.toLocaleString('vi-VN') || '0';
 
+  const applyDiscount = async () => {
+    if (!couponCode) {
+      message.error("Please enter a coupon code.");
+      return;
+    }
 
+    try {
+      const discount = await findCode(couponCode, userId, tokenData.access_token);
+      console.log("Discount response: ", discount);
 
-  // Danh sách mã giảm giá hợp lệ
-  const discountCodes = {
-    "DISCOUNT10": 0.1, // Giảm 10%
-    "SAVE20": 0.2, // Giảm 20%
-    "FITNESS30": 0.3, // Giảm 30%
-  };
+      if (!discount || !discount.data) {
+        message.error("Invalid discount code.");
+        setDiscountedPrice(null);
+        return;
+      }
 
-  const applyDiscount = () => {
-    const discount = discountCodes[couponCode.toUpperCase()];
-    if (discount) {
-      const newPrice = selectedPackage.price * (1 - discount);
-      setDiscountedPrice(newPrice.toFixed(2)); // Giữ 2 số thập phân
-      message.success(`Applied ${discount * 100}% discount!`);
-    } else {
-      message.error("Invalid discount code.");
-      setDiscountedPrice(null);
+      // Lấy giá trị discount chính xác
+      const discountValue = parseFloat(discount.data.discountValue);
+      if (isNaN(discountValue) || discountValue <= 0) {
+        message.error("Invalid discount value from API.");
+        setDiscountedPrice(null);
+        return;
+      }
+
+      // Kiểm tra điều kiện giảm giá
+      if (
+        discount.data.minValue <= selectedPackage.price &&
+        (discount.data.packageName === selectedPackage.packageName || discount.data.packageName === null)
+      ) {
+        let newPrice = selectedPackage.price - discountValue;
+
+        if (newPrice < 0) newPrice = 0; // Đảm bảo giá không âm
+
+        setDiscountedPrice(newPrice.toFixed(0)); // Cập nhật state
+        console.log("New discounted price:", newPrice.toFixed(0));
+
+        message.success(`Applied ${discountValue}% discount!`);
+      } else {
+        message.error("This discount code cannot be applied to the selected package.");
+      }
+    } catch (error) {
+      console.error("Error applying discount:", error);
+      message.error("Failed to apply discount. Please try again.");
     }
   };
+
 
   return (
     <section id="services">
@@ -249,11 +290,22 @@ const PaymentPage = () => {
                 </div>
                 <div className="total-row">
                   <Text strong>Price:</Text>
-                  <Text>{formattedPrice} VND/month</Text>
+                  <Text>{formattedPrice} USD</Text>
                 </div>
-                <div className="total-row total-amount">
+                {/* Coupon Input */}
+                <div className="total-row coupon-section" style={{ marginTop: 10 }}>
+                  <Input
+                    placeholder="Enter discount code"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    style={{ width: 200, marginRight: 10 }}
+                  />
+                  <Button type="primary" onClick={applyDiscount}>Apply</Button>
+                </div>
+
+                <div className="total-row total-amount" style={{ marginTop: 10 }}>
                   <Text strong>SUBTOTAL:</Text>
-                  <Text strong>{formattedPrice} VND</Text>
+                  <Text strong>{discountedPrice || formattedPrice} USD</Text>
                 </div>
               </div>
 

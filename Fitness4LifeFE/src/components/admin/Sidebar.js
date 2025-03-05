@@ -23,7 +23,7 @@ const Sidebar = ({ setMenuItems, isCollapsed }) => {
     { label: 'Promotion', icon: 'bx-cog', path: '/admin/Promotion' },
     { label: 'Post', icon: 'bx-cog', path: '/admin/post' },
     { label: 'Orders', icon: 'bx-cog', path: '/admin/orders' },
-    // { label: 'Settings', icon: 'bx-cog', path: '/admin/home' },
+    { label: 'BookingManage', icon: 'bx-cog', path: '/admin/BookingManage' },
     // { label: 'Dashboard', icon: 'bxs-dashboard', path: '/admin/dashboard' },
 
 

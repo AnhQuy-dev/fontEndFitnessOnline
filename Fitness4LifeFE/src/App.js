@@ -45,6 +45,7 @@ import Club from './components/admin/Club/Club';
 import BookingMain from './components/main/booking/Booking';
 import Order from './components/admin/Orders/Orders';
 import BlogAdmin from './components/admin/Blog/BlogAdmin';
+import BookingManage from './components/admin/Booking/BookingManage';
 
 const App = () => {
   return (
@@ -112,6 +113,7 @@ const App = () => {
             <Route path="profile" element={<UserProfilePage />} />
             <Route path="Statistics" element={<StatisticsPage />} />
             <Route path="orders" element={<Order />} />
+            <Route path="BookingManage" element={<BookingManage />} />
           </Route>
         </Route>
 

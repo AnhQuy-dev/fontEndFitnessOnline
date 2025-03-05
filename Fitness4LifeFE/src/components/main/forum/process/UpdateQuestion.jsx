@@ -66,6 +66,7 @@ const UpdateQuestion = () => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [imageList, setImageList] = useState([]);
+    const [deletedImageIds, setDeletedImageIds] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const tokenData = getTokenData();
 
@@ -117,6 +118,15 @@ const UpdateQuestion = () => {
         });
     };
 
+    // Xử lý khi người dùng xóa ảnh
+    const handleRemoveImage = (file) => {
+        if (file.uid) {
+            setDeletedImageIds((prevIds) => [...prevIds, file.uid]);
+        }
+        setImageList((prevList) => prevList.filter(item => item.uid !== file.uid));
+    };
+    // console.log("deletedImageIds: ", deletedImageIds);
+
     const handleUpdate = async (values) => {
         try {
             setLoading(true);
@@ -126,6 +136,7 @@ const UpdateQuestion = () => {
             formData.append('content', values.content);
             formData.append('tag', values.tag);
             formData.append('category', values.category);
+            formData.append('deleteImageUrl', deletedImageIds);
 
             // Log FormData entries
             console.log('FormData being sent:');
@@ -138,7 +149,7 @@ const UpdateQuestion = () => {
                 console.log('Images to upload:', values.images.fileList);
                 values.images.fileList.forEach((file) => {
                     if (file.originFileObj) {
-                        formData.append('images', file.originFileObj);
+                        formData.append('imageQuestionUrl', file.originFileObj);
                         console.log('Adding image:', file.name);
                     }
                 });
@@ -152,7 +163,7 @@ const UpdateQuestion = () => {
                     message: 'Success',
                     description: 'Question updated successfully!',
                 });
-                navigate('/your-posts');
+                navigate('/profile/your-posts');
             } else {
                 notification.error({
                     message: 'Error',
@@ -306,6 +317,7 @@ const UpdateQuestion = () => {
                                         listType="picture-card"
                                         fileList={imageList}
                                         onChange={({ fileList }) => setImageList(fileList)}
+                                        onRemove={handleRemoveImage} // Thêm sự kiện xóa ảnh
                                         beforeUpload={() => false}
                                         multiple
                                         className="custom-upload"

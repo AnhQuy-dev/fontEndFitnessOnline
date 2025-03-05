@@ -155,7 +155,7 @@ const MainHeader = () => {
       </Menu.Item>
       {user?.role === 'ADMIN' && (
         <Menu.Item key="admin-dashboard">
-          <Link to="/admin/dashboard">Admin Dashboard</Link>
+          <Link to="/admin/Statistics">Admin Dashboard</Link>
         </Menu.Item>
       )}
       <Menu.Item key="history-booking">
