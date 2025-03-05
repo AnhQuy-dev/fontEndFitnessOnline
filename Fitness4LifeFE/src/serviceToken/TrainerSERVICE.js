@@ -68,10 +68,9 @@ export const updateTrainer = async (id, TrainerDataPayloadUpdate, token) => {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
       },
       credentials: "include",
-      body: JSON.stringify(TrainerDataPayloadUpdate)
+      body: TrainerDataPayloadUpdate
     });
     // Kiểm tra lỗi HTTP (4xx, 5xx)
     if (!response.ok) {

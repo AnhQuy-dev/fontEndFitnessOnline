@@ -70,12 +70,10 @@ const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
             
             if (fileList && fileList.length > 0) {
                 const fileObj = fileList[0].originFileObj || fileList[0];
-                console.log("File object being added:", fileObj);
                 formData.append("file", fileObj);
             }
 
             const res = await createTrainer(formData, tokenData.access_token);
-            console.log("Server response:", res);
 
             if (res.data) {
                 notification.success({

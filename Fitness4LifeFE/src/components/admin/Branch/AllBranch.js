@@ -36,8 +36,8 @@ function AllBranch(props) {
 
     const columns = [
         {
-            title: 'Id',
-            dataIndex: 'id',
+            title: 'Branch Name',
+            dataIndex: 'branchName',
             render: (_, record) => (
                 <a
                     href="#"
@@ -46,13 +46,9 @@ function AllBranch(props) {
                         setIsDataDetailOpen(true);
                     }}
                 >
-                    {record.id}
+                    {record.branchName}
                 </a>
             ),
-        },
-        {
-            title: 'Branch Name',
-            dataIndex: 'branchName',
         },
         {
             title: 'Address',
@@ -92,21 +88,21 @@ function AllBranch(props) {
                         >
                             Edit
                         </Menu.Item>
-                        <Menu.Item
+                        {/* <Menu.Item
                             key="delete"
                             icon={<DeleteOutlined style={{ color: 'red' }} />}
                         >
                             <Popconfirm
                                 title="Delete Branch"
                                 description="Are you sure delete it?"
-                                onConfirm={() => handleDeleteBranch(record.id)}
+                                // onConfirm={() => handleDeleteBranch(record.id)}
                                 okText="Yes"
                                 cancelText="No"
                                 placement="left"
                             >
                                 Delete
                             </Popconfirm>
-                        </Menu.Item>
+                        </Menu.Item> */}
                     </Menu>
                 );
                 return (
@@ -133,21 +129,21 @@ function AllBranch(props) {
 
     };
 
-    const handleDeleteBranch = async (id) => {
-        const res = await deleteBranch(id, tokenData.access_token);
-        if (res.data) {
-            notification.success({
-                message: 'Delete Branch',
-                description: 'Delete Branch successfully....!',
-            });
-            await loadBranch();
-        } else {
-            notification.error({
-                message: 'Error deleting branch',
-                description: JSON.stringify(res.message),
-            });
-        }
-    };
+    // const handleDeleteBranch = async (id) => {
+    //     const res = await deleteBranch(id, tokenData.access_token);
+    //     if (res.data) {
+    //         notification.success({
+    //             message: 'Delete Branch',
+    //             description: 'Delete Branch successfully....!',
+    //         });
+    //         await loadBranch();
+    //     } else {
+    //         notification.error({
+    //             message: 'Error deleting branch',
+    //             description: JSON.stringify(res.message),
+    //         });
+    //     }
+    // };
 
     return (
         <>

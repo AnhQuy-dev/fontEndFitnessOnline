@@ -16,14 +16,16 @@ function AllTrainers(props) {
     const [dataDetail, setDataDetail] = useState(null);
 
     const [searchText, setSearchText] = useState('');
-    const [branchFilters, setBranchFilters] = useState([]);
     const tokenData = getTokenData();
+
+
+
 
     // Columns definition for Table
     const columns = [
         {
-            title: 'Id',
-            dataIndex: 'id',
+            title: 'Full Name',
+            dataIndex: 'fullName',
             render: (_, record) => (
                 <a
                     href="#"
@@ -32,13 +34,14 @@ function AllTrainers(props) {
                         setIsDataDetailOpen(true);
                     }}
                 >
-                    {record.id}
+                    {record.fullName}
                 </a>
             ),
         },
         {
-            title: 'Full Name',
-            dataIndex: 'fullName',
+            title: 'Branch Name',
+            dataIndex: 'branch',
+            render: (branch) => branch?.branchName || 'N/A',
         },
         {
             title: 'Specialization',
@@ -72,8 +75,7 @@ function AllTrainers(props) {
                             onClick={() => {
                                 setDataUpdate(record);
                                 setIsModalUpdateOpen(true);
-                                console.log("d",record);
-                                
+
                             }}
                         >
                             Edit
@@ -119,7 +121,7 @@ function AllTrainers(props) {
 
     const handleDeleteTrainer = async (id) => {
         try {
-            const res = await deleteTrainer(id,tokenData.access_token);
+            const res = await deleteTrainer(id, tokenData.access_token);
             if (res.status === 200 || res.data?.status === 200) {
                 notification.success({
                     message: 'Delete Trainer',
@@ -182,6 +184,7 @@ function AllTrainers(props) {
                 setDataUpdate={setDataUpdate}
                 loadTrainers={loadTrainers}
                 token={token}
+                dataTrainer={dataTrainer}
             />
 
             <DetailTrainer

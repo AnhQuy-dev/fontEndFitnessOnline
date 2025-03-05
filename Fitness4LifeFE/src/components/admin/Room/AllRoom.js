@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Dropdown, Input, Menu, notification, Popconfirm, Table } from 'antd';
+import { Button, Dropdown, Input, Menu, notification, Popconfirm, Table, Tag } from 'antd';
 import DetailRoom from './DetailRoom';
 import UpdateRoom from './UpdateRoom';
 import '../../../assets/css/club.css';
 import { getTokenData } from '../../../serviceToken/tokenUtils';
-import { deleteRoom } from '../../../serviceToken/RoomSERVICE';
+import { deleteRoom, updateRoom } from '../../../serviceToken/RoomSERVICE';
 
 function AllRoom(props) {
     const { loadRoom, dataRoom, filteredData, setFilteredData, setIsModalOpen, token } = props;
@@ -26,10 +26,63 @@ function AllRoom(props) {
         }
     }, [dataRoom]);
 
+
+    const handleStatusChange = async (record) => {
+        try {
+            const updatedRoom = {
+                club: record.trainer.branch.id,
+                trainer: record.trainer.id,
+                roomName: record.roomName,
+                slug: record.slug,
+                capacity: record.capacity,
+                facilities: record.facilities,
+                status: !record.status,
+                startTime: record.startTime,
+                endTime: record.endTime
+            };
+
+            console.log("Request data:", {
+                roomId: record.id,
+                updatedRoom: updatedRoom,
+                token: tokenData.access_token
+            });
+
+            const response = await updateRoom(record.id, updatedRoom, tokenData.access_token);
+            console.log("API Response:", response);
+
+            if (response.status === 200 || response.status === 201) {
+                notification.success({
+                    message: 'Update Status',
+                    description: `Room status has been ${updatedRoom.status ? 'activated' : 'deactivated'} successfully!`,
+                });
+                await loadRoom();
+            } else {
+                console.log("Error details:", {
+                    status: response.status,
+                    data: response.data,
+                    message: response.data?.message
+                });
+
+                notification.error({
+                    message: 'Error updating status',
+                    description: response.data?.message || 'Failed to update room status',
+                });
+            }
+        } catch (error) {
+            console.error("Full error object:", error);
+            console.error("Error response:", error.response);
+
+            notification.error({
+                message: 'Error updating status',
+                description: error.response?.data?.message || 'An error occurred while updating room status',
+            });
+        }
+    };
+
     const columns = [
         {
-            title: 'Id',
-            dataIndex: 'id',
+            title: 'Room Name',
+            dataIndex: 'roomName',
             render: (_, record) => (
                 <a
                     href="#"
@@ -38,13 +91,14 @@ function AllRoom(props) {
                         setIsDataDetailOpen(true);
                     }}
                 >
-                    {record.id}
+                    {record.roomName}
                 </a>
             ),
         },
         {
-            title: 'Room Name',
-            dataIndex: 'roomName',
+            title: 'Club Name',
+            dataIndex: 'club',
+            render: (club) => club.name || 'N/A',
         },
         {
             title: 'Capacity',
@@ -55,10 +109,6 @@ function AllRoom(props) {
             dataIndex: 'availableSeats',
         },
         {
-            title: 'Facilities',
-            dataIndex: 'facilities',
-        },
-        {
             title: 'Start Time',
             dataIndex: 'startTime',
             render: (value) => `${value[0]}:${value[1] === 0 ? '00' : value[1]}`,
@@ -67,6 +117,27 @@ function AllRoom(props) {
             title: 'End Time',
             dataIndex: 'endTime',
             render: (value) => `${value[0]}:${value[1] === 0 ? '00' : value[1]}`,
+        },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            render: (status, record) => (
+                <Popconfirm
+                    title={`${status ? 'Deactivate' : 'Activate'} Room`}
+                    description={`Are you sure you want to ${status ? 'deactivate' : 'activate'} this room?`}
+                    onConfirm={() => handleStatusChange(record)}
+                    okText="Yes"
+                    cancelText="No"
+                    placement="left"
+                >
+                    <Tag
+                        color={status ? 'green' : 'red'}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        {status ? 'Active' : 'Inactive'}
+                    </Tag>
+                </Popconfirm>
+            ),
         },
         {
             title: 'Action',
@@ -83,21 +154,6 @@ function AllRoom(props) {
                             }}
                         >
                             Edit
-                        </Menu.Item>
-                        <Menu.Item
-                            key="delete"
-                            icon={<DeleteOutlined style={{ color: 'red' }} />}
-                        >
-                            <Popconfirm
-                                title="Delete Room"
-                                description="Are you sure delete it?"
-                                onConfirm={() => handleDeleteRoom(record.id)}
-                                okText="Yes"
-                                cancelText="No"
-                                placement="left"
-                            >
-                                Delete
-                            </Popconfirm>
                         </Menu.Item>
                     </Menu>
                 );
@@ -123,29 +179,29 @@ function AllRoom(props) {
         setFilteredData(filtered);
     };
 
-    const handleDeleteRoom = async (id) => {
-        try {
-            const response = await deleteRoom(id, tokenData.access_token);
-            if (response.status === 200 || response.status === 201) {
-                notification.success({
-                    message: 'Delete Room',
-                    description: 'Delete Room successfully!',
-                });
-                await loadRoom();
-            } else {
-                notification.error({
-                    message: 'Error deleting room',
-                    description: response.data?.message || 'Failed to delete room',
-                });
-            }
-        } catch (error) {
-            console.error("Delete room error:", error);
-            notification.error({
-                message: 'Error deleting room',
-                description: error.response?.data?.message || 'An error occurred while deleting room',
-            });
-        }
-    };
+    // const handleDeleteRoom = async (id) => {
+    //     try {
+    //         const response = await deleteRoom(id, tokenData.access_token);
+    //         if (response.status === 200 || response.status === 201) {
+    //             notification.success({
+    //                 message: 'Delete Room',
+    //                 description: 'Delete Room successfully!',
+    //             });
+    //             await loadRoom();
+    //         } else {
+    //             notification.error({
+    //                 message: 'Error deleting room',
+    //                 description: response.data?.message || 'Failed to delete room',
+    //             });
+    //         }
+    //     } catch (error) {
+    //         console.error("Delete room error:", error);
+    //         notification.error({
+    //             message: 'Error deleting room',
+    //             description: error.response?.data?.message || 'An error occurred while deleting room',
+    //         });
+    //     }
+    // };
 
     return (
         <>

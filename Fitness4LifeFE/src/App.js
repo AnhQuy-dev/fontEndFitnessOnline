@@ -1,7 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Outlet, Navigate } from 'react-router-dom';
-import Home from './components/admin/page/Home';
-import AdminDashboard from './components/admin/page/AdminDashboard';
 import AdminLayout from './components/layout/AdminLayout';
 import MainLayout from './components/layout/MainLayout';
 import Footer from './components/main/Footer';
@@ -46,6 +44,7 @@ import DetailPage from './components/main/forum/modal/DetailPage';
 import UpdateQuestion from './components/main/forum/process/UpdateQuestion';
 import Club from './components/admin/Club/Club';
 import BookingMain from './components/main/booking/Booking';
+import Order from './components/admin/Orders/Orders';
 
 const App = () => {
   return (
@@ -101,9 +100,6 @@ const App = () => {
         {/* Admin-only Routes */}
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="home" element={<Home />} />
             <Route path="Users" element={<Users />} />
             <Route path="Blogs" element={<Blogs />} />
             <Route path="Club" element={<Club />} />
@@ -115,6 +111,7 @@ const App = () => {
             <Route path="Post" element={<PostPage />} />
             <Route path="profile" element={<UserProfilePage />} />
             <Route path="Statistics" element={<StatisticsPage />} />
+            <Route path="orders" element={<Order />} />
           </Route>
         </Route>
 

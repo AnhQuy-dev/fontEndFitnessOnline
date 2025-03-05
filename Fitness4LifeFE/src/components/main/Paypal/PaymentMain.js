@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Card, Button, notification, Row, Col, Typography, Divider, Space, message } from 'antd';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SyncOutlined, ArrowLeftOutlined, CreditCardOutlined, CheckCircleOutlined } from '@ant-design/icons';
@@ -14,6 +14,8 @@ const PaymentPage = () => {
   const navigate = useNavigate();
   const { package: selectedPackage } = location.state || {};
   const [isLoading, setIsLoading] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [discountedPrice, setDiscountedPrice] = useState(null);
 
   const tokenData = getTokenData();
   const decodeToken = getDecodedToken();
@@ -127,6 +129,27 @@ const PaymentPage = () => {
 
   // Format the price
   const formattedPrice = selectedPackage.price?.toLocaleString('vi-VN') || '0';
+
+
+
+  // Danh sách mã giảm giá hợp lệ
+  const discountCodes = {
+    "DISCOUNT10": 0.1, // Giảm 10%
+    "SAVE20": 0.2, // Giảm 20%
+    "FITNESS30": 0.3, // Giảm 30%
+  };
+
+  const applyDiscount = () => {
+    const discount = discountCodes[couponCode.toUpperCase()];
+    if (discount) {
+      const newPrice = selectedPackage.price * (1 - discount);
+      setDiscountedPrice(newPrice.toFixed(2)); // Giữ 2 số thập phân
+      message.success(`Applied ${discount * 100}% discount!`);
+    } else {
+      message.error("Invalid discount code.");
+      setDiscountedPrice(null);
+    }
+  };
 
   return (
     <section id="services">

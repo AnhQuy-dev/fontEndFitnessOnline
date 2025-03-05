@@ -18,7 +18,7 @@ const scheduleOptions = [
 ];
 
 const UpdateTrainer = (props) => {
-    const { isModalUpdateOpen, setIsModalUpdateOpen, dataUpdate, setDataUpdate, loadTrainers, token } = props;
+    const { isModalUpdateOpen, setIsModalUpdateOpen, dataUpdate, setDataUpdate, loadTrainers, dataTrainer } = props;
     const [fullName, setFullName] = useState("");
     const [slug, setSlug] = useState("");
     const [specialization, setSpecialization] = useState("");
@@ -34,6 +34,8 @@ const UpdateTrainer = (props) => {
     const [error, setErrors] = useState({});
     const tokenData = getTokenData();
 
+
+    
     useEffect(() => {
         const getAllBranch = async () => {
             try {
@@ -180,31 +182,33 @@ const UpdateTrainer = (props) => {
             });
             return;
         }
-
+    
         try {
             setLoading(true);
             
-            // Create FormData object - matching the CreateTrainer approach
+            // Create FormData object
             const formData = new FormData();
-            formData.append("fullName", fullName);
-            formData.append("slug", slug);
-            formData.append("specialization", specialization);
-            formData.append("experienceYear", experienceYear);
-            formData.append("certificate", certificate);
-            formData.append("phoneNumber", phoneNumber);
-            formData.append("branch", branch);
+            
+            // Ensure all text fields are trimmed and not undefined
+            formData.append("fullName", fullName.trim());
+            formData.append("specialization", specialization.trim());
+            formData.append("experienceYear", experienceYear.toString());
+            formData.append("certificate", certificate.trim());
+            formData.append("phoneNumber", phoneNumber.trim());
+            formData.append("branch", branch.toString());
             
             if (scheduleTrainers && scheduleTrainers.length > 0) {
                 scheduleTrainers.forEach(day => {
                     formData.append("scheduleTrainers", day);
                 });
+
             }
             
-            if (fileList && fileList.length > 0 && fileList[0].originFileObj) {
-                const fileObj = fileList[0].originFileObj;
-                console.log("File object being added:", fileObj);
+            if (fileList && fileList.length > 0) {
+                const fileObj = fileList[0].originFileObj || fileList[0];
                 formData.append("file", fileObj);
             }
+            
             
             console.log("Form data being sent:");
             for (let pair of formData.entries()) {
@@ -212,9 +216,11 @@ const UpdateTrainer = (props) => {
             }
             
             const res = await updateTrainer(
-                dataUpdate.id, formData, tokenData.access_token
+                dataUpdate.id, 
+                formData, 
+                tokenData.access_token 
             );
-
+    
             if (res.status === 200) {
                 notification.success({
                     message: "Update Trainer",
@@ -225,14 +231,14 @@ const UpdateTrainer = (props) => {
             } else {
                 notification.error({
                     message: "Error Updating Trainer",
-                    description: JSON.stringify(res.data || "Unknown error"),
+                    description: res.data?.message || JSON.stringify(res.data || "Unknown error"),
                 });
             }
         } catch (error) {
-            console.error("Error during update:", error.response || error.message);
+            console.error("Error during update:", error);
             notification.error({
                 message: "Error Updating Trainer",
-                description: error.response?.data?.message || "An unexpected error occurred.",
+                description: error.response?.data?.message || error.message || "An unexpected error occurred.",
             });
         } finally {
             setLoading(false);
@@ -273,16 +279,6 @@ const UpdateTrainer = (props) => {
                         onChange={(e) => handleChange("fullName", e.target.value)}
                     />
                     {error.fullName && <span style={{ color: "red" }}>{error.fullName}</span>}
-                </div>
-
-                <div>
-                    <span>Slug</span>
-                    <Input
-                        value={slug}
-                        placeholder="Slug"
-                        onChange={(e) => handleChange("slug", e.target.value)}
-                    />
-                    {error.slug && <span style={{ color: "red" }}>{error.slug}</span>}
                 </div>
 
                 <div>

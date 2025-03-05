@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, MoreOutlined, PlusOutlined, AppstoreAddOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Input, Menu, notification, Popconfirm, Table } from 'antd';
 import { deletePackage } from '../../../serviceToken/PackageSERVICE';
 import { getTokenData } from '../../../serviceToken/tokenUtils';
 import UpdatePackage from './UpdatePackage';
 import DetailPackage from './DetailPAckage';
+import AddRoomForPackage from './AddRoomForPackage';
+
 function AllPackage(props) {
     const { loadPackage, dataPackage, filteredData, setFilteredData, setIsModalOpen } = props;
 
@@ -14,32 +16,40 @@ function AllPackage(props) {
     const [isDataDetailOpen, setIsDataDetailOpen] = useState(false);
     const [dataDetail, setDataDetail] = useState(null);
 
+    const [isAddRoomModalOpen, setIsAddRoomModalOpen] = useState(false);
+    const [selectedPackage, setSelectedPackage] = useState(null);
+
     const [searchText, setSearchText] = useState('');
     const tokenData = getTokenData();//tokenData.access_token
 
     const columns = [
         {
-            title: 'Id',
-            dataIndex: 'id',
+            title: 'Package Name',
+            dataIndex: 'packageName',
             render: (_, record) => (
                 <a
-                    href="#"
                     onClick={() => {
                         setDataDetail(record);
                         setIsDataDetailOpen(true);
                     }}
                 >
-                    {record.id}
+                    {record.packageName}
                 </a>
             ),
         },
         {
-            title: 'Package Name',
-            dataIndex: 'packageName',
-        },
-        {
             title: 'Description',
             dataIndex: 'description',
+            render: (_, record) => (
+                <a
+                    onClick={() => {
+                        setDataDetail(record);
+                        setIsDataDetailOpen(true);
+                    }}
+                >
+                    {record.description}
+                </a>
+            ),
         },
         {
             title: 'Duration (Months)',
@@ -67,20 +77,30 @@ function AllPackage(props) {
                             Edit
                         </Menu.Item>
                         <Menu.Item
+                            key="add-room"
+                            icon={<AppstoreAddOutlined style={{ color: 'green' }} />}
+                            onClick={() => {
+                                setSelectedPackage(record);
+                                setIsAddRoomModalOpen(true);
+                            }}
+                        >
+                            Add Room
+                        </Menu.Item>
+                        {/* <Menu.Item
                             key="delete"
                             icon={<DeleteOutlined style={{ color: 'red' }} />}
                         >
                             <Popconfirm
                                 title="Delete Package"
                                 description="Are you sure delete it?"
-                                onConfirm={() => handleDeletePackage(record.id)}
+                                // onConfirm={() => handleDeletePackage(record.id)}
                                 okText="Yes"
                                 cancelText="No"
                                 placement="left"
                             >
                                 Delete
                             </Popconfirm>
-                        </Menu.Item>
+                        </Menu.Item> */}
                     </Menu>
                 );
                 return (
@@ -105,21 +125,21 @@ function AllPackage(props) {
         setFilteredData(filtered);
     };
 
-    const handleDeletePackage = async (id) => {
-        const res = await deletePackage(id, tokenData.access_token);
-        if (res.data) {
-            notification.success({
-                message: 'Delete Package',
-                description: 'Delete Package successfully....!',
-            });
-            await loadPackage();
-        } else {
-            notification.error({
-                message: 'Error deleting package',
-                description: JSON.stringify(res.message),
-            });
-        }
-    };
+    // const handleDeletePackage = async (id) => {
+    //     const res = await deletePackage(id, tokenData.access_token);
+    //     if (res.data) {
+    //         notification.success({
+    //             message: 'Delete Package',
+    //             description: 'Delete Package successfully....!',
+    //         });
+    //         await loadPackage();
+    //     } else {
+    //         notification.error({
+    //             message: 'Error deleting package',
+    //             description: JSON.stringify(res.message),
+    //         });
+    //     }
+    // };
 
     return (
         <>
@@ -162,6 +182,13 @@ function AllPackage(props) {
                 setIsModalUpdateOpen={setIsModalUpdateOpen}
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
+                loadPackage={loadPackage}
+            />
+
+            <AddRoomForPackage
+                isAddRoomModalOpen={isAddRoomModalOpen}
+                setIsAddRoomModalOpen={setIsAddRoomModalOpen}
+                packageData={selectedPackage}
                 loadPackage={loadPackage}
             />
 

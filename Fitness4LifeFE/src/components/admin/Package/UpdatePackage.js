@@ -109,6 +109,14 @@ const UpdatePackage = (props) => {
                     message: "Update Package",
                     description: "Package updated successfully.",
                 });
+                //=====================
+                if (res.status === false) {
+                    localStorage.setItem('room_status_updated', JSON.stringify({
+                        roomId: dataUpdate.id,
+                        timestamp: Date.now()
+                    }));
+                }
+                //========================
                 resetAndCloseModal();
                 await loadPackage();
             } else {
@@ -188,11 +196,6 @@ const UpdatePackage = (props) => {
                     />
                     {error.price && <span style={{ color: "red" }}>{error.price}</span>}
                 </div>
-
-
-
-
-
             </div>
         </Modal>
     );

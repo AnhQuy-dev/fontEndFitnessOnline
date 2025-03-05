@@ -74,8 +74,8 @@ const UpdateRoom = (props) => {
 
     useEffect(() => {
         if (dataUpdate) {
-            setClub(dataUpdate.club);
-            setTrainer(dataUpdate.trainer);
+            setClub(dataUpdate.club.id);
+            setTrainer(dataUpdate.trainer.id);
             setRoomName(dataUpdate.roomName);
             setSlug(dataUpdate.slug);
             setCapacity(dataUpdate.capacity);
@@ -85,6 +85,14 @@ const UpdateRoom = (props) => {
             setEndTime(moment(dataUpdate.endTime, "HH:mm:ss").format("HH:mm"));
         }
     }, [dataUpdate]);
+
+    // Thêm useEffect mới
+    useEffect(() => {
+        if (isModalUpdateOpen) {
+            getClubs();
+            getTrainers();
+        }
+    }, [isModalUpdateOpen]);
 
     const validateField = (field, value) => {
         const newErrors = { ...error };
@@ -204,7 +212,7 @@ const UpdateRoom = (props) => {
                 {/* Club Select */}
                 <Select
                     value={club}
-                    placeholder="Select Club"
+                    placeholder="Select branch"
                     onChange={(value) => handleChange("club", value)}
                 >
                     {clubs.map((clubItem) => (

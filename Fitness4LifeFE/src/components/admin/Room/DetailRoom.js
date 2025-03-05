@@ -47,38 +47,6 @@ const DetailRoom = (props) => {
                 : "Not updated yet"}
             </Descriptions.Item>
           </Descriptions>
-
-          <div style={{ marginTop: "20px", textAlign: "center" }}>
-            <Title level={5}>Trainers in This Room</Title>
-            {dataDetail.trainers && dataDetail.trainers.length > 0 ? (
-              <List
-                itemLayout="vertical"
-                dataSource={dataDetail.trainers}
-                renderItem={(trainer) => (
-                  <List.Item>
-                    <Descriptions
-                      bordered
-                      column={1}
-                      size="small"
-                      labelStyle={{ fontWeight: "bold", width: "30%" }}
-                      contentStyle={{ background: "#fafafa" }}
-                    >
-                      <Descriptions.Item label="Trainer Name">{trainer.fullName}</Descriptions.Item>
-                      <Descriptions.Item label="Specialization">
-                        {trainer.specialization}
-                      </Descriptions.Item>
-                      <Descriptions.Item label="Phone Number">{trainer.phoneNumber}</Descriptions.Item>
-                      <Descriptions.Item label="Schedule">
-                        {trainer.scheduleTrainers.join(", ")}
-                      </Descriptions.Item>
-                    </Descriptions>
-                  </List.Item>
-                )}
-              />
-            ) : (
-              <Text type="secondary">No trainers assigned to this room</Text>
-            )}
-          </div>
         </>
       ) : (
         <div style={{ textAlign: "center", color: "red" }}>

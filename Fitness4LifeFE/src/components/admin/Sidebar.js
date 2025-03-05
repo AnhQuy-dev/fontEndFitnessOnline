@@ -22,6 +22,7 @@ const Sidebar = ({ setMenuItems, isCollapsed }) => {
     { label: 'Package', icon: 'bx-message-square-dots', path: '/admin/Package' },
     { label: 'Promotion', icon: 'bx-cog', path: '/admin/Promotion' },
     { label: 'Post', icon: 'bx-cog', path: '/admin/post' },
+    { label: 'Orders', icon: 'bx-cog', path: '/admin/orders' },
     // { label: 'Settings', icon: 'bx-cog', path: '/admin/home' },
     // { label: 'Dashboard', icon: 'bxs-dashboard', path: '/admin/dashboard' },
 

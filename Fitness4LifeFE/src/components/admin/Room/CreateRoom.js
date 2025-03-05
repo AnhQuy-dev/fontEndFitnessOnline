@@ -1,9 +1,9 @@
 import { Input, Modal, notification, Select } from "antd";
 import { useEffect, useState } from "react";
-import { fetchAllClubs } from "../../../serviceToken/ClubService";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
 import { createRoom } from "../../../serviceToken/RoomSERVICE";
 import { fetchAllTrainer } from "../../../serviceToken/TrainerSERVICE";
+import { fetchAllClubs } from "../../../serviceToken/ClubService";
 
 const { Option } = Select;
 
@@ -224,7 +224,7 @@ function CreateRoom(props) {
                     {error.facilities && <span style={{ color: "red" }}>{error.facilities}</span>}
                 </div>
                 <div>
-                    <span>Club</span>
+                    <span>club</span>
                     <Select
                         value={club}
                         onChange={(value) => { handleChange("club", value); }}

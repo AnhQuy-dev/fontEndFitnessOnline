@@ -41,44 +41,6 @@ const DetailBranch = (props) => {
                 : "No services available"}
             </Descriptions.Item>
           </Descriptions>
-          <div style={{ marginTop: "20px", textAlign: "center" }}>
-            <Title level={5}>Trainers</Title>
-            {dataDetail.trainers && dataDetail.trainers.length > 0 ? (
-              <List
-                itemLayout="vertical"
-                dataSource={dataDetail.trainers}
-                renderItem={(trainer) => (
-                  <List.Item>
-                    <Image
-                      src={trainer.photo}
-                      alt={`Trainer ${trainer.fullName}`}
-                      style={{
-                        maxHeight: "200px",
-                        borderRadius: "10px",
-                        marginBottom: "10px",
-                      }}
-                      placeholder
-                    />
-                    <Descriptions
-                      bordered
-                      column={1}
-                      size="small"
-                      labelStyle={{ fontWeight: "bold", width: "30%" }}
-                      contentStyle={{ background: "#fafafa" }}
-                    >
-                      <Descriptions.Item label="Full Name">{trainer.fullName}</Descriptions.Item>
-                      <Descriptions.Item label="Specialization">
-                        {trainer.specialization}
-                      </Descriptions.Item>
-                      <Descriptions.Item label="Phone Number">{trainer.phoneNumber}</Descriptions.Item>
-                    </Descriptions>
-                  </List.Item>
-                )}
-              />
-            ) : (
-              <Text type="secondary">No trainers available</Text>
-            )}
-          </div>
         </>
       ) : (
         <div style={{ textAlign: "center", color: "red" }}>
