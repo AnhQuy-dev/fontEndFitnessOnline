@@ -5,29 +5,28 @@ import { useNavigate } from "react-router-dom"; // Import useNavigate
 const { Title, Text } = Typography;
 
 const categories = [
-    "Các Chính Sách Diễn Đàn Thể Hình Vui",
-    "Nội Quy Diễn Đàn",
-    "Giáo Án Fitness Nam",
-    "Giáo Án Fitness Nữ",
-    "Giáo án Thể Hình",
-    "Hỏi Đáp Thể Hình",
-    "Sửa Tư Thế Kỹ Thuật Tập Luyện",
-    "Kinh Nghiệm Dinh Dưỡng",
-    "Review Thực Phẩm Bổ Sung",
-    "Hỏi Đáp Giảm Cân - Giảm Mỡ",
-    "Hỏi Đáp Tăng Cơ - Tăng Cân",
-    "Nhật Ký Thay Đổi",
-    "Tán Gẫu Liên Quan Fitness",
-    "HLV Thể Hình - Trao Đổi Công Việc",
-    "CLB Phòng Gym Toàn Quốc",
-    "Tìm Bạn Tập Cùng - Team Workout",
-    "Mua Bán Thực Phẩm Bổ Sung",
-    "Dụng Cụ - Phụ Kiện Tập Luyện",
-    "Sang Nhượng Phòng Tập",
-    "Võ Thuật Tổng Hợp MMA",
-    "Cross Fit",
-    "Powerlifting",
-];
+    "Men's Fitness Program",
+    "Women's Fitness Program",
+    "General Bodybuilding Program",
+    "Fitness Q&A",
+    "Exercise Form & Technique Correction",
+    "Nutrition Experience",
+    "Supplement Reviews",
+    "Weight Loss & Fat Loss Q&A",
+    "Muscle Gain & Weight Gain Q&A",
+    "Transformation Journal",
+    "Fitness Related Chats",
+    "Fitness Trainers - Job Exchange",
+    "National Gym Clubs",
+    "Find Workout Partners - Team Workout",
+    "Supplement Marketplace",
+    "Training Equipment & Accessories",
+    "Gym Transfer & Sales",
+    "Mixed Martial Arts (MMA)",
+    "CrossFit",
+    "Powerlifting"
+]
+
 
 const CategoryModal = ({ visible, onClose }) => {
     const navigate = useNavigate();

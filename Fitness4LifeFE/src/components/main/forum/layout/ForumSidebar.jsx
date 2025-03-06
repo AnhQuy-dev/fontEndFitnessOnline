@@ -9,9 +9,9 @@ const { Title } = Typography;
 const forumMenuItems = [
     { key: "1", label: "WHAT'S NEW", path: "/forums/whats-new" },
     { key: "2", label: "NEW POSTS", path: "/forums/post-new" },
-    { key: "3", label: "LATEST ACTIVITY", path: "/forum?category=Fitness Knowledge" },
+    { key: "3", label: "LATEST ACTIVITY", path: "/forums/#" },
     { key: "4", label: "FORUM-HOME", path: "/forums" },
-    { key: "5", label: "...", path: "/forum?##" }
+    { key: "5", label: "...", path: "/forum/#" }
 ];
 
 const ForumSidebar = () => {

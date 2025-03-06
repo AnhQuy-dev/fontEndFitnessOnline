@@ -6,6 +6,7 @@ import QuestionDetailModal from "./QuestionDetailModal";
 import CreateQuestionModal from "./CreateQuestionModal";
 import { changePublished, deleteQuestion, GetAllQuestion } from "../../../serviceToken/ForumService";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Paragraph, Text } = Typography;
 const { TabPane } = Tabs;
@@ -26,6 +27,7 @@ const PostPage = () => {
 
     const [filterStatus, setFilterStatus] = useState("ALL"); // Trạng thái lọc của bài viết bên USER tab
     const tokenData = getTokenData();
+    const navigate = useNavigate();
 
     const fetchQuestions = async () => {
         try {
@@ -87,6 +89,7 @@ const PostPage = () => {
 
                 if (response.status === 201) {
                     message.success("Post status updated successfully!");
+                    fetchQuestions();
                 } else {
                     message.error(response.message || "Failed to update status!");
                 }
@@ -101,8 +104,8 @@ const PostPage = () => {
     };
 
 
-    const openModal = (question) => {
-        setSelectedQuestion(question);
+    const openModal = (post) => {
+        setSelectedQuestion(post);
         setIsModalOpen(true);
     };
 
@@ -156,9 +159,9 @@ const PostPage = () => {
                     ) : (
                         <div>
                             <div className="post-grid">
-                                {privateCurrentQuestions.map((question) => (
+                                {privateCurrentQuestions.map((post) => (
                                     <Card
-                                        key={question.id}
+                                        key={post.id}
                                         className="post-card"
                                         hoverable
                                     >
@@ -166,27 +169,33 @@ const PostPage = () => {
                                             <Title
                                                 level={4}
                                                 className="post-card-title"
-                                                onClick={() => openModal(question)} // Chỉ mở modal khi click vào title
+                                                onClick={() => openModal(post)} // Chỉ mở modal khi click vào title
                                             >
-                                                {question.title}
+                                                {post.title}
                                             </Title>
                                             <Text type="secondary" className="forum-author">
-                                                {question.author} -{" "}
-                                                {question.createdAt
-                                                    ? moment(question.createdAt, "YYYY-MM-DD HH:mm:ss").format("LLL")
+                                                {post.author} -{" "}
+                                                {post.createdAt
+                                                    ? moment(post.createdAt, "YYYY-MM-DD HH:mm:ss").format("LLL")
                                                     : "No creation date"}
                                             </Text>
                                             <Paragraph
                                                 ellipsis={{ rows: 2, expandable: false }}
                                                 className="post-card-paragraph"
                                             >
-                                                {question.content}
+                                                {post.content}
                                             </Paragraph>
                                             <div className="post-card-actions">
-                                                <Button type="primary" onClick={() => handleUpdate(question.id)}>
+                                                <Button
+                                                    type="primary"
+                                                    onClick={() =>
+                                                        navigate(`/admin/update-question/${post.id}`, {
+                                                            state: { post },
+                                                        })
+                                                    }>
                                                     Update
                                                 </Button>
-                                                <Button danger onClick={() => handleDelete(question.id)}>
+                                                <Button danger onClick={() => handleDelete(post.id)}>
                                                     Delete
                                                 </Button>
                                             </div>

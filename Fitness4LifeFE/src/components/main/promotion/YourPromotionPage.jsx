@@ -28,6 +28,8 @@ const YourPromotionPage = () => {
     const [userPoints, setUserPoints] = useState(null);
     const tokenData = getTokenData();
     const decotoken = getDecodedToken();
+    console.log("decotoken: ", decotoken);
+
 
     useEffect(() => {
         fetchPromotions();
@@ -40,8 +42,10 @@ const YourPromotionPage = () => {
         setError("");
         try {
             const response = await getPromotionUser(decotoken.id, tokenData.access_token);
-            const { data } = response;
-            setPromotions(Array.isArray(data) ? data : []);
+            // console.log("response: ", response);
+            const filteredPromotions = (response.data || []).filter(promo => promo.promotionAmount > 0);
+
+            setPromotions(filteredPromotions);
         } catch (err) {
             setError("Failed to fetch promotions. Please try again.");
         } finally {

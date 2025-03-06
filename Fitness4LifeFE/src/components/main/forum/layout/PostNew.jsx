@@ -81,7 +81,7 @@ const PostNew = () => {
                                 <Title
                                     level={4}
                                     style={{ marginBottom: "8px", cursor: "pointer", color: "#1890ff" }}
-                                    onClick={() => navigate(`/forum/${article.id}`)} // Navigate on click
+                                    onClick={() => navigate(`/forums/forum/post/${article.id}`)} // Navigate on click
                                 >
                                     {article.title}
                                 </Title>
@@ -101,7 +101,7 @@ const PostNew = () => {
                                     {truncateContent(article.content, 300)}
 
                                     <span
-                                        onClick={() => navigate(`/forum/${article.id}`)} // Navigate on click
+                                        onClick={() => navigate(`/forums/forum/post/${article.id}`)} // Navigate on click
                                         style={{
                                             cursor: "pointer",
                                             color: "#1890ff"

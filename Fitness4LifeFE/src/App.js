@@ -79,8 +79,8 @@ const App = () => {
           <Route element={<AuthenticatedRoute />}>
             <Route path="/forums" element={<ForumLayout />}>
               <Route path="create-new-post" element={<CreateNewPost />} />
+              <Route path="/forums/forum/post/:id" element={<DetailPage />} />
             </Route>
-            <Route path="/forums/forum/post/:id" element={<DetailPage />} />
             <Route path="/profile/your-posts" element={<YourPostThread />} />
             <Route path="/profile/post/:postId" element={<YourPostDetailPage />} />
             <Route path="/profile/update-question/:postId" element={<UpdateQuestion />} />
@@ -114,6 +114,7 @@ const App = () => {
             <Route path="Statistics" element={<StatisticsPage />} />
             <Route path="orders" element={<Order />} />
             <Route path="BookingManage" element={<BookingManage />} />
+            <Route path="update-question/:postId" element={<UpdateQuestion />} />
           </Route>
         </Route>
 

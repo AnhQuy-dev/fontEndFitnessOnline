@@ -17,6 +17,7 @@ const PaymentPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [discountedPrice, setDiscountedPrice] = useState();
+  const [discountedCode, setDiscountedCode] = useState();
 
   const tokenData = getTokenData();
   const decodeToken = getDecodedToken();
@@ -42,7 +43,6 @@ const PaymentPage = () => {
 
   const handleSubmitPayment = async () => {
     setIsLoading(true);
-
     try {
       // Validate required data
       if (!selectedPackage?.id || !userId) {
@@ -59,7 +59,7 @@ const PaymentPage = () => {
         userId: userId,
         description: selectedPackage.description || "Package Subscription",
         cancelUrl: "http://localhost:5173/cancel",
-        successUrl: "http://localhost:3000/order",
+        successUrl: `http://localhost:3000/order?code=${encodeURIComponent(discountedCode || "no-code")}`,
         currency: "USD",
         intent: "Sale",
         transactions: [
@@ -72,10 +72,6 @@ const PaymentPage = () => {
           }
         ],
       };
-
-      console.log("payload: ", payload);
-
-
 
       if (!tokenData) {
         notification.error({
@@ -91,8 +87,6 @@ const PaymentPage = () => {
         console.log("Payload", payload);
 
         const response = await ProceedToPayment(payload, tokenData.access_token);
-        console.log("response", response);
-
         hide();
 
         const approvalUrl = response.data?.approvalUrl;
@@ -107,8 +101,10 @@ const PaymentPage = () => {
         });
 
         setTimeout(() => {
+          // usedCodeOfPromotion();
           window.location.href = approvalUrl;
         }, 1000);
+
 
       } catch (error) {
         // Hide loading message in case of error
@@ -141,6 +137,7 @@ const PaymentPage = () => {
       setIsLoading(false);
     }
   };
+
 
   // Format the price
   const formattedPrice = selectedPackage.price?.toLocaleString('vi-VN') || '0';
@@ -178,6 +175,7 @@ const PaymentPage = () => {
 
         if (newPrice < 0) newPrice = 0; // Đảm bảo giá không âm
 
+        setDiscountedCode(discount.data.code)
         setDiscountedPrice(newPrice.toFixed(0)); // Cập nhật state
         console.log("New discounted price:", newPrice.toFixed(0));
 
@@ -190,6 +188,7 @@ const PaymentPage = () => {
       message.error("Failed to apply discount. Please try again.");
     }
   };
+
 
 
   return (

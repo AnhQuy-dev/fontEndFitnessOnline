@@ -26,7 +26,7 @@ import {
     AppstoreOutlined
 } from '@ant-design/icons';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { getTokenData } from '../../../../serviceToken/tokenUtils';
+import { getDecodedToken, getTokenData } from '../../../../serviceToken/tokenUtils';
 import { updateQuestion } from '../../../../serviceToken/ForumService';
 import '../../../../assets/css/updateQuestion.css';
 
@@ -36,27 +36,25 @@ const { Option } = Select;
 
 // Add categoryOptions constant
 const categoryOptions = [
-    { value: "FORUM_POLICY", label: "Các Chính Sách Diễn Đàn Thể Hình Vui" },
-    { value: "FORUM_RULES", label: "Nội Quy Diễn Đàn" },
-    { value: "MALE_FITNESS_PROGRAM", label: "Giáo Án Fitness Nam" },
-    { value: "FEMALE_FITNESS_PROGRAM", label: "Giáo Án Fitness Nữ" },
-    { value: "GENERAL_FITNESS_PROGRAM", label: "Giáo án Thể Hình" },
-    { value: "FITNESS_QA", label: "Hỏi Đáp Thể Hình" },
-    { value: "POSTURE_CORRECTION", label: "Sửa Tư Thế Kỹ Thuật Tập Luyện" },
-    { value: "NUTRITION_EXPERIENCE", label: "Kinh Nghiệm Dinh Dưỡng" },
-    { value: "SUPPLEMENT_REVIEW", label: "Review Thực Phẩm Bổ Sung" },
-    { value: "WEIGHT_LOSS_QA", label: "Hỏi Đáp Giảm Cân - Giảm Mỡ" },
-    { value: "MUSCLE_GAIN_QA", label: "Hỏi Đáp Tăng Cơ - Tăng Cân" },
-    { value: "TRANSFORMATION_JOURNAL", label: "Nhật Ký Thay Đổi" },
-    { value: "FITNESS_CHATS", label: "Tán Gẫu Liên Quan Fitness" },
-    { value: "TRAINER_DISCUSSION", label: "HLV Thể Hình - Trao Đổi Công Việc" },
-    { value: "NATIONAL_GYM_CLUBS", label: "CLB Phòng Gym Toàn Quốc" },
-    { value: "FIND_WORKOUT_BUDDY", label: "Tìm Bạn Tập Cùng - Team Workout" },
-    { value: "SUPPLEMENT_MARKET", label: "Mua Bán Thực Phẩm Bổ Sung" },
-    { value: "EQUIPMENT_ACCESSORIES", label: "Dụng Cụ - Phụ Kiện Tập Luyện" },
-    { value: "GYM_TRANSFER", label: "Sang Nhượng Phòng Tập" },
-    { value: "MMA_DISCUSSION", label: "Võ Thuật Tổng Hợp MMA" },
-    { value: "CROSSFIT_DISCUSSION", label: "Cross Fit" },
+    { value: "MALE_FITNESS_PROGRAM", label: "Men's Fitness Program" },
+    { value: "FEMALE_FITNESS_PROGRAM", label: "Women's Fitness Program" },
+    { value: "GENERAL_FITNESS_PROGRAM", label: "General Bodybuilding Program" },
+    { value: "FITNESS_QA", label: "Fitness Q&A" },
+    { value: "POSTURE_CORRECTION", label: "Exercise Form & Technique Correction" },
+    { value: "NUTRITION_EXPERIENCE", label: "Nutrition Experience" },
+    { value: "SUPPLEMENT_REVIEW", label: "Supplement Reviews" },
+    { value: "WEIGHT_LOSS_QA", label: "Weight Loss & Fat Loss Q&A" },
+    { value: "MUSCLE_GAIN_QA", label: "Muscle Gain & Weight Gain Q&A" },
+    { value: "TRANSFORMATION_JOURNAL", label: "Transformation Journal" },
+    { value: "FITNESS_CHATS", label: "Fitness Related Chats" },
+    { value: "TRAINER_DISCUSSION", label: "Fitness Trainers - Job Exchange" },
+    { value: "NATIONAL_GYM_CLUBS", label: "National Gym Clubs" },
+    { value: "FIND_WORKOUT_BUDDY", label: "Find Workout Partners - Team Workout" },
+    { value: "SUPPLEMENT_MARKET", label: "Supplement Marketplace" },
+    { value: "EQUIPMENT_ACCESSORIES", label: "Training Equipment & Accessories" },
+    { value: "GYM_TRANSFER", label: "Gym Transfer & Sales" },
+    { value: "MMA_DISCUSSION", label: "Mixed Martial Arts (MMA)" },
+    { value: "CROSSFIT_DISCUSSION", label: "CrossFit" },
     { value: "POWERLIFTING_DISCUSSION", label: "Powerlifting" },
 ];
 
@@ -69,6 +67,9 @@ const UpdateQuestion = () => {
     const [deletedImageIds, setDeletedImageIds] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const tokenData = getTokenData();
+    const decotoken = getDecodedToken();
+
+    // console.log("decotoken: ", decotoken);
 
     useEffect(() => {
         if (location.state?.post) {
@@ -163,7 +164,12 @@ const UpdateQuestion = () => {
                     message: 'Success',
                     description: 'Question updated successfully!',
                 });
-                navigate('/profile/your-posts');
+                if (decotoken.role === "ADMIN") {
+                    navigate('/admin/post');
+                } else {
+                    navigate('/profile/your-posts');
+                }
+
             } else {
                 notification.error({
                     message: 'Error',

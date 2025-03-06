@@ -65,7 +65,7 @@ const WhatsNew = () => {
                                         <Title
                                             level={4}
                                             style={{ marginBottom: "8px", cursor: "pointer", color: "#1890ff" }}
-                                            onClick={() => navigate(`/forum/${article.id}`)} // Navigate on click
+                                            onClick={() => navigate(`/forums/forum/post/${article.id}`)} // Navigate on click
                                         >
                                             {article.title}
                                         </Title>

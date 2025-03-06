@@ -53,7 +53,8 @@ const PromotionDetailsModal = ({ visible, onClose, promotion }) => {
                         ))}
                     </Descriptions.Item>
                     <Descriptions.Item label="Code">{promotion.code}</Descriptions.Item>
-                    <Descriptions.Item label="Points">{promotion.points}</Descriptions.Item>
+                    {/* <Descriptions.Item label="Points">{promotion.points}</Descriptions.Item> */}
+                    <Descriptions.Item label="promotionAmount">{promotion.promotionAmount}</Descriptions.Item>
                 </Descriptions>
             )}
         </Modal>
