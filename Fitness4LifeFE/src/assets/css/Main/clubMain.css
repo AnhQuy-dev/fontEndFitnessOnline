@@ -1,0 +1,263 @@
+/* CSS điều chỉnh cho phần description */
+
+/* Bố cục chia đôi chính */
+.split-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Responsive: Khi màn hình đủ rộng thì chuyển sang layout ngang */
+@media (min-width: 992px) {
+    .split-layout {
+        flex-direction: row;
+    }
+
+    .left-panel {
+        width: 50%;
+        padding-right: 20px;
+    }
+
+    .right-panel {
+        width: 50%;
+        padding-left: 20px;
+    }
+}
+
+/* Panel bên trái - Ảnh */
+.left-panel {
+    flex: 1;
+}
+
+/* Panel bên phải - Thông tin */
+.right-panel {
+    flex: 1;
+}
+
+/* Container cho ảnh xếp chồng */
+.image-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-height: 800px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Scrollbar tùy chỉnh cho container ảnh */
+.image-stack::-webkit-scrollbar {
+    width: 6px;
+}
+
+.image-stack::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.image-stack::-webkit-scrollbar-thumb {
+    background: #f57c00;
+}
+
+.image-stack::-webkit-scrollbar-thumb:hover {
+    background: #e65100;
+}
+
+/* Style cho mỗi ảnh trong stack */
+.stack-image-item {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Điều chỉnh chiều cao của mỗi ảnh */
+.stack-image {
+    width: 100%;
+    height: 280px;
+    display: block;
+    object-fit: cover;
+}
+
+/* Điều chỉnh phần info section để phù hợp với layout mới */
+.info-section {
+    height: 100%;
+    background-color: #fff;
+    padding: 20px;
+}
+
+/* Thêm phần description vào info section */
+.club-description {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    color: #666;
+    border-bottom: 1px solid #eee;
+}
+
+/* Club header */
+.club-header {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.club-name {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 0;
+    color: #1a1a1a;
+}
+
+.info-title {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #1a1a1a;
+}
+
+/* Thêm một vài hiệu ứng khi hover vào ảnh */
+.stack-image-item:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Location info */
+.location-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    margin-top: 20px;
+}
+
+.location-icon {
+    margin-right: 10px;
+    color: #f57c00;
+}
+
+.address-text {
+    font-size: 16px;
+}
+
+/* Style khi không có ảnh */
+.no-images {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f5f5f5;
+    color: #666;
+    font-style: italic;
+}
+
+.club-details-container {
+    max-width: calc(100% - 420px);
+    /* Giảm chiều rộng đi 200px (100px mỗi bên) */
+    margin: 20px auto;
+    padding: 20px;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+/* Bố cục chia đôi chính */
+.split-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Responsive: Khi màn hình đủ rộng thì chuyển sang layout ngang */
+@media (min-width: 992px) {
+    .split-layout {
+        flex-direction: row;
+    }
+
+    .left-panel {
+        width: 50%;
+        padding-right: 20px;
+    }
+
+    .right-panel {
+        width: 50%;
+        padding-left: 20px;
+    }
+}
+
+/* Responsive cho màn hình nhỏ hơn */
+@media (max-width: 768px) {
+    .club-details-container {
+        max-width: calc(100% - 40px);
+        /* Giảm margin khi màn hình nhỏ */
+        padding: 15px;
+    }
+}
+
+/* Panel bên trái - Ảnh */
+.left-panel {
+    flex: 1;
+}
+
+/* Panel bên phải - Thông tin */
+.right-panel {
+    flex: 1;
+}
+
+/* Container cho ảnh xếp chồng */
+.image-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-height: 800px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Scrollbar tùy chỉnh cho container ảnh */
+.image-stack::-webkit-scrollbar {
+    width: 6px;
+}
+
+.image-stack::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.image-stack::-webkit-scrollbar-thumb {
+    background: #f57c00;
+}
+
+.image-stack::-webkit-scrollbar-thumb:hover {
+    background: #e65100;
+}
+
+/* Style cho mỗi ảnh trong stack */
+.stack-image-item {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Điều chỉnh chiều cao của mỗi ảnh */
+.stack-image {
+    width: 100%;
+    height: 280px;
+    display: block;
+    object-fit: cover;
+}
+
+/* Điều chỉnh phần info section để phù hợp với layout mới */
+.info-section {
+    height: 100%;
+    background-color: #fff;
+    padding: 20px;
+}
+
+/* Thêm phần description vào info section */
+.club-description {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    color: #666;
+    border-bottom: 1px solid #eee;
+}

@@ -1,0 +1,89 @@
+.club-images-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  justify-items: center;
+  max-width: 650px;
+  margin: auto;
+}
+
+.club-image-wrapper {
+  position: relative;
+  text-align: center;
+}
+
+.club-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 3px solid transparent; /* Định dạng mặc định */
+}
+
+/* Khi checkbox được chọn, đổi viền ảnh thành màu xanh */
+.checkbox-style:checked + .club-image {
+  border-color: green;
+}
+
+/* Định dạng checkbox */
+.checkbox-label {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1; /* Đảm bảo checkbox nằm trên ảnh */
+  background: white;
+  padding: 5px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  display: none;
+}
+
+/* Khi ô checkbox được chọn, hiển thị viền */
+.checkbox-label input:checked + span {
+  background-color: green;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
+.upload-container {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #f9f9f9;
+}
+
+.preview-images {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.preview-item {
+  position: relative;
+  display: inline-block;
+}
+
+.preview-img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.preview-item button {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}

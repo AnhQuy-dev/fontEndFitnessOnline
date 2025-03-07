@@ -1,0 +1,79 @@
+/* Pricing Carousel Styles */
+.pricing-carousel-container {
+    padding: 0 30px;
+  }
+  
+  .ant-carousel .slick-slide {
+    text-align: center;
+    overflow: hidden;
+  }
+  
+  .ant-carousel .slick-dots li button {
+    background: #d8d8d8;
+    opacity: 0.4;
+  }
+  
+  .ant-carousel .slick-dots li.slick-active button {
+    opacity: 1;
+    background: #1890ff;
+  }
+  
+  .pricing-card {
+    transition: transform 0.3s ease;
+    margin: 10px;
+    height: 400px; /* Fixed height for consistency */
+  }
+  
+  .pricing-card:hover {
+    transform: translateY(-10px);
+  }
+  
+  .pricing-card.featured {
+    border: 2px solid #1890ff;
+    transform: scale(1.02);
+  }
+  
+  .pricing-card.featured:hover {
+    transform: scale(1.02) translateY(-10px);
+  }
+  
+  .carousel-button {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .plan-name {
+    font-weight: 600;
+  }
+  
+  .price {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  
+  .duration {
+    color: #888;
+    font-size: 14px;
+  }
+  
+  .plan-features {
+    margin: 20px 0;
+    color: #666;
+  }
+  
+  .plan-purchase {
+    margin-top: 20px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .pricing-card {
+      height: 350px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .pricing-carousel-container {
+      padding: 0 15px;
+    }
+  }

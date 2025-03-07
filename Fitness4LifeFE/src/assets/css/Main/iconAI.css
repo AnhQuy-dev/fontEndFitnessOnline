@@ -1,0 +1,38 @@
+.chatbot-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 28px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+    animation: bounce 1.5s infinite; /* Thêm hiệu ứng nhảy */
+}
+
+.chatbot-toggle:hover {
+    background-color: #0056b3;
+}
+
+/* Icon của AI Chatbot */
+.chatbot-icon {
+    font-size: 32px;
+}
+
+/* Hiệu ứng nhảy lên xuống */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
