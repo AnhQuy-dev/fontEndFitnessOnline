@@ -1,4 +1,4 @@
-import { Input, Modal, notification, Select } from "antd";
+import { Input, Modal, notification, Select, Spin } from "antd";
 import { useState } from "react";
 import { registerUser } from "../../../serviceToken/authService";
 
@@ -14,6 +14,7 @@ function CreateUser(props) {
     const [role, setRole] = useState("");
     const [gender, setGender] = useState("");
     const [status, setStatus] = useState(false); // Mặc định là false
+    const [loading, setLoading] = useState(false); // Thêm trạng thái loading
 
     const [error, setErrors] = useState({});
 
@@ -81,6 +82,9 @@ function CreateUser(props) {
     };
 
     const handleSubmitBtn = async () => {
+        // Nếu đang loading thì không cho phép submit lại
+        if (loading) return;
+        
         if (validateAllFields()) {
             notification.error({
                 message: "Validation Error",
@@ -88,6 +92,9 @@ function CreateUser(props) {
             });
             return;
         }
+
+        // Bắt đầu loading
+        setLoading(true);
 
         const newUserData = {
             fullName,
@@ -99,20 +106,30 @@ function CreateUser(props) {
             status, // Mặc định false nếu không chọn
         };
 
-        const res = await registerUser(newUserData);
+        try {
+            const res = await registerUser(newUserData);
 
-        if (res.data) {
-            notification.success({
-                message: "Create User",
-                description: "User created successfully."
-            });
-            resetAndCloseModal();
-            await loadUsers();
-        } else {
+            if (res.data) {
+                notification.success({
+                    message: "Create User",
+                    description: "User created successfully."
+                });
+                resetAndCloseModal();
+                await loadUsers();
+            } else {
+                notification.error({
+                    message: "Error Creating User",
+                    description: JSON.stringify(res.message)
+                });
+            }
+        } catch (error) {
             notification.error({
                 message: "Error Creating User",
-                description: JSON.stringify(res.message)
+                description: error.message || "An error occurred while creating the user."
             });
+        } finally {
+            // Kết thúc loading, bất kể thành công hay thất bại
+            setLoading(false);
         }
     };
 
@@ -126,6 +143,7 @@ function CreateUser(props) {
         setGender("");
         setStatus(false); // Reset về false khi đóng modal
         setErrors({});
+        setLoading(false); // Đảm bảo reset loading khi đóng modal
     };
 
     return (
@@ -137,55 +155,88 @@ function CreateUser(props) {
             okText="Create"
             cancelText="Cancel"
             maskClosable={false}
+            okButtonProps={{ loading: loading }} // Thêm loading vào nút OK
+            cancelButtonProps={{ disabled: loading }} // Disable nút Cancel khi đang loading
         >
-            <div style={{ display: "flex", gap: "15px", flexDirection: "column" }}>
-                <div>
-                    <span>Full Name</span>
-                    <Input value={fullName} onChange={(e) => handleChange("fullName", e.target.value)} />
-                    {error.fullName && <span style={{ color: "red" }}>{error.fullName}</span>}
+            <Spin spinning={loading} tip="Creating user...">
+                <div style={{ display: "flex", gap: "15px", flexDirection: "column" }}>
+                    <div>
+                        <span>Full Name</span>
+                        <Input 
+                            value={fullName} 
+                            onChange={(e) => handleChange("fullName", e.target.value)} 
+                            disabled={loading}
+                        />
+                        {error.fullName && <span style={{ color: "red" }}>{error.fullName}</span>}
+                    </div>
+                    <div>
+                        <span>Email</span>
+                        <Input 
+                            value={email} 
+                            onChange={(e) => handleChange("email", e.target.value)} 
+                            disabled={loading}
+                        />
+                        {error.email && <span style={{ color: "red" }}>{error.email}</span>}
+                    </div>
+                    <div>
+                        <span>Password</span>
+                        <Input.Password 
+                            value={password} 
+                            onChange={(e) => handleChange("password", e.target.value)} 
+                            disabled={loading}
+                        />
+                        {error.password && <span style={{ color: "red" }}>{error.password}</span>}
+                    </div>
+                    <div>
+                        <span>Confirm Password</span>
+                        <Input.Password 
+                            value={confirmPassword} 
+                            onChange={(e) => handleChange("confirmPassword", e.target.value)} 
+                            disabled={loading}
+                        />
+                        {error.confirmPassword && <span style={{ color: "red" }}>{error.confirmPassword}</span>}
+                    </div>
+                    <div>
+                        <span>Role</span>
+                        <Select 
+                            value={role} 
+                            onChange={(value) => handleChange("role", value)} 
+                            style={{ width: "100%" }}
+                            disabled={loading}
+                        >
+                            <Option value="USER">USER</Option>
+                            <Option value="TRAINER">TRAINER</Option>
+                        </Select>
+                        {error.role && <span style={{ color: "red" }}>{error.role}</span>}
+                    </div>
+                    <div>
+                        <span>Gender</span>
+                        <Select 
+                            value={gender} 
+                            onChange={(value) => handleChange("gender", value)} 
+                            style={{ width: "100%" }}
+                            disabled={loading}
+                        >
+                            <Option value="MALE">MALE</Option>
+                            <Option value="FEMALE">FEMALE</Option>
+                            <Option value="OTHER">OTHER</Option>
+                        </Select>
+                        {error.gender && <span style={{ color: "red" }}>{error.gender}</span>}
+                    </div>
+                    <div>
+                        <span>Status</span>
+                        <Select 
+                            value={status} 
+                            onChange={(value) => handleChange("status", value)} 
+                            style={{ width: "100%" }}
+                            disabled={loading}
+                        >
+                            <Option value={true}>ACTIVE</Option>
+                            <Option value={false}>INACTIVE</Option>
+                        </Select>
+                    </div>
                 </div>
-                <div>
-                    <span>Email</span>
-                    <Input value={email} onChange={(e) => handleChange("email", e.target.value)} />
-                    {error.email && <span style={{ color: "red" }}>{error.email}</span>}
-                </div>
-                <div>
-                    <span>Password</span>
-                    <Input.Password value={password} onChange={(e) => handleChange("password", e.target.value)} />
-                    {error.password && <span style={{ color: "red" }}>{error.password}</span>}
-                </div>
-                <div>
-                    <span>Confirm Password</span>
-                    <Input.Password value={confirmPassword} onChange={(e) => handleChange("confirmPassword", e.target.value)} />
-                    {error.confirmPassword && <span style={{ color: "red" }}>{error.confirmPassword}</span>}
-                </div>
-                <div>
-                    <span>Role</span>
-                    <Select value={role} onChange={(value) => handleChange("role", value)} style={{ width: "100%" }}>
-                        <Option value="USER">USER</Option>
-                        <Option value="MANAGER">MANAGER</Option>
-                        <Option value="ADMIN">ADMIN</Option>
-                        <Option value="TRAINER">TRAINER</Option>
-                    </Select>
-                    {error.role && <span style={{ color: "red" }}>{error.role}</span>}
-                </div>
-                <div>
-                    <span>Gender</span>
-                    <Select value={gender} onChange={(value) => handleChange("gender", value)} style={{ width: "100%" }}>
-                        <Option value="MALE">MALE</Option>
-                        <Option value="FEMALE">FEMALE</Option>
-                        <Option value="OTHER">OTHER</Option>
-                    </Select>
-                    {error.gender && <span style={{ color: "red" }}>{error.gender}</span>}
-                </div>
-                <div>
-                    <span>Status</span>
-                    <Select value={status} onChange={(value) => handleChange("status", value)} style={{ width: "100%" }}>
-                        <Option value={true}>ACTIVE</Option>
-                        <Option value={false}>INACTIVE</Option>
-                    </Select>
-                </div>
-            </div>
+            </Spin>
         </Modal>
     );
 }
