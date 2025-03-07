@@ -15,6 +15,8 @@ function Users() {
             if (Array.isArray(response)) {  // Kiểm tra có phải mảng không
                 setDataUsers(response);
                 setFilteredData(response);
+                console.log("dataUsers",dataUsers);
+                
             } else {
                 console.error("Invalid data format received:", response);
                 setDataUsers([]);
