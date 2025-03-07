@@ -129,7 +129,7 @@ export const deletePackage = async (id, token) => {
 };
 
 
-export const packageAddRoom = async (packageID,roomId, token) => {
+export const packageAddRoom = async (packageID, roomId, token) => {
   try {
     const response = await fetch(`${APIGetWay}/dashboard/packages/${packageID}/rooms/${roomId}`, {
       method: 'POST',
@@ -159,7 +159,7 @@ export const packageAddRoom = async (packageID,roomId, token) => {
   }
 };
 
-export const fetchAllRoomByPackageId = async (packageId,token) => {
+export const fetchAllRoomByPackageId = async (packageId, token) => {
   try {
     const response = await fetch(`${APIGetWay}/dashboard/packages/${packageId}/rooms`, {
       method: 'GET',
@@ -191,7 +191,7 @@ export const fetchAllRoomByPackageId = async (packageId,token) => {
 
 };
 
-export const deleteRoomFormPackageId = async (packageId,roomId, token) => {
+export const deleteRoomFormPackageId = async (packageId, roomId, token) => {
   try {
     const response = await fetch(`${APIGetWay}/dashboard/packages/${packageId}/rooms/${roomId}`, {
       method: 'DELETE',
@@ -219,4 +219,36 @@ export const deleteRoomFormPackageId = async (packageId,roomId, token) => {
     console.error("Lỗi khi đặt phòng:", error.message);
     return { status: 500, data: `Lỗi: ${error.message}` };
   }
+};
+
+export const getOnePackage = async (packageId, token) => {
+  try {
+    const response = await fetch(`${APIGetWay}/booking/package/${packageId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Lỗi ${response.status}: ${errorText}`);
+    }
+    const contentType = response.headers.get("content-type");
+
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    } else {
+      return await response.text();
+
+    }
+
+
+  } catch (error) {
+    console.error("Lỗi khi gửi mã khuyến mãi:", error.message);
+    return `Lỗi: ${error.message}`;
+  }
+
 };

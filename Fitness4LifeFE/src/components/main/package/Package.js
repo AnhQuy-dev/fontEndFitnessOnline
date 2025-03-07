@@ -7,7 +7,7 @@ import packageHeaderPage from '../../../assets/images/Tow_Person_Play_Gym.webp';
 // Import placeholder images for packages
 import classicImage from '../../..//assets//images/img3.jpg';
 import classicPlusImage from '../../..//assets//images/img3.jpg';
-import citifitsportImage from '../../..//assets//images/img3.jpg';
+import PRESIDENTImage from '../../..//assets//images/img3.jpg';
 import royalImage from '../../..//assets//images/img3.jpg';
 import signatureImage from '../../..//assets//images/img3.jpg';
 import { getDecodedToken, getTokenData } from '../../../serviceToken/tokenUtils';
@@ -47,7 +47,7 @@ const PackageMain = () => {
     const packageImages = {
         'CLASSIC': classicImage,
         'CLASSIC-PLUS': classicPlusImage,
-        'CITIFITSPORT': citifitsportImage,
+        'PRESIDENT': PRESIDENTImage,
         'ROYAL': royalImage,
         'SIGNATURE': signatureImage,
         // Default image for any other package
@@ -109,16 +109,16 @@ const PackageMain = () => {
     }
 
     const packageFeatures = [
-        { feature: "Workout at the selected GT CLUB", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "Workout at the selected GT CLUB", packages: ["CLASSIC", "CLASSIC-PLUS", "PRESIDENT", "ROYAL", "SIGNATURE"] },
         { feature: "Join Yoga and Group X at one selected CLUB", packages: ["CLASSIC", "CLASSIC-PLUS"] },
-        { feature: "Freely participate in all GX classes across the CITIGYM/VN system", packages: ["CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Unlimited workout time", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Join all Yoga and Group X classes at all clubs within the CITIGYM system", packages: ["CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "One personalized training orientation session and nutrition consultation", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Access to relaxation services after workouts (sauna and steam room)", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Free drinking water", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Premium sports towel service", packages: ["CITIFITSPORT", "ROYAL", "SIGNATURE"] },
-        { feature: "Use of smart locker with emergency login", packages: ["CLASSIC", "CLASSIC-PLUS", "CITIFITSPORT", "ROYAL", "SIGNATURE"] },
+        { feature: "Freely participate in all GX classes across the CITIGYM/VN system", packages: ["PRESIDENT", "ROYAL", "SIGNATURE"] },
+        { feature: "Unlimited workout time", packages: ["CLASSIC", "CLASSIC-PLUS", "PRESIDENT", "ROYAL", "SIGNATURE"] },
+        { feature: "Join all Yoga and Group X classes at all clubs within the CITIGYM system", packages: ["CLASSIC-PLUS", "PRESIDENT", "ROYAL", "SIGNATURE"] },
+        { feature: "One personalized training orientation session and nutrition consultation", packages: ["CLASSIC", "CLASSIC-PLUS", "PRESIDENT", "ROYAL", "SIGNATURE"] },
+        { feature: "Access to relaxation services after workouts (sauna and steam room)", packages: ["CLASSIC", "CLASSIC-PLUS", "PRESIDENT", "ROYAL", "SIGNATURE"] },
+        { feature: "Free drinking water", packages: ["CLASSIC", "CLASSIC-PLUS", "PRESIDENT", "ROYAL", "SIGNATURE"] },
+        { feature: "Premium sports towel service", packages: ["PRESIDENT", "ROYAL", "SIGNATURE"] },
+        { feature: "Use of smart locker with emergency login", packages: ["CLASSIC", "CLASSIC-PLUS", "PRESIDENT", "ROYAL", "SIGNATURE"] },
         { feature: "One-day advance booking to experience state-of-the-art gym facilities with the latest equipment", packages: ["ROYAL"] },
         { feature: "Pre-booking for two guests without membership to work out together (guests receive a discount on Signature/VIP day passes)", packages: ["SIGNATURE"] },
         { feature: "Priority membership benefits for flexibility and balance", packages: ["SIGNATURE"] },
@@ -130,7 +130,6 @@ const PackageMain = () => {
         { feature: "Provided with a Signature-branded yoga towel during workouts", packages: ["SIGNATURE"] },
         { feature: "Access to a private VIP area exclusively for Signature members (not applicable to three-time trial guests)", packages: ["SIGNATURE"] }
     ];
-
 
     const columns = [
         {
@@ -200,7 +199,7 @@ const PackageMain = () => {
                                                     <h3 className="package-name">{pkg.packageName}</h3>
                                                     <p className="package-description">{pkg.description}</p>
                                                     <p className="package-price">
-                                                        {pkg.price.toLocaleString('vi-VN')} VND/month
+                                                        {pkg.price.toLocaleString('vi-VN')} USD/month
                                                     </p>
                                                     <Button
                                                         type="primary"

@@ -1,4 +1,6 @@
+import axios from "axios";
 import { APIGetWay } from "../components/helpers/constants";
+import { getTokenData } from "./tokenUtils";
 
 export const loginUser = async (email, password) => {
   try {
@@ -149,7 +151,44 @@ export const fetchAllUsers = async (token) => {
     return `Lỗi: ${error.message}`;
   }
 };
-
+export const fetchFaceAuthData = async (token) => {
+  try {
+    const response = await axios.get(`${APIGetWay}/face-auth`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      withCredentials: true
+    });
+    
+    if (response.data && response.data.status === 200) {
+      return response.data;
+    } else {
+      throw new Error(response.data?.message || 'Failed to retrieve face data');
+    }
+  } catch (error) {
+    console.error("Error fetching face authentication data:", error);
+    throw error;
+  }
+};  
+export const updateFaceById = async (faceId, formData, token) => {
+  try {
+    const response = await axios.put(
+      `${APIGetWay}/face-auth/update/${faceId}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error updating face by ID:', error);
+    throw error;
+  }
+};
 
 export const updateUserAPI = async (userId, dataData, token) => {
   try {

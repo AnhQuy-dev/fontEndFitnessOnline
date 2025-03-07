@@ -12,7 +12,6 @@ import Room from './components/admin/Room/Room';
 import Branch from './components/admin/Branch/Branch';
 import Trainer from './components/admin/Trainer/Trainer';
 import Package from './components/admin/Package/Package';
-import PackageMain from './components/main/package/Package';
 import PaymentMain from './components/main/Paypal/PaymentMain';
 import UserProfilePage from './components/main/user/UserProfilePage';
 import HistoryBooking from './components/main/user/HistoryBooking';
@@ -42,10 +41,11 @@ import CreateNewPost from './components/main/forum/process/CreateNewPost';
 import DetailPage from './components/main/forum/modal/DetailPage';
 import UpdateQuestion from './components/main/forum/process/UpdateQuestion';
 import Club from './components/admin/Club/Club';
-import BookingMain from './components/main/booking/Booking';
-import Order from './components/admin/Orders/Orders';
 import BlogAdmin from './components/admin/Blog/BlogAdmin';
 import BookingManage from './components/admin/Booking/BookingManage';
+import Order from './components/admin/Orders/Orders';
+import BookingMain from './components/main/booking/Booking';
+import PackageMain from './components/main/package/Package';
 
 const App = () => {
   return (

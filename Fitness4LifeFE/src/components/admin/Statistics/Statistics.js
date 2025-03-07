@@ -1,122 +1,110 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { Card, Select, Table, Row, Col, Statistic } from "antd";
+import { Card, Select, Row, Col, Statistic, Slider, Space, Button, DatePicker, Typography, Tabs } from "antd";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
-import { fetchPaymentStatistics, GetAllBookings, getRoomById } from "../../../serviceToken/StaticsticsSERVICE";
-import { TrophyOutlined } from '@ant-design/icons';
+import { fetchPaymentStatistics } from "../../../serviceToken/StaticsticsSERVICE";
+import { useNavigate } from "react-router-dom";
+import dayjs from 'dayjs';
+import TopPackagesStatistics from "./TopPackagesStatistics";
+import BookingStatistics from "./BookingStatistics";
+import { fetchAllRooms } from "../../../serviceToken/RoomSERVICE";
+
+const { RangePicker } = DatePicker;
+const { Title } = Typography;
+const { TabPane } = Tabs;
+const tokenData = getTokenData();//tokenData.access_token
+
+
 
 const StatisticsPage = () => {
   const [dataByMonth, setDataByMonth] = useState([]);
+  const [filteredMonthData, setFilteredMonthData] = useState([]);
   const [dataByDay, setDataByDay] = useState([]);
+  const [filteredDayData, setFilteredDayData] = useState([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [monthRange, setMonthRange] = useState([1, 12]); // Default: show all months
+  const [dateRange, setDateRange] = useState(null); // For date range picker
   const [years, setYears] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [topRooms, setTopRooms] = useState([]);
-  const [top3Rooms, setTop3Rooms] = useState([]);
-  const [restRooms, setRestRooms] = useState([]);
-  const [bookingsLoading, setBookingsLoading] = useState(true);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [totalSales, setTotalSales] = useState(0);
+  const [totalRooms, setTotalRooms] = useState(0); // Add state for total rooms
+  const navigate = useNavigate();
+
+  // Refs for scrolling to specific sections
+  const dailyRevenueChartRef = useRef(null);
 
   const tokenData = getTokenData();
 
-  // Xử lý dữ liệu bookings để tìm top 10 phòng
-  const processBookingsData = (data) => {
-    // Đếm số lần mỗi phòng được đặt
-    const roomCounts = {};
-
-    data.forEach(booking => {
-      const roomName = booking.roomName;
-      if (!roomCounts[roomName]) {
-        roomCounts[roomName] = {
-          roomId: booking.roomId,
-          roomName: roomName,
-          count: 0
-        };
-      }
-      roomCounts[roomName].count += 1;
-    });
-
-    // Chuyển đổi thành mảng và sắp xếp
-    const sortedRooms = Object.values(roomCounts)
-      .sort((a, b) => b.count - a.count)
-      .map((room, index) => ({
-        key: room.roomId,
-        rank: index + 1,
-        roomName: room.roomName,
-        bookingCount: room.count
-      }));
-
-    // Chia thành top 3 và phần còn lại (top 4-10)
-    const top3 = sortedRooms.slice(0, 3);
-    const rest = sortedRooms.slice(3, 10);
-
-    return {
-      all: sortedRooms.slice(0, 10), // Top 10
-      top3,
-      rest
-    };
+  // Function to scroll to the daily revenue chart
+  const scrollToDailyRevenueChart = () => {
+    if (dailyRevenueChartRef.current) {
+      dailyRevenueChartRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   };
 
-  // Lấy dữ liệu bookings
-  useEffect(() => {
-    const getBookingsData = async () => {
-      try {
-        setBookingsLoading(true);
-        const bookingsResponse = await GetAllBookings(tokenData.access_token);
-        if (bookingsResponse && bookingsResponse.data && bookingsResponse.data.data) {
-          const processedData = processBookingsData(bookingsResponse.data.data);
-          const roomIds = bookingsResponse.data.data.map(booking => booking.roomId);
-          const roomsData = await Promise.all(roomIds.map(roomId => getRoomById(roomId, tokenData.access_token)));
-          const roomsMap = new Map(roomsData.map(room => [room.id, room]));
-          if (roomsMap.has(undefined)) {
-            console.warn("⚠️ Warning: roomsMap chứa giá trị lỗi", roomsMap.get(undefined));
-          }
-          // Ánh xạ lại dữ liệu, sử dụng room.key thay vì room.roomId
-          processedData.all = processedData.all.map(room => {
-            const matchingRoom = roomsMap.get(room.key); // Sửa `room.roomId` thành `room.key`
-            if (matchingRoom) {
-              return {
-                ...room,
-                startTime: matchingRoom.startTime,
-                endTime: matchingRoom.endTime,
-              };
-            } else {
-              console.warn(`❌ No matching room found for roomId ${room.key}`);
-            }
-            return { ...room, startTime: "N/A", endTime: "N/A" }; // Tránh lỗi undefined
-          });
-          setTopRooms(processedData.all);
-          setTop3Rooms(processedData.top3);
-          setRestRooms(processedData.rest);
-        }
-      } catch (error) {
-        console.error("Error processing bookings:", error);
-      } finally {
-        setBookingsLoading(false);
-      }
-    };
+  // Function to filter data by month range
+  const filterDataByMonthRange = (data, range) => {
+    return data.filter(item => item.month >= range[0] && item.month <= range[1]);
+  };
 
-    getBookingsData();
-  }, [tokenData.access_token]);
+  // Function to filter daily data by date range
+  const filterDataByDateRange = (data, dateRange) => {
+    if (!dateRange || dateRange.length !== 2) {
+      // If no date range selected, show all data
+      return data;
+    }
 
+    const startDate = dateRange[0].format('YYYY-MM-DD');
+    const endDate = dateRange[1].format('YYYY-MM-DD');
 
-  console.log("topRooms: ", topRooms);
+    return data.filter(item => {
+      return item.date >= startDate && item.date <= endDate;
+    });
+  };
 
-  // Lấy dữ liệu thanh toán
+  // Fetch statistics data and room data
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        // Gọi API để lấy dữ liệu
+        // Call API to get payment statistics
         const response = await fetchPaymentStatistics(tokenData.access_token);
-        // console.log("API Response:", response);
+        console.log("API Response:", response);
+
+        // Call API to get all rooms
+        const roomsResponse = await fetchAllRooms(tokenData.access_token);
+        console.log("Rooms API Response:", roomsResponse);
+
+        // Set total rooms count
+        if (roomsResponse && roomsResponse.data) {
+          setTotalRooms(roomsResponse.data.length);
+        }
 
         if (response && response.data && response.data.data) {
-          // API trả về response.data.data là một mảng
+          // API returns response.data.data as an array
           const orderData = response.data.data;
-          // console.log("Parsed data length:", orderData.length);
+          console.log("Parsed data length:", orderData.length);
+
+          // Set total orders count
+          setTotalOrders(orderData.length);
+
+          // Calculate total sales from all orders
+          const totalSalesAmount = orderData.reduce((sum, order) => {
+            const amount = typeof order.totalAmount === 'number'
+              ? order.totalAmount
+              : parseFloat(order.totalAmount || 0);
+            return sum + amount;
+          }, 0);
+
+          setTotalSales(totalSalesAmount);
+
           processData(orderData);
         } else {
-          // console.error("Response data structure is not as expected", response);
+          console.error("Response data structure is not as expected", response);
         }
       } catch (error) {
         console.error("Error fetching statistics:", error);
@@ -129,7 +117,7 @@ const StatisticsPage = () => {
   }, [tokenData.access_token]);
 
   const processData = (data) => {
-    // Khởi tạo dữ liệu cho 12 tháng
+    // Initialize data for 12 months
     const groupedByMonth = Array(12).fill(0).map((_, index) => ({
       month: index + 1,
       totalPurchases: 0,
@@ -140,15 +128,15 @@ const StatisticsPage = () => {
     const uniqueYears = new Set();
 
     data.forEach((item) => {
-      // Xử lý startDate - là mảng [year, month, day]
+      // Process startDate - is an array [year, month, day]
       let startDate;
       if (Array.isArray(item.startDate) && item.startDate.length >= 3) {
-        // Định dạng [year, month, day]
+        // Format [year, month, day]
         startDate = new Date(item.startDate[0], item.startDate[1] - 1, item.startDate[2]);
       } else {
-        // Fallback nếu không phải định dạng mảng
+        // Fallback if not array format
         console.warn("Unexpected startDate format:", item.startDate);
-        return; // Bỏ qua item này
+        return; // Skip this item
       }
 
       const year = startDate.getFullYear();
@@ -157,9 +145,9 @@ const StatisticsPage = () => {
 
       uniqueYears.add(year);
 
-      // Tính toán theo tháng
+      // Calculate by month
       if (year === selectedYear) {
-        // Đảm bảo totalAmount là số
+        // Ensure totalAmount is a number
         const amount = typeof item.totalAmount === 'number'
           ? item.totalAmount
           : parseFloat(item.totalAmount || 0);
@@ -168,7 +156,7 @@ const StatisticsPage = () => {
         groupedByMonth[month].totalRevenue += amount;
       }
 
-      // Tính toán theo ngày
+      // Calculate by day
       const dayKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       if (!groupedByDay[dayKey]) {
         groupedByDay[dayKey] = { date: dayKey, totalPurchases: 0, totalRevenue: 0 };
@@ -182,28 +170,101 @@ const StatisticsPage = () => {
       groupedByDay[dayKey].totalRevenue += amount;
     });
 
-    // Lọc dữ liệu ngày theo năm được chọn
-    const filteredDayData = Object.values(groupedByDay).filter(item => {
+    // Filter daily data by selected year
+    const yearFilteredDayData = Object.values(groupedByDay).filter(item => {
       const [year] = item.date.split('-');
       return parseInt(year) === selectedYear;
     });
 
-    // console.log("Monthly data:", groupedByMonth);
-    // console.log("Daily data:", filteredDayData);
+    console.log("Monthly data:", groupedByMonth);
+    console.log("Daily data:", yearFilteredDayData);
 
     setDataByMonth(groupedByMonth);
-    setDataByDay(filteredDayData);
+    setDataByDay(yearFilteredDayData);
+    setFilteredDayData(yearFilteredDayData); // Initially show all days
+
+    // Apply current filters
+    setFilteredMonthData(filterDataByMonthRange(groupedByMonth, monthRange));
+
     setYears([...uniqueYears].sort((a, b) => b - a));
   };
 
-  // Xử lý khi selectedYear thay đổi
+  // Handle month range change for monthly chart
+  const handleMonthRangeChange = (newRange) => {
+    setMonthRange(newRange);
+    setFilteredMonthData(filterDataByMonthRange(dataByMonth, newRange));
+  };
+
+  // Reset month range to show all months
+  const resetMonthRange = () => {
+    setMonthRange([1, 12]);
+    setFilteredMonthData(filterDataByMonthRange(dataByMonth, [1, 12]));
+  };
+
+  // Handle date range change for daily chart
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+    setFilteredDayData(filterDataByDateRange(dataByDay, dates));
+  };
+
+  // Reset date filter to show all days
+  const resetDateFilter = () => {
+    setDateRange(null);
+    setFilteredDayData(dataByDay); // Reset to show all data
+  };
+
+  // Get month ranges for presets (for each month)
+  const getMonthRanges = () => {
+    const ranges = {};
+
+    // Add each month as a preset
+    months.forEach(month => {
+      ranges[month.label] = [
+        dayjs().year(selectedYear).month(month.value - 1).startOf('month'),
+        dayjs().year(selectedYear).month(month.value - 1).endOf('month')
+      ];
+    });
+
+    // Add some common date ranges
+    ranges['Current Month'] = [
+      dayjs().startOf('month'),
+      dayjs().endOf('month')
+    ];
+
+    ranges['Previous Month'] = [
+      dayjs().subtract(1, 'month').startOf('month'),
+      dayjs().subtract(1, 'month').endOf('month')
+    ];
+
+    ranges['Last 30 Days'] = [
+      dayjs().subtract(29, 'day'),
+      dayjs()
+    ];
+
+    return ranges;
+  };
+
+  // Handle selected year change
   useEffect(() => {
-    // Gọi lại API khi năm thay đổi để refresh dữ liệu
+    // Refresh data when year changes
     const refreshData = async () => {
       try {
         setIsLoading(true);
         const response = await fetchPaymentStatistics(tokenData.access_token);
         if (response && response.data && response.data.data) {
+          // Update total orders when year changes
+          setTotalOrders(response.data.data.length);
+
+          // Calculate total sales when year changes
+          const totalSalesAmount = response.data.data.reduce((sum, order) => {
+            const amount = typeof order.totalAmount === 'number'
+              ? order.totalAmount
+              : parseFloat(order.totalAmount || 0);
+            return sum + amount;
+          }, 0);
+
+          setTotalSales(totalSalesAmount);
+
           processData(response.data.data);
         }
       } catch (error) {
@@ -214,101 +275,31 @@ const StatisticsPage = () => {
     };
 
     refreshData();
+    // Reset date range when year changes
+    setDateRange(null);
   }, [selectedYear]);
 
-  // Định nghĩa cột cho bảng Top Rooms (4-10)
-  const topRoomsColumns = [
-    {
-      title: 'Thứ hạng',
-      dataIndex: 'rank',
-      key: 'rank',
-      width: 100,
-      render: (text) => <span style={{ fontWeight: 'bold' }}>{text}</span>
-    },
-    {
-      title: 'Tên phòng',
-      dataIndex: 'roomName',
-      key: 'roomName',
-    },
-    {
-      title: 'Số lần đặt phòng',
-      dataIndex: 'bookingCount',
-      key: 'bookingCount',
-      sorter: (a, b) => a.bookingCount - b.bookingCount,
-      sortDirections: ['descend', 'ascend'],
-    }
+  // Generate marks for the slider
+  const marks = {};
+  for (let i = 1; i <= 12; i++) {
+    marks[i] = i;
+  }
+
+  // Month names for presets
+  const months = [
+    { value: 1, label: 'January' },
+    { value: 2, label: 'February' },
+    { value: 3, label: 'March' },
+    { value: 4, label: 'April' },
+    { value: 5, label: 'May' },
+    { value: 6, label: 'June' },
+    { value: 7, label: 'July' },
+    { value: 8, label: 'August' },
+    { value: 9, label: 'September' },
+    { value: 10, label: 'October' },
+    { value: 11, label: 'November' },
+    { value: 12, label: 'December' }
   ];
-
-  // Lấy các màu tương ứng với xếp hạng
-  const getRankColor = (rank) => {
-    switch (rank) {
-      case 1: return '#ffd700'; // Gold
-      case 2: return '#c0c0c0'; // Silver
-      case 3: return '#cd7f32'; // Bronze
-      default: return '#1890ff'; // Default blue
-    }
-  };
-
-  // Tạo top 3 rooms
-  const renderTop3 = () => {
-    if (bookingsLoading || top3Rooms.length === 0) {
-      return <div>Đang tải dữ liệu...</div>;
-    }
-
-    return (
-      <div style={{ padding: '20px 0' }}>
-        {/* Top 1 - Hàng đầu */}
-        <Row justify="center" style={{ marginBottom: '20px' }}>
-          <Col xs={24} sm={18} md={12} lg={8}>
-            <Card
-              hoverable
-              style={{
-                textAlign: 'center',
-                backgroundColor: '#FFFDF0',
-                borderColor: getRankColor(1),
-                borderWidth: '2px'
-              }}
-            >
-              <TrophyOutlined style={{ fontSize: '32px', color: getRankColor(1), marginBottom: '8px' }} />
-              <h2 style={{ margin: '0', fontSize: '24px', color: getRankColor(1) }}>Top 1</h2>
-              <h3 style={{ fontSize: '20px', margin: '12px 0' }}>{top3Rooms[0]?.roomName}</h3>
-              <Statistic
-                value={top3Rooms[0]?.bookingCount}
-                suffix="lượt đặt phòng"
-                valueStyle={{ color: '#1890ff', fontSize: '18px' }}
-              />
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Top 2 và 3 - Hàng thứ hai */}
-        <Row gutter={16} justify="center">
-          {top3Rooms.slice(1, 3).map((room, index) => (
-            <Col xs={24} sm={12} md={8} lg={6} key={room.key}>
-              <Card
-                hoverable
-                style={{
-                  textAlign: 'center',
-                  backgroundColor: '#FAFAFA',
-                  borderColor: getRankColor(room.rank),
-                  borderWidth: '2px'
-                }}
-              >
-                <TrophyOutlined style={{ fontSize: '24px', color: getRankColor(room.rank), marginBottom: '8px' }} />
-                <h3 style={{ margin: '0', fontSize: '18px', color: getRankColor(room.rank) }}>Top {room.rank}</h3>
-                <h4 style={{ fontSize: '16px', margin: '8px 0' }}>{room.roomName}</h4>
-                <Statistic
-                  value={room.bookingCount}
-                  suffix="lượt đặt"
-                  valueStyle={{ color: '#1890ff', fontSize: '16px' }}
-                />
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </div>
-    );
-  };
 
   return (
     <div>
@@ -323,74 +314,144 @@ const StatisticsPage = () => {
           <Select.Option key={year} value={year}>{year}</Select.Option>
         ))}
       </Select>
+      <ul className="insights">
+        <li onClick={() => navigate("/admin/orders")}>
+          <i className='bx bx-calendar-check'></i>
+          <span className="info">
+            <h3>{isLoading ? 'Loading...' : totalOrders.toLocaleString()}</h3>
+            <p>Paid Order</p>
+          </span>
+        </li>
 
-      {/* Top 3 phòng được đặt nhiều nhất */}
-      <Card
-        title={<h3 style={{ textAlign: 'center' }}>Top 3 phòng được đặt nhiều nhất</h3>}
-        style={{ marginTop: 20 }}
-        loading={bookingsLoading}
-        bordered={false}
-      >
-        {renderTop3()}
-      </Card>
+        <li onClick={() => navigate("/admin/room")}>
+          <i className='bx bx-building-house'></i>
+          <span className="info">
+            <h3>{isLoading ? 'Loading...' : totalRooms.toLocaleString()}</h3>
+            <p>Room</p>
+          </span>
+        </li>
 
-      {/* Bảng xếp hạng từ Top 4 đến Top 10 */}
-      <Card
-        title="Xếp hạng Top 4 - 10 phòng được đặt nhiều nhất"
-        style={{ marginTop: 20 }}
-        loading={bookingsLoading}
-      >
-        <Table
-          columns={topRoomsColumns}
-          dataSource={restRooms}
-          pagination={false}
-          loading={bookingsLoading}
-        />
-      </Card>
+        <li onClick={scrollToDailyRevenueChart} style={{ cursor: 'pointer' }}>
+          <i className='bx bx-dollar-circle'></i>
+          <span className="info">
+            <h3>{isLoading ? 'Loading...' : `₫${totalSales.toLocaleString()}`}</h3>
+            <p>Total Sales</p>
+          </span>
+        </li>
+      </ul>
 
-      {isLoading ? (
-        <div>Đang tải dữ liệu...</div>
-      ) : (
-        <>
-          <Card title={`Purchases & Revenue by Month in ${selectedYear}`} style={{ marginTop: 20 }}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={dataByMonth}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      {/* Statistics Tab System */}
+      <Tabs defaultActiveKey="1" style={{ marginTop: 20 }}>
+        <TabPane tab="Revenue Statistics" key="1">
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : (
+            <>
+              {/* Monthly chart with filter */}
+              <Card
+                title={`Purchases & Revenue by Month in ${selectedYear}`}
+                style={{ marginTop: 20 }}
+                extra={
+                  <Button type="primary" onClick={resetMonthRange} size="small">
+                    Reset Filter
+                  </Button>
+                }
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" tickFormatter={(tick) => `Tháng ${tick}`} />
-                <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
-                <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                <Tooltip formatter={(value) => value.toLocaleString('vi-VN')} />
-                <Legend />
-                <Bar dataKey="totalPurchases" fill="#8884d8" name="Lượt Mua" yAxisId="left" />
-                <Bar dataKey="totalRevenue" fill="#82ca9d" name="Doanh Thu (VND)" yAxisId="right" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
+                {/* Month range slider */}
+                <div style={{ margin: '20px 10px 30px' }}>
+                  <Space direction="vertical" style={{ width: '100%' }}>
+                    <h4>Filter Months: {monthRange[0]} to {monthRange[1]}</h4>
+                    <Slider
+                      range
+                      min={1}
+                      max={12}
+                      marks={marks}
+                      value={monthRange}
+                      onChange={handleMonthRangeChange}
+                      tooltip={{
+                        formatter: value => `Month ${value}`
+                      }}
+                    />
+                  </Space>
+                </div>
 
-          <Card title={`Purchases & Revenue by Day in ${selectedYear}`} style={{ marginTop: 20 }}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={dataByDay}
-                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={filteredMonthData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="month" tickFormatter={(tick) => `Tháng ${tick}`} />
+                    <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
+                    <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+                    <Tooltip formatter={(value) => value.toLocaleString('en-US')} />
+                    <Legend />
+                    <Bar dataKey="totalPurchases" fill="#8884d8" name="Buys" yAxisId="left" />
+                    <Bar dataKey="totalRevenue" fill="#82ca9d" name="Turnover (USD)" yAxisId="right" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Card>
+
+              {/* Daily chart with date range filter */}
+              <Card
+                ref={dailyRevenueChartRef} // Add ref to this card
+                title={`Purchases & Revenue by Day in ${selectedYear}`}
+                style={{ marginTop: 20 }}
+                extra={
+                  <Button type="primary" onClick={resetDateFilter} size="small">
+                    Reset Date Filter
+                  </Button>
+                }
+                id="daily-revenue-chart" // Add an ID for easier access
               >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
-                <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                <Tooltip formatter={(value) => value.toLocaleString('vi-VN')} />
-                <Legend />
-                <Bar dataKey="totalPurchases" fill="#8884d8" name="Lượt Mua" yAxisId="left" />
-                <Bar dataKey="totalRevenue" fill="#82ca9d" name="Doanh Thu (VND)" yAxisId="right" />
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-        </>
-      )}
+                <div style={{ margin: '0 0 20px' }}>
+                  <Row gutter={16} align="middle">
+                    <Col xs={24}>
+                      <Title level={5}>Date Range:</Title>
+                      <RangePicker
+                        style={{ width: '100%' }}
+                        value={dateRange}
+                        onChange={handleDateRangeChange}
+                        format="YYYY-MM-DD"
+                        placeholder={['Start Date', 'End Date']}
+                        allowClear={true}
+                        ranges={getMonthRanges()}
+                      />
+                    </Col>
+                  </Row>
+                </div>
+
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={filteredDayData}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
+                    <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+                    <Tooltip formatter={(value) => value.toLocaleString('en-US')} />
+                    <Legend />
+                    <Bar dataKey="totalPurchases" fill="#8884d8" name="Buys" yAxisId="left" />
+                    <Bar dataKey="totalRevenue" fill="#82ca9d" name="Turnover (USD)" yAxisId="right" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Card>
+            </>
+          )}
+        </TabPane>
+
+        <TabPane tab="Package Statistics" key="2">
+          <TopPackagesStatistics />
+        </TabPane>
+
+        <TabPane tab="Booking Statistics" key="3">
+          <BookingStatistics />
+        </TabPane>
+      </Tabs>
     </div>
   );
 };
 
 export default StatisticsPage;
+

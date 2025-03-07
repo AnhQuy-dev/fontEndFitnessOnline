@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import {
     Card, Modal, Button, notification, Layout, Typography,
-    Spin, Menu, Row, Col, Select, Divider, Badge, Tag
+    Spin, Menu, Row, Col, Select, Divider, Badge, Tag, Pagination
 } from 'antd';
 import {
     CalendarOutlined, EnvironmentOutlined, UserOutlined,
-    BranchesOutlined, FilterOutlined, TeamOutlined, ClockCircleOutlined
+    BranchesOutlined, FilterOutlined, TeamOutlined, ClockCircleOutlined,
+    ShoppingCartOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import stickman from '../../../assets/images/Stickman.gif';
@@ -15,7 +16,7 @@ import { getRoomOfPackageId, submitBookingRoom } from '../../../serviceToken/Boo
 import { fetchAllClubs } from '../../../serviceToken/ClubService';
 import { getUserByEmail } from '../../../serviceToken/authService';
 
-const { Content } = Layout;
+const { Content, Sider } = Layout;
 const { Title, Text } = Typography;
 const { Option } = Select;
 
@@ -32,6 +33,12 @@ const BookingMain = () => {
     const [loading, setLoading] = useState(true);
     const [clubLoading, setClubLoading] = useState(true);
     const [user, setUser] = useState(null);
+    const [hasWorkoutPackage, setHasWorkoutPackage] = useState(false);
+
+    // Pagination states - updated to show 6 rooms per page
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(6);
+    const [totalRooms, setTotalRooms] = useState(0);
 
     const tokenData = getTokenData();
     const decodeToken = getDecodedToken();
@@ -39,10 +46,20 @@ const BookingMain = () => {
     const userId = decodeToken?.id;
     const userEmail = decodeToken?.sub;
 
+    // Navigate to package page
+    const navigateToPackage = () => {
+        navigate('/packageMain');
+    };
+
     // Load package rooms when user data is available
     useEffect(() => {
-        if (user?.workoutPackageId && tokenData?.access_token) {
-            loadPackageRooms();
+        if (user) {
+            // Check if user has a workout package
+            setHasWorkoutPackage(!!user.workoutPackageId);
+
+            if (user.workoutPackageId && tokenData?.access_token) {
+                loadPackageRooms();
+            }
         }
     }, [user, tokenData?.access_token]);
 
@@ -101,6 +118,8 @@ const BookingMain = () => {
             const activeRooms = roomsData.data.filter(room => room.status === true);
             setAllRooms(activeRooms);
             setFilteredRooms(activeRooms);
+            setTotalRooms(activeRooms.length);
+            setCurrentPage(1);
         } catch (error) {
             console.error('Error loading rooms:', error);
             notification.error({
@@ -159,8 +178,11 @@ const BookingMain = () => {
     // Filter rooms by club
     const filterRoomsByClub = (clubName) => {
         setSelectedClub(clubName);
+        setCurrentPage(1);
+
         if (!clubName || clubName === 'all') {
             setFilteredRooms(allRooms);
+            setTotalRooms(allRooms.length);
         } else {
             const selectedClubObj = clubs.find(club => club.name === clubName);
             if (selectedClubObj) {
@@ -169,8 +191,10 @@ const BookingMain = () => {
                     room.club.id === selectedClubObj.id
                 );
                 setFilteredRooms(filtered);
+                setTotalRooms(filtered.length);
             } else {
                 setFilteredRooms([]);
+                setTotalRooms(0);
             }
         }
     };
@@ -191,8 +215,8 @@ const BookingMain = () => {
     const handleSubmitBooking = async () => {
         if (!selectedRoom) {
             notification.error({
-                message: 'Lỗi đặt phòng',
-                description: 'Vui lòng chọn phòng để đặt.',
+                message: 'Error',
+                description: 'Please select room.',
             });
             return;
         }
@@ -200,7 +224,6 @@ const BookingMain = () => {
         const bookingData = {
             userId: userId,
             roomId: selectedRoom.id
-
         };
         console.log("bookingData", bookingData);
 
@@ -208,16 +231,16 @@ const BookingMain = () => {
             const response = await submitBookingRoom(bookingData, tokenData.access_token);
             if (response.status === 201) {
                 notification.success({
-                    message: 'Đặt phòng thành công!',
-                    description: `Bạn đã đặt phòng ${selectedRoom.roomName}.`,
+                    message: 'Success!',
+                    description: `You was booked ${selectedRoom.roomName}.`,
                 });
                 setIsModalOpen(false);
             } else {
-                throw new Error(response.data.message || 'Không thể đặt phòng.');
+                throw new Error(response.data.message || 'Can not book.');
             }
         } catch (error) {
             notification.error({
-                message: 'Lỗi đặt phòng',
+                message: 'Error',
                 description: error.message || 'Có lỗi xảy ra khi đặt phòng.',
             });
         }
@@ -238,196 +261,297 @@ const BookingMain = () => {
         return `${timeArray[0]}:${timeArray[1].toString().padStart(2, '0')}`;
     };
 
+    // Pagination change handler
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Get current rooms for the current page
+    const getCurrentRooms = () => {
+        const startIndex = (currentPage - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        return filteredRooms.slice(startIndex, endIndex);
+    };
+
     return (
         <section id="services" style={{ backgroundColor: '#f7f9fc', minHeight: '100vh', padding: '24px 0' }}>
             <Layout className="booking-container" style={{ maxWidth: '1440px', margin: '0 auto', background: 'transparent' }}>
-                {/* Filter Section - Moved to top */}
-                <div className="filter-section" style={{
-                    padding: '16px 24px',
-                    background: 'white',
-                    borderRadius: '8px',
-                    marginBottom: '24px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
-                }}>
-                    <Row align="middle" gutter={[16, 16]}>
-                        <Col xs={24} sm={8} md={6}>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <FilterOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
-                                <Title level={5} style={{ margin: 0 }}>Lọc theo câu lạc bộ</Title>
-                            </div>
-                        </Col>
-                        <Col xs={24} sm={16} md={18}>
-                            {clubLoading ? (
-                                <div style={{ padding: '8px', textAlign: 'center' }}>
-                                    <Spin size="small" />
-                                </div>
-                            ) : (
-                                <Select
-                                    style={{ width: '100%' }}
-                                    placeholder="Chọn câu lạc bộ"
-                                    value={selectedClub}
-                                    onChange={filterRoomsByClub}
-                                    suffixIcon={<BranchesOutlined />}
-                                >
-                                    <Option value="all">Tất cả câu lạc bộ</Option>
-                                    {clubs.map(club => (
-                                        <Option key={club.name} value={club.name}>
-                                            {club.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                            )}
-                        </Col>
-                    </Row>
-                </div>
-
-                {/* Room Cards Section */}
-                <Content style={{ padding: '0', background: 'transparent' }}>
-                    {loading ? (
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            marginTop: '50px',
-                            flexDirection: 'column',
-                            gap: '16px'
-                        }}>
-                            <img src={stickman} alt="Loading..." width={120} height={120} />
-                            <Text style={{ color: '#1890ff', fontWeight: 'bold' }}>Đang tải danh sách phòng...</Text>
-                        </div>
-                    ) : filteredRooms.length === 0 ? (
-                        <div style={{
-                            textAlign: 'center',
-                            marginTop: '50px',
-                            padding: '32px',
+                <Layout style={{ background: 'transparent' }}>
+                    {/* Left side filter section */}
+                    <Sider
+                        width={280}
+                        theme="light"
+                        style={{
                             background: 'white',
                             borderRadius: '8px',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                            marginRight: '24px',
+                            padding: '20px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                            height: 'fit-content'
+                        }}
+                    >
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            marginBottom: '16px'
                         }}>
-                            <BranchesOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
-                            <div>
-                                <Text style={{ fontSize: '16px', color: '#8c8c8c' }}>
-                                    Không có phòng nào khả dụng cho lựa chọn hiện tại.
-                                </Text>
+                            <FilterOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
+                            <Title level={4} style={{ margin: 0 }}>Filter By Club</Title>
+                        </div>
+
+                        <Divider style={{ margin: '12px 0' }} />
+
+                        {clubLoading ? (
+                            <div style={{ padding: '8px', textAlign: 'center' }}>
+                                <Spin size="small" />
                             </div>
-                            <Button
-                                type="primary"
-                                style={{ marginTop: '16px' }}
-                                onClick={() => filterRoomsByClub('all')}
-                            >
-                                Xem tất cả phòng
-                            </Button>
-                        </div>
-                    ) : (
-                        <div>
-                            <Row gutter={[16, 16]}>
-                                {filteredRooms.map((room) => (
-                                    <Col xs={24} sm={12} md={8} lg={6} xl={4.8} key={room.id}>
-                                        <Card
-                                            hoverable
-                                            className="room-card"
-                                            style={{
-                                                height: '100%',
-                                                borderRadius: '8px',
-                                                overflow: 'hidden',
-                                                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                                                transition: 'all 0.3s ease',
-                                                border: isRoomInPackage(room.id) ? '1px solid #52c41a' : '1px solid #f0f0f0',
-                                                position: 'relative'
-                                            }}
-                                            cover={
-                                                <div style={{
-                                                    height: '140px',
-                                                    background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                    color: 'white',
-                                                    padding: '16px',
-                                                    position: 'relative'
-                                                }}>
-                                                    {isRoomInPackage(room.id) && (
-                                                        <Tag
-                                                            color="#52c41a"
-                                                            style={{
-                                                                position: 'absolute',
-                                                                top: '8px',
-                                                                right: '8px',
-                                                                margin: 0,
-                                                                padding: '4px 8px',
-                                                                borderRadius: '4px'
-                                                            }}
-                                                        >
-                                                            Có thể đặt
-                                                        </Tag>
-                                                    )}
-                                                    <Title level={4} style={{ color: 'white', margin: 0, textAlign: 'center' }}>
-                                                        {room.roomName}
-                                                    </Title>
-                                                    <Text style={{ color: 'rgba(255, 255, 255, 0.85)', marginTop: '8px' }}>
-                                                        {room.club.name || 'Câu lạc bộ chưa xác định'}
-                                                    </Text>
-                                                </div>
-                                            }
-                                            bodyStyle={{ padding: '16px' }}
-                                        >
-                                            <div style={{ marginBottom: '16px' }}>
-                                                <div style={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center',
-                                                    marginBottom: '12px'
-                                                }}>
-                                                    <Tag color="blue" icon={<ClockCircleOutlined />} style={{ padding: '4px 8px' }}>
-                                                        {`${formatTime(room.startTime)} - ${formatTime(room.endTime)}`}
-                                                    </Tag>
-                                                    <Tag color="orange" icon={<TeamOutlined />}>
-                                                        {`${room.availableSeats}/${room.capacity}`}
-                                                    </Tag>
-                                                </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <Button
+                                    type={selectedClub === 'all' ? "primary" : "default"}
+                                    icon={<BranchesOutlined />}
+                                    block
+                                    onClick={() => filterRoomsByClub('all')}
+                                    style={{
+                                        textAlign: 'left',
+                                        borderRadius: '6px',
+                                        fontWeight: selectedClub === 'all' ? 'bold' : 'normal'
+                                    }}
+                                >
+                                    All Clubs
+                                </Button>
 
-                                                <div style={{ marginBottom: '8px' }}>
-                                                    <Text type="secondary" style={{ display: 'flex', alignItems: 'flex-start' }}>
-                                                        <EnvironmentOutlined style={{ marginRight: '8px', marginTop: '4px' }} />
-                                                        <span>{room.facilities}</span>
-                                                    </Text>
-                                                </div>
-                                            </div>
-
-                                            <Divider style={{ margin: '12px 0' }} />
-
-                                            <Button
-                                                type={isRoomInPackage(room.id) ? "primary" : "default"}
-                                                danger={isRoomInPackage(room.id)}
-                                                block
-                                                style={{
-                                                    borderRadius: '4px',
-                                                    fontWeight: isRoomInPackage(room.id) ? 'bold' : 'normal',
-                                                }}
-                                                disabled={!isRoomInPackage(room.id)}
-                                                onClick={() => {
-                                                    if (isRoomInPackage(room.id)) {
-                                                        openModal(room);
-                                                    }
-                                                }}
-                                            >
-                                                {isRoomInPackage(room.id) ? 'Đặt lịch ngay' : 'Không thuộc gói tập'}
-                                            </Button>
-                                        </Card>
-                                    </Col>
+                                {clubs.map(club => (
+                                    <Button
+                                        key={club.name}
+                                        type={selectedClub === club.name ? "primary" : "default"}
+                                        block
+                                        onClick={() => filterRoomsByClub(club.name)}
+                                        style={{
+                                            textAlign: 'left',
+                                            borderRadius: '6px',
+                                            fontWeight: selectedClub === club.name ? 'bold' : 'normal'
+                                        }}
+                                    >
+                                        {club.name}
+                                    </Button>
                                 ))}
-                            </Row>
+                            </div>
+                        )}
+                    </Sider>
+
+                    {/* Right side content with rooms */}
+                    <Content style={{ padding: '0', background: 'transparent' }}>
+                        {/* Title for the Room section with conditionally rendered "Go To Pay" button */}
+                        <div style={{
+                            background: 'white',
+                            borderRadius: '8px',
+                            padding: '16px 24px',
+                            marginBottom: '16px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            position: 'relative'
+                        }}>
+                            <Title level={4} style={{ margin: 0 }}>Available Rooms</Title>
+
+                            {!hasWorkoutPackage && user && (
+                                <Button
+                                    size="large"
+                                    icon={<ShoppingCartOutlined />}
+                                    onClick={navigateToPackage}
+                                    style={{
+                                        position: 'absolute',
+                                        left: '50%',
+                                        transform: 'translateX(-50%)',
+                                        background: '#ff6b01',
+                                        borderColor: 'black',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    Go To Pay
+                                </Button>
+                            )}
+
+                            <Text>Showing {getCurrentRooms().length} of {totalRooms} rooms</Text>
                         </div>
-                    )}
-                </Content>
+
+                        {loading ? (
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                marginTop: '50px',
+                                flexDirection: 'column',
+                                gap: '16px',
+                                background: 'white',
+                                padding: '50px',
+                                borderRadius: '8px',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                            }}>
+                                <img src={stickman} alt="Loading..." width={120} height={120} />
+                                <Text style={{ color: '#1890ff', fontWeight: 'bold' }}>Đang tải danh sách phòng...</Text>
+                            </div>
+                        ) : filteredRooms.length === 0 ? (
+                            <div style={{
+                                textAlign: 'center',
+                                marginTop: '50px',
+                                padding: '32px',
+                                background: 'white',
+                                borderRadius: '8px',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                            }}>
+                                <BranchesOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
+                                <div>
+                                    <Text style={{ fontSize: '16px', color: '#8c8c8c' }}>
+                                        Không có phòng nào khả dụng cho lựa chọn hiện tại.
+                                    </Text>
+                                </div>
+                                <Button
+                                    type="primary"
+                                    style={{ marginTop: '16px' }}
+                                    onClick={() => filterRoomsByClub('all')}
+                                >
+                                    Xem tất cả phòng
+                                </Button>
+                            </div>
+                        ) : (
+                            <div>
+                                {/* Room Cards - 3 columns */}
+                                <Row gutter={[16, 16]}>
+                                    {getCurrentRooms().map((room) => (
+                                        <Col xs={24} sm={12} md={8} key={room.id}>
+                                            <Card
+                                                hoverable
+                                                className="room-card"
+                                                style={{
+                                                    height: '100%',
+                                                    borderRadius: '8px',
+                                                    overflow: 'hidden',
+                                                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                                                    transition: 'all 0.3s ease',
+                                                    border: isRoomInPackage(room.id) ? '1px solid #52c41a' : '1px solid #f0f0f0',
+                                                    position: 'relative'
+                                                }}
+                                                cover={
+                                                    <div style={{
+                                                        height: '140px',
+                                                        background: 'linear-gradient(135deg, #1890ff 0%, #722ed1 100%)',
+                                                        display: 'flex',
+                                                        flexDirection: 'column',
+                                                        justifyContent: 'center',
+                                                        alignItems: 'center',
+                                                        color: 'white',
+                                                        padding: '16px',
+                                                        position: 'relative'
+                                                    }}>
+                                                        {isRoomInPackage(room.id) && (
+                                                            <Tag
+                                                                color="#52c41a"
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    top: '8px',
+                                                                    right: '8px',
+                                                                    margin: 0,
+                                                                    padding: '4px 8px',
+                                                                    borderRadius: '4px'
+                                                                }}
+                                                            >
+                                                                Available
+                                                            </Tag>
+                                                        )}
+                                                        <Title level={4} style={{ color: 'white', margin: 0, textAlign: 'center' }}>
+                                                            {room.roomName}
+                                                        </Title>
+                                                        <Text style={{ color: 'rgba(255, 255, 255, 0.85)', marginTop: '8px' }}>
+                                                            {room.club.name || 'Câu lạc bộ chưa xác định'}
+                                                        </Text>
+                                                    </div>
+                                                }
+                                                bodyStyle={{ padding: '16px' }}
+                                            >
+                                                <div style={{ marginBottom: '16px' }}>
+                                                    <div style={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center',
+                                                        marginBottom: '12px'
+                                                    }}>
+                                                        <Tag color="blue" icon={<ClockCircleOutlined />} style={{ padding: '4px 8px' }}>
+                                                            {`${formatTime(room.startTime)} - ${formatTime(room.endTime)}`}
+                                                        </Tag>
+                                                        <Tag color="orange" icon={<TeamOutlined />}>
+                                                            {`${room.availableSeats}/${room.capacity}`}
+                                                        </Tag>
+                                                    </div>
+
+                                                    <div style={{ marginBottom: '8px' }}>
+                                                        <Text type="secondary" style={{ display: 'flex', alignItems: 'flex-start' }}>
+                                                            <UserOutlined style={{ marginRight: '8px' }} />
+                                                            {room.trainer?.fullName || 'Chưa có HLV'}
+                                                        </Text>
+                                                    </div>
+                                                </div>
+
+                                                <Divider style={{ margin: '12px 0' }} />
+
+                                                <Button
+                                                    type={isRoomInPackage(room.id) ? "primary" : "default"}
+                                                    danger={isRoomInPackage(room.id)}
+                                                    block
+                                                    style={{
+                                                        borderRadius: '4px',
+                                                        fontWeight: isRoomInPackage(room.id) ? 'bold' : 'normal',
+                                                    }}
+                                                    disabled={!isRoomInPackage(room.id)}
+                                                    onClick={() => {
+                                                        if (isRoomInPackage(room.id)) {
+                                                            openModal(room);
+                                                        }
+                                                    }}
+                                                >
+                                                    {isRoomInPackage(room.id) ? 'Book now' : 'You need to pay before booking this room'}
+                                                </Button>
+                                            </Card>
+                                        </Col>
+                                    ))}
+                                </Row>
+
+                                {/* Pagination */}
+                                {filteredRooms.length > 0 && (
+                                    <div style={{
+                                        marginTop: '32px',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        background: 'white',
+                                        padding: '16px',
+                                        borderRadius: '8px',
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                                    }}>
+                                        <Pagination
+                                            current={currentPage}
+                                            total={totalRooms}
+                                            pageSize={pageSize}
+                                            onChange={handlePageChange}
+                                            showSizeChanger={false}
+                                            showQuickJumper
+                                            showTotal={(total) => `Tổng cộng ${total} phòng`}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </Content>
+                </Layout>
 
                 {/* Booking Modal */}
                 <Modal
                     title={
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <BranchesOutlined style={{ color: '#1890ff' }} />
-                            <span>Đặt phòng: {selectedRoom?.roomName}</span>
+                            <span>Room : {selectedRoom?.roomName}</span>
                         </div>
                     }
                     open={isModalOpen}
@@ -435,7 +559,7 @@ const BookingMain = () => {
                     width={500}
                     footer={[
                         <Button key="cancel" onClick={() => setIsModalOpen(false)}>
-                            Hủy
+                            Cancel
                         </Button>,
                         <Button
                             key="submit"
@@ -444,7 +568,7 @@ const BookingMain = () => {
                             onClick={handleSubmitBooking}
                             icon={<CalendarOutlined />}
                         >
-                            Xác nhận đặt phòng
+                            Confirm book
                         </Button>,
                     ]}
                 >
@@ -459,32 +583,28 @@ const BookingMain = () => {
                         }}>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <BranchesOutlined style={{ color: '#1890ff' }} />
-                                <Text strong>Câu lạc bộ: </Text>
+                                <Text strong>Club: </Text>
                                 <Text>{selectedRoom.club.name || 'Câu lạc bộ chưa xác định'}</Text>
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <CalendarOutlined style={{ color: '#1890ff' }} />
-                                <Text strong>Ngày: </Text>
+                                <Text strong>Date: </Text>
                                 <Text>{selectedDate.toLocaleDateString()}</Text>
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <ClockCircleOutlined style={{ color: '#1890ff' }} />
-                                <Text strong>Thời gian: </Text>
+                                <Text strong>Time: </Text>
                                 <Text>{`${formatTime(selectedRoom.startTime)} - ${formatTime(selectedRoom.endTime)}`}</Text>
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <TeamOutlined style={{ color: '#1890ff' }} />
-                                <Text strong>Số chỗ trống: </Text>
+                                <Text strong>Available Seats: </Text>
                                 <Text>{selectedRoom.availableSeats}/{selectedRoom.capacity}</Text>
                             </div>
-                            <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                                <EnvironmentOutlined style={{ color: '#1890ff', marginTop: '4px' }} />
-                                <Text strong>Tiện nghi: </Text>
-                                <Text>{selectedRoom.facilities}</Text>
-                            </div>
+
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <UserOutlined style={{ color: '#1890ff' }} />
-                                <Text strong>Huấn luyện viên: </Text>
+                                <Text strong>Trainer: </Text>
                                 <Text>{selectedRoom.trainer?.fullName || 'Chưa có HLV'}</Text>
                             </div>
                         </div>

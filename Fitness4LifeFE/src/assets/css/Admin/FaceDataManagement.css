@@ -1,0 +1,455 @@
+/* FaceDataManagement.css */
+.face-data-modal .ant-modal-content {
+    background-color: #000;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+  
+  .face-data-modal .ant-modal-header {
+    background-color: #000;
+    border-bottom: 1px solid #222;
+    padding: 20px 24px;
+  }
+  
+  .face-data-modal .ant-modal-title h4 {
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  .face-data-modal .ant-modal-close {
+    color: #fff;
+  }
+  
+  .ag-format-container {
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .ag-courses_box {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding: 30px 0;
+  }
+  
+  .ag-courses_item {
+    flex-basis: calc(33.33333% - 30px);
+    margin: 0 15px 30px;
+    overflow: hidden;
+    border-radius: 28px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .ag-courses_item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  }
+  
+  .ag-courses-item_link {
+    display: block;
+    padding: 30px 20px;
+    background-color: #121212;
+    overflow: hidden;
+    position: relative;
+    text-decoration: none;
+  }
+  
+  .ag-courses-item_link:hover,
+  .ag-courses-item_link:hover .ag-courses-item_date {
+    text-decoration: none;
+    color: #FFF;
+  }
+  
+  .ag-courses-item_link:hover .ag-courses-item_bg {
+    transform: scale(10);
+  }
+  
+  /* Update Face Overlay */
+  .update-face-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+    border-radius: 28px;
+    backdrop-filter: blur(4px);
+  }
+  
+  .ag-courses_item:hover .update-face-overlay {
+    opacity: 1;
+  }
+  
+  .update-face-btn {
+    transform: scale(0.9);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    border-radius: 30px !important;
+    padding: 0 25px !important;
+    height: 40px !important;
+    font-weight: 500 !important;
+    border: none !important;
+    background: linear-gradient(135deg, #4c49ea, #952aff) !important;
+    box-shadow: 0 5px 15px rgba(76, 73, 234, 0.4) !important;
+  }
+  
+  .update-face-btn:hover {
+    transform: scale(1);
+    background: linear-gradient(135deg, #5d5bf0, #a84bff) !important;
+    box-shadow: 0 8px 20px rgba(76, 73, 234, 0.6) !important;
+  }
+  
+  .user-profile {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .user-avatar {
+    border: 3px solid #fff;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  .ag-courses-item_title {
+    min-height: 40px;
+    margin: 0 0 15px;
+    overflow: hidden;
+    font-weight: bold;
+    font-size: 24px;
+    color: #FFF;
+    text-align: center;
+    z-index: 2;
+    position: relative;
+  }
+  
+  .ag-courses-item_info {
+    margin-bottom: 20px;
+    z-index: 2;
+    position: relative;
+  }
+  
+  .ag-courses-item_email {
+    font-size: 14px;
+    color: #ccc;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .ag-courses-item_date-box {
+    font-size: 16px;
+    color: #FFF;
+    z-index: 2;
+    position: relative;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .ag-courses-item_date {
+    font-weight: bold;
+    color: #f9b234;
+    transition: color .5s ease;
+    margin-left: 5px;
+  }
+  
+  .ag-courses-item_user-id {
+    font-size: 12px;
+    color: #888;
+    z-index: 2;
+    position: relative;
+    text-align: center;
+  }
+  
+  /* Camera Modal Styles - ENHANCED */
+  .camera-modal .ant-modal-content {
+    background-color: #121212;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  }
+  
+  .camera-modal .ant-modal-header {
+    background-color: #121212;
+    border-bottom: 1px solid #333;
+    padding: 20px 24px;
+  }
+  
+  .camera-modal .ant-modal-title h5 {
+    color: #fff;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  
+  .camera-modal .ant-modal-close {
+    color: #fff;
+  }
+  
+  .camera-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+  }
+  
+  /* Enhanced video display */
+  .w-full.rounded-lg {
+    position: relative;
+    border-radius: 16px !important;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 2px solid #333;
+    margin-bottom: 20px;
+  }
+  
+  .camera-container video {
+    width: 100%;
+    background-color: #000 !important;
+    min-height: 350px !important;
+    object-fit: cover;
+  }
+  
+  /* Face Detection Guide - ENHANCED */
+  .camera-container .absolute.inset-0 .w-64.h-64 {
+    width: 280px !important;
+    height: 280px !important;
+    border-width: 3px !important;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .camera-container .absolute.inset-0 .border-green-500 {
+    border-color: #3ecd5e !important;
+    box-shadow: 0 0 30px rgba(62, 205, 94, 0.3) !important;
+  }
+  
+  .camera-container .absolute.inset-0 .border-yellow-500 {
+    border-color: #f9b234 !important;
+    box-shadow: 0 0 30px rgba(249, 178, 52, 0.3) !important;
+  }
+  
+  /* Alert Styles - ENHANCED */
+  .camera-container .mb-4.ant-alert {
+    width: 100%;
+    margin-bottom: 20px !important;
+    border-radius: 12px !important;
+    border: none !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .camera-container .ant-alert-warning {
+    background-color: rgba(249, 178, 52, 0.1) !important;
+    border-left: 4px solid #f9b234 !important;
+  }
+  
+  .camera-container .ant-alert-error {
+    background-color: rgba(228, 64, 2, 0.1) !important;
+    border-left: 4px solid #e44002 !important;
+  }
+  
+  .camera-container .ant-alert-success {
+    background-color: rgba(62, 205, 94, 0.1) !important;
+    border-left: 4px solid #3ecd5e !important;
+  }
+  
+  .camera-container .ant-alert-message {
+    color: #fff !important;
+    font-weight: 500 !important;
+  }
+  
+  .camera-container .ant-alert-description {
+    color: #ccc !important;
+  }
+  
+  /* Camera Button Styles - ENHANCED */
+  .camera-container .flex.justify-center {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .camera-container button.ant-btn {
+    height: 44px !important;
+    padding: 0 25px !important;
+    border-radius: 22px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.5px !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
+  }
+  
+  .camera-container button.ant-btn-primary {
+    background: linear-gradient(135deg, #4c49ea, #952aff) !important;
+    box-shadow: 0 5px 15px rgba(76, 73, 234, 0.4) !important;
+  }
+  
+  .camera-container button.ant-btn-primary:hover {
+    background: linear-gradient(135deg, #5d5bf0, #a84bff) !important;
+    box-shadow: 0 8px 20px rgba(76, 73, 234, 0.6) !important;
+    transform: translateY(-2px) !important;
+  }
+  
+  .camera-container button.bg-gray-300 {
+    background: #333 !important;
+    color: #fff !important;
+  }
+  
+  .camera-container button.bg-gray-300:hover {
+    background: #444 !important;
+    transform: translateY(-2px) !important;
+  }
+  
+  /* Modal Footer Buttons - ENHANCED */
+  .camera-modal .ant-modal-footer button {
+    height: 40px !important;
+    padding: 0 25px !important;
+    border-radius: 20px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.5px !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+  }
+  
+  .camera-modal .ant-modal-footer button:first-child {
+    background: #333 !important;
+    color: #fff !important;
+  }
+  
+  .camera-modal .ant-modal-footer button:first-child:hover {
+    background: #444 !important;
+    transform: translateY(-2px) !important;
+  }
+  
+  .camera-modal .ant-modal-footer button.ant-btn-primary {
+    background: linear-gradient(135deg, #4c49ea, #952aff) !important;
+    box-shadow: 0 5px 15px rgba(76, 73, 234, 0.4) !important;
+  }
+  
+  .camera-modal .ant-modal-footer button.ant-btn-primary:hover {
+    background: linear-gradient(135deg, #5d5bf0, #a84bff) !important;
+    box-shadow: 0 8px 20px rgba(76, 73, 234, 0.6) !important;
+    transform: translateY(-2px) !important;
+  }
+  
+  .camera-modal .ant-modal-footer button.ant-btn-primary:disabled {
+    background: #333 !important;
+    color: #666 !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+  }
+  
+  .camera-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    color: #fff;
+  }
+  
+  .ag-courses-item_bg {
+    height: 128px;
+    width: 128px;
+    background-color: #f9b234;
+    z-index: 1;
+    position: absolute;
+    top: -75px;
+    right: -175px;
+    border-radius: 50%;
+    transition: all .5s ease;
+  }
+  
+  .ag-courses_item:nth-child(2n) .ag-courses-item_bg {
+    background-color: #3ecd5e;
+  }
+  
+  .ag-courses_item:nth-child(3n) .ag-courses-item_bg {
+    background-color: #e44002;
+  }
+  
+  .ag-courses_item:nth-child(4n) .ag-courses-item_bg {
+    background-color: #952aff;
+  }
+  
+  .ag-courses_item:nth-child(5n) .ag-courses-item_bg {
+    background-color: #cd3e94;
+  }
+  
+  .ag-courses_item:nth-child(6n) .ag-courses-item_bg {
+    background-color: #4c49ea;
+  }
+  
+  .loading-container {
+    width: 100%;
+    text-align: center;
+    padding: 40px;
+    color: #fff;
+    font-size: 18px;
+  }
+  
+  .empty-container {
+    width: 100%;
+    padding: 40px;
+    background-color: #121212;
+    border-radius: 28px;
+  }
+  
+  .empty-container .ant-empty-description {
+    color: #fff;
+  }
+  
+  /* Responsive Media Queries */
+  @media only screen and (max-width: 979px) {
+    .ag-courses_item {
+      flex-basis: calc(50% - 30px);
+    }
+    .ag-courses-item_title {
+      font-size: 20px;
+    }
+  }
+  
+  @media only screen and (max-width: 767px) {
+    .ag-format-container {
+      width: 96%;
+    }
+  }
+  
+  @media only screen and (max-width: 639px) {
+    .ag-courses_item {
+      flex-basis: 100%;
+    }
+    .ag-courses-item_title {
+      min-height: 40px;
+      line-height: 1.2;
+      font-size: 20px;
+    }
+    .ag-courses-item_link {
+      padding: 22px 40px;
+    }
+    .ag-courses-item_date-box {
+      font-size: 16px;
+    }
+    
+    /* Camera modal responsive fixes */
+    .camera-container .absolute.inset-0 .w-64.h-64 {
+      width: 220px !important;
+      height: 220px !important;
+    }
+  }
+  
+  /* Position the modal to the right */
+  .face-data-modal {
+    top: 75px;
+    right: -120px;
+  }

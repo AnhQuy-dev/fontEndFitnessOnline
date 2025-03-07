@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../assets/css/Admin/dashboardAdmin.css'
-import { Avatar, notification } from 'antd';
-import { UserOutlined } from "@ant-design/icons";
+import '../../assets/css/Admin/dashboardAdmin.css';
+import { Avatar, notification, Dropdown, Menu, Modal } from 'antd';
+import { UserOutlined, LogoutOutlined, HomeOutlined } from "@ant-design/icons";
 import { getDecodedToken, getTokenData } from '../../serviceToken/tokenUtils';
 import { getUserByEmail } from '../../serviceToken/authService';
+
 const Navbar = ({ menuItems, onToggleSidebar }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredItems, setFilteredItems] = useState([]);
@@ -13,10 +14,6 @@ const Navbar = ({ menuItems, onToggleSidebar }) => {
   const decodeToken = getDecodedToken();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-
-
-
-  // console.log("userData", userData);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -51,7 +48,6 @@ const Navbar = ({ menuItems, onToggleSidebar }) => {
     return "https://via.placeholder.com/150";
   };
 
-
   const handleSearch = (e) => {
     const term = e.target.value;
     setSearchTerm(term);
@@ -75,7 +71,50 @@ const Navbar = ({ menuItems, onToggleSidebar }) => {
     }
   };
 
-  
+  const handleLogout = (message = null) => {
+    localStorage.removeItem('tokenData');
+    // These states would need to be passed from a parent component or context
+    // setIsLoggedIn(false);
+    // setUser(null);
+
+    if (message) {
+      // Display message if provided
+      Modal.info({
+        title: 'Session Information',
+        content: message,
+        onOk: () => navigate('/login'),
+      });
+    } else {
+      navigate('/login');
+    }
+  };
+
+  const confirmLogout = () => {
+    Modal.confirm({
+      title: 'Bạn có chắc chắn muốn đăng xuất?',
+      okText: 'Đăng xuất',
+      cancelText: 'Hủy',
+      onOk: () => {
+        handleLogout();
+      },
+    });
+  };
+
+  const handleHomeClick = () => {
+    navigate('/');
+  };
+
+  // Menu for the dropdown
+  const menu = (
+    <Menu>
+      <Menu.Item key="1" icon={<HomeOutlined />} onClick={handleHomeClick}>
+        Home
+      </Menu.Item>
+      <Menu.Item key="2" icon={<LogoutOutlined />} onClick={confirmLogout}>
+        Logout
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <nav>
@@ -111,13 +150,15 @@ const Navbar = ({ menuItems, onToggleSidebar }) => {
         <i className="bx bx-bell"></i>
         <span className="count">12</span>
       </a>
-      <a href="/admin/profile" className="profile">
-        <Avatar
-          size={32}
-          src={loading ? null : `${getAvatarUrl()}?t=${Date.now()}`}
-          icon={<UserOutlined />}
-        />
-      </a>
+      <Dropdown overlay={menu} trigger={['hover']}>
+        <div className="profile">
+          <Avatar
+            size={32}
+            src={loading ? null : `${getAvatarUrl()}?t=${Date.now()}`}
+            icon={<UserOutlined />}
+          />
+        </div>
+      </Dropdown>
     </nav>
   );
 };

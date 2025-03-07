@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { getTokenData } from '../../serviceToken/tokenUtils';
 import { fetchAllTrainer } from '../../serviceToken/TrainerSERVICE';
-
+import { Carousel, Card, Spin, Alert, Button } from 'antd';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import '../../assets/css/Main/TrainerHome.css'
 const OurTeam = () => {
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const carouselRef = React.createRef();
   console.log("trainers", trainers);
 
   useEffect(() => {
@@ -15,7 +17,7 @@ const OurTeam = () => {
         setLoading(true);
         const tokenData = getTokenData();
         const response = await fetchAllTrainer(tokenData.access_token);
-        
+
         if (response && Array.isArray(response.data)) {
           setTrainers(response.data);
         } else {
@@ -32,25 +34,53 @@ const OurTeam = () => {
     loadTrainers();
   }, []);
 
-  // CSS for consistent image sizing
-  const imageContainerStyle = {
-    width: '100%',
-    height: '250px', // Fixed height for all image containers
-    overflow: 'hidden',
-    position: 'relative'
+  // Carousel navigation handlers
+  const next = () => {
+    carouselRef.current.next();
   };
 
-  const imageStyle = {
-    width: '100%',
-    height: '100%',
-    objectFit: 'cover',
-    objectPosition: 'center top'
+  const previous = () => {
+    carouselRef.current.prev();
+  };
+
+  // Carousel settings
+  const carouselSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 1,
+        }
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        }
+      }
+    ]
   };
 
   return (
-    <section id="our-team">
+    <section id="our-team" style={{ padding: '60px 0' }}>
       <div className="container">
-        <div className="section-header">
+        <div className="section-header text-center" style={{ marginBottom: '40px' }}>
           <h2 className="section-title wow fadeInDown">Our Team</h2>
           <p className="wow fadeInDown">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eget risus vitae massa <br />
@@ -58,45 +88,87 @@ const OurTeam = () => {
           </p>
         </div>
 
-        <div className="row text-center">
-          {loading ? (
-            <div className="col-12">
-              <p>Loading trainers...</p>
-            </div>
-          ) : error ? (
-            <div className="col-12">
-              <p>Error: {error}</p>
-            </div>
-          ) : (
-            trainers.map((trainer, index) => (
-              <div className="col-md-3 col-sm-6 col-xs-12" key={trainer.id || index}>
-                <div
-                  className="team-member wow fadeInUp"
-                  data-wow-duration="400ms"
-                  data-wow-delay={`${index * 100}ms`}
-                >
-                  <div className="team-img" style={imageContainerStyle}>
-                    <img 
-                      style={imageStyle}
-                      src={trainer.photo || `../../assets/images/team/0${(index % 4) + 1}.jpg`} 
-                      alt={trainer.fullName} 
-                    />
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <Spin size="large" tip="Loading trainers..." />
+          </div>
+        ) : error ? (
+          <Alert
+            message="Error"
+            description={error}
+            type="error"
+            showIcon
+          />
+        ) : (
+          <div className="team-carousel-container">
+            <div style={{ position: 'relative' }}>
+              <Button
+                className="carousel-button prev"
+                onClick={previous}
+                icon={<LeftOutlined />}
+                shape="circle"
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '-20px',
+                  zIndex: 2,
+                  transform: 'translateY(-50%)'
+                }}
+              />
+
+              <Carousel ref={carouselRef} {...carouselSettings}>
+                {trainers.map((trainer, index) => (
+                  <div key={trainer.id || index} style={{ padding: '0 10px' }}>
+                    <Card
+                      hoverable
+                      className="team-member wow fadeInUp"
+                      cover={
+                        <div style={{ height: '250px', overflow: 'hidden' }}>
+                          <img
+                            alt={trainer.fullName}
+                            src={trainer.photo || `../../assets/images/team/0${(index % 4) + 1}.jpg`}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              objectPosition: 'center top'
+                            }}
+                          />
+                        </div>
+                      }
+                      bodyStyle={{ textAlign: 'center', padding: '20px' }}
+                    >
+                      <Card.Meta
+                        title={trainer.fullName}
+                        description={trainer.specialization || 'Trainer'}
+                      />
+                      <div className="social-icons" style={{ marginTop: '15px' }}>
+                        <a href="#" style={{ margin: '0 5px' }}><i className="fa fa-facebook"></i></a>
+                        <a href="#" style={{ margin: '0 5px' }}><i className="fa fa-twitter"></i></a>
+                        <a href="#" style={{ margin: '0 5px' }}><i className="fa fa-google-plus"></i></a>
+                        <a href="#" style={{ margin: '0 5px' }}><i className="fa fa-linkedin"></i></a>
+                      </div>
+                    </Card>
                   </div>
-                  <div className="team-info">
-                    <h3>{trainer.fullName}</h3>
-                    <span>{trainer.specialization || 'Trainer'}</span>
-                  </div>
-                  <ul className="social-icons">
-                    <li><a href="#"><i className="fa fa-facebook"></i></a></li>
-                    <li><a href="#"><i className="fa fa-twitter"></i></a></li>
-                    <li><a href="#"><i className="fa fa-google-plus"></i></a></li>
-                    <li><a href="#"><i className="fa fa-linkedin"></i></a></li>
-                  </ul>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+                ))}
+              </Carousel>
+
+              <Button
+                className="carousel-button next"
+                onClick={next}
+                icon={<RightOutlined />}
+                shape="circle"
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  right: '-20px',
+                  zIndex: 2,
+                  transform: 'translateY(-50%)'
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

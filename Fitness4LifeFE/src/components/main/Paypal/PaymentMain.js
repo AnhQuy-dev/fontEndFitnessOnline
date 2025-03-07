@@ -256,7 +256,7 @@ const PaymentPage = () => {
                         <div className="feature-item"><CheckCircleOutlined /> Participate in all Yoga and Group X classes at all CLUBs</div>
                       </>
                     )}
-                    {selectedPackage.packageName === 'CITIFITSPORT' && (
+                    {selectedPackage.packageName === 'PRESIDENT' && (
                       <>
                         <div className="feature-item"><CheckCircleOutlined /> Unlimited access to all GX classes in the system</div>
                         <div className="feature-item"><CheckCircleOutlined /> Premium sports towel service</div>

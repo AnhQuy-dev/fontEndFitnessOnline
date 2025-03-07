@@ -26,6 +26,19 @@ function AllRoom(props) {
         }
     }, [dataRoom]);
 
+    // Format time to display properly (HH:MM) with leading zeros
+    const formatTime = (timeArray) => {
+        if (!timeArray || !Array.isArray(timeArray) || timeArray.length < 2) {
+            return 'N/A';
+        }
+
+        // Get hours and minutes from the array
+        let hours = timeArray[0];
+        const minutes = timeArray[1];
+
+        // Format as HH:MM with leading zeros
+        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    };
 
     const handleStatusChange = async (record) => {
         try {
@@ -111,12 +124,12 @@ function AllRoom(props) {
         {
             title: 'Start Time',
             dataIndex: 'startTime',
-            render: (value) => `${value[0]}:${value[1] === 0 ? '00' : value[1]}`,
+            render: (value) => formatTime(value),
         },
         {
             title: 'End Time',
             dataIndex: 'endTime',
-            render: (value) => `${value[0]}:${value[1] === 0 ? '00' : value[1]}`,
+            render: (value) => formatTime(value),
         },
         {
             title: 'Status',

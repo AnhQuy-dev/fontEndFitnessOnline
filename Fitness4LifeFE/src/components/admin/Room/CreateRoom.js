@@ -81,9 +81,6 @@ function CreateRoom(props) {
             case "roomName":
                 newErrors.roomName = value.trim() ? "" : "Room name is required.";
                 break;
-            case "slug":
-                newErrors.slug = value.trim() ? "" : "Slug is required.";
-                break;
             case "capacity":
                 newErrors.capacity = value > 0 ? "" : "Capacity must be greater than 0.";
                 break;
@@ -105,7 +102,6 @@ function CreateRoom(props) {
     const validateAllFields = () => {
         const newErrors = {
             roomName: roomName.trim() ? "" : "Room name is required.",
-            slug: slug.trim() ? "" : "Slug is required.",
             capacity: capacity > 0 ? "" : "Capacity must be greater than 0.",
             facilities: facilities.trim() ? "" : "Facilities are required.",
             club: club ? "" : "Club is required.",
@@ -146,7 +142,7 @@ function CreateRoom(props) {
 
         const RoomDataPayload = {
             club, trainer, roomName, slug, capacity, facilities, status, startTime, endTime
-        }   
+        }
 
         const res = await createRoom(RoomDataPayload, tokenData.access_token);
 
@@ -197,14 +193,6 @@ function CreateRoom(props) {
                         onChange={(event) => { handleChange("roomName", event.target.value); }}
                     />
                     {error.roomName && <span style={{ color: "red" }}>{error.roomName}</span>}
-                </div>
-                <div>
-                    <span>Slug</span>
-                    <Input
-                        value={slug}
-                        onChange={(event) => { handleChange("slug", event.target.value); }}
-                    />
-                    {error.slug && <span style={{ color: "red" }}>{error.slug}</span>}
                 </div>
                 <div>
                     <span>Capacity</span>
