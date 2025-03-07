@@ -28,9 +28,9 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
   const streamRef = useRef(null);
   const detectionRef = useRef(null);
   const tokenData = getTokenData();
-    // Pagination states
-    const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 3; // 6 items per page
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 3; // 6 items per page
 
   // Fetch face data from API when modal opens
   useEffect(() => {
@@ -46,15 +46,15 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
         try {
           // Use CDN for face-api models instead of local path
           const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/models';
-          
+
           // Show loading message
           message.loading('Loading face detection models...', 0);
-          
+
           await Promise.all([
             faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
             faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
           ]);
-          
+
           // Hide loading message and show success
           message.destroy();
           setModelsLoaded(true);
@@ -65,7 +65,7 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
           message.error('Failed to load face detection models: ' + error.message);
         }
       };
-      
+
       loadModels();
     }
   }, [isCameraOpen, modelsLoaded]);
@@ -73,12 +73,12 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
   // Start face detection when camera is on and models are loaded
   useEffect(() => {
     let detectInterval;
-    
+
     if (isOn && modelsLoaded && videoRef.current) {
       // Start detecting faces
       detectInterval = setInterval(detectFaces, 200);
     }
-    
+
     return () => {
       if (detectInterval) clearInterval(detectInterval);
     };
@@ -87,46 +87,46 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
   // Function to detect faces and validate position
   const detectFaces = async () => {
     if (!videoRef.current || !modelsLoaded || detectingFace) return;
-    
+
     try {
       setDetectingFace(true);
-      
+
       const videoEl = videoRef.current;
       if (videoEl.paused || videoEl.ended || !videoEl.readyState) {
         setDetectingFace(false);
         return;
       }
-      
+
       const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 320 });
       const detections = await faceapi.detectAllFaces(videoEl, options);
-      
+
       // Check number of faces
       const faceCount = detections.length;
       setFaceDetected(faceCount > 0);
       setMultipleFaces(faceCount > 1);
-      
+
       // Check face position if exactly one face is detected
       if (faceCount === 1) {
         const face = detections[0];
         const videoWidth = videoEl.videoWidth;
         const videoHeight = videoEl.videoHeight;
-        
+
         // Calculate face center
         const faceX = face.box.x + (face.box.width / 2);
         const faceY = face.box.y + (face.box.height / 2);
-        
+
         // Calculate video center
         const centerX = videoWidth / 2;
         const centerY = videoHeight / 2;
-        
+
         // Check if face is centered (within 20% of center)
         const thresholdX = videoWidth * 0.2;
         const thresholdY = videoHeight * 0.2;
-        
-        const isCentered = 
-          Math.abs(faceX - centerX) < thresholdX && 
+
+        const isCentered =
+          Math.abs(faceX - centerX) < thresholdX &&
           Math.abs(faceY - centerY) < thresholdY;
-        
+
         setFacePosition({
           centered: isCentered,
           xOffset: faceX - centerX,
@@ -135,7 +135,7 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
       } else {
         setFacePosition({ centered: false });
       }
-      
+
       // Store detection results for reference
       detectionRef.current = {
         faceCount,
@@ -168,7 +168,7 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
     setIsCameraOpen(false);
     setIsModalOpen(false);
   };
-  
+
   const handleUpdateFace = (user) => {
     setSelectedUser(user);
     setIsCameraOpen(true);
@@ -177,17 +177,17 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
     setFacePosition({ centered: false });
     // Start camera will be triggered by a button click
   };
-  
+
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { 
+        video: {
           width: { ideal: 640 },
           height: { ideal: 480 },
           facingMode: "user"
         }
       });
-      
+
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -222,51 +222,51 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
       }
     };
   }, []);
-  
+
   const closeCamera = () => {
     stopCamera();
     setIsCameraOpen(false);
     setSelectedUser(null);
   };
-  
+
   const captureImage = () => {
     if (!videoRef.current || !canvasRef.current || !selectedUser || !isOn) return;
-    
+
     // Check if face is valid for capture
     if (!faceDetected) {
       message.error('No face detected. Please position your face in the frame.');
       return;
     }
-    
+
     if (multipleFaces) {
       message.error('Multiple faces detected. Please ensure only one face is in the frame.');
       return;
     }
-    
+
     if (!facePosition.centered) {
       message.error('Face not centered. Please position your face in the center of the frame.');
       return;
     }
-    
+
     setCapturing(true);
-    
+
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
-    
+
     // Set canvas dimensions to match video
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    
+
     // Draw video frame to canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
+
     // Convert canvas to blob
     canvas.toBlob(async (blob) => {
       try {
         // Create a File object from the blob
         const file = new File([blob], `face_update_${Date.now()}.jpg`, { type: 'image/jpeg' });
-        
+
         // Create FormData
         const formData = new FormData();
         formData.append('file', file);
@@ -274,7 +274,7 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
 
         // Call update face API by faceId instead of userId
         const response = await updateFaceById(selectedUser.userId, formData, tokenData.access_token);
-        
+
         message.success('Face updated successfully');
         closeCamera();
         handleFetchFaceData(); // Refresh the face data
@@ -286,33 +286,33 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
       }
     }, 'image/jpeg', 0.9);
   };
-    // Handle page change
-    const handlePageChange = (page) => {
-      setCurrentPage(page);
-    };
-  
-    // Get current page data
-    const getCurrentPageData = () => {
-      const startIndex = (currentPage - 1) * pageSize;
-      const endIndex = startIndex + pageSize;
-      return faceData.slice(startIndex, endIndex);
-    };
-  
+  // Handle page change
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  // Get current page data
+  const getCurrentPageData = () => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return faceData.slice(startIndex, endIndex);
+  };
+
 
   // Format registration date
   const formatDate = (dateArray) => {
     if (!dateArray || dateArray.length < 6) return 'Unknown date';
-    
+
     const [year, month, day, hour, minute] = dateArray;
     const date = new Date(year, month - 1, day, hour, minute);
-    
+
     return date.toLocaleString();
   };
 
   // Function to render face detection guidance
   const renderFaceGuidance = () => {
     if (!isOn) return null;
-    
+
     if (!faceDetected) {
       return (
         <Alert
@@ -325,7 +325,7 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
         />
       );
     }
-    
+
     if (multipleFaces) {
       return (
         <Alert
@@ -338,7 +338,7 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
         />
       );
     }
-    
+
     if (!facePosition.centered) {
       return (
         <Alert
@@ -351,7 +351,7 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
         />
       );
     }
-    
+
     return (
       <Alert
         message="Face detected correctly"
@@ -379,7 +379,7 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
         width={700}
         footer={
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-            <Button 
+            <Button
               key="onOFF"
               type={isOn ? "default" : "primary"}
               onClick={isOn ? stopCamera : startCamera}
@@ -390,10 +390,10 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
             <Button key="cancel" onClick={closeCamera}>
               Cancel
             </Button>
-            <Button 
-              key="capture" 
-              type="primary" 
-              onClick={captureImage} 
+            <Button
+              key="capture"
+              type="primary"
+              onClick={captureImage}
               loading={capturing}
               disabled={!isOn || !faceDetected || multipleFaces || !facePosition.centered}
             >
@@ -407,20 +407,19 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
           <div className="w-full rounded-lg overflow-hidden bg-gray-100 mb-4 relative">
             {/* Face overlay guide */}
             {isOn && (
-              <div 
+              <div
                 className="w-full rounded-lg overflow-hidden bg-gray-100 mb-4 relative"
               >
-                <div 
-                  className={`w-64 h-64 border-2 rounded-full ${
-                    faceDetected && !multipleFaces && facePosition.centered 
-                      ? 'border-green-500' 
-                      : 'border-yellow-500'
-                  }`}
+                <div
+                  className={`w-64 h-64 border-2 rounded-full ${faceDetected && !multipleFaces && facePosition.centered
+                    ? 'border-green-500'
+                    : 'border-yellow-500'
+                    }`}
                   style={{ opacity: 0.7 }}
                 />
               </div>
             )}
-            <video 
+            <video
               ref={videoRef}
               className="w-full h-auto object-cover"
               autoPlay
@@ -435,14 +434,14 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
             )}
             <canvas ref={canvasRef} style={{ display: 'none' }} />
           </div>
-          
+
           {/* Face detection status */}
           {renderFaceGuidance()}
-          
+
           {/* Remove this div as we've moved the camera button to the footer */}
         </div>
       </Modal>
-      
+
       <div className="ag-format-container">
         <div className="ag-courses_box">
           {loading ? (
@@ -454,25 +453,25 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
               <div className="ag-courses_item" key={user.faceId}>
                 <div className="ag-courses-item_link">
                   <div className="ag-courses-item_bg"></div>
-                  
+
                   {/* Overlay for Update Face button */}
                   <div className="update-face-overlay">
-                    <Button 
-                      type="primary" 
-                      icon={<CameraOutlined />} 
+                    <Button
+                      type="primary"
+                      icon={<CameraOutlined />}
                       onClick={() => handleUpdateFace(user)}
                       className="update-face-btn"
                     >
                       Update Face
                     </Button>
                   </div>
-                  
+
                   {/* User Profile Section */}
                   <div className="user-profile">
                     {user.imageUrl ? (
-                      <Avatar 
-                        size={64} 
-                        src={user.imageUrl} 
+                      <Avatar
+                        size={64}
+                        src={user.imageUrl}
                         className="user-avatar"
                       />
                     ) : (
@@ -481,28 +480,28 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
                       </Avatar>
                     )}
                   </div>
-                  
+
                   <div className="ag-courses-item_title">
                     {user.username.split('@')[0]}
                   </div>
-                  
+
                   <div className="ag-courses-item_info">
                     <div className="ag-courses-item_email">
                       {user.email}
                     </div>
                   </div>
-                  
+
                   <div className="ag-courses-item_date-box">
                     Registered:
                     <span className="ag-courses-item_date">
                       {formatDate(user.registeredAt)}
                     </span>
                   </div>
-                  
+
                   <div className="ag-courses-item_user-id">
                     User ID: {user.userId}
                   </div>
-                  
+
                   <div className="ag-courses-item_face-id">
                     Face ID: {user.faceId}
                   </div>
@@ -515,7 +514,7 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
             </div>
           )}
         </div>
-        
+
         {/* Pagination component */}
         {faceData && faceData.length > 0 && (
           <div className="pagination-container" style={{ textAlign: 'center', marginTop: '20px' }}>

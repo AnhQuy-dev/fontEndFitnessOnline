@@ -235,25 +235,25 @@ function CreateRoom(props) {
 
         console.log("RoomDataPayload:", RoomDataPayload);
 
-        // try {
-        //     const res = await createRoom(RoomDataPayload, tokenData.access_token); // Gọi API đúng cách
+        try {
+            const res = await createRoom(RoomDataPayload, tokenData.access_token); // Gọi API đúng cách
 
-        //     if (res && res.data) {
-        //         notification.success({
-        //             message: "Create Room",
-        //             description: "Room created successfully."
-        //         });
-        //         resetAndCloseModal();
-        //         await loadRoom();
-        //     } else {
-        //         throw new Error(res.message || "Unknown error");
-        //     }
-        // } catch (error) {
-        //     notification.error({
-        //         message: "Error Creating Room",
-        //         description: error.message
-        //     });
-        // }
+            if (res && res.data) {
+                notification.success({
+                    message: "Create Room",
+                    description: "Room created successfully."
+                });
+                resetAndCloseModal();
+                await loadRoom();
+            } else {
+                throw new Error(res.message || "Unknown error");
+            }
+        } catch (error) {
+            notification.error({
+                message: "Error Creating Room",
+                description: error.message
+            });
+        }
     };
 
     const resetAndCloseModal = () => {

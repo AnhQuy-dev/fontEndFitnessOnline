@@ -1,10 +1,11 @@
-import { EditOutlined, LockOutlined, MoreOutlined, PlusOutlined, FundViewOutlined } from '@ant-design/icons';
+import { EditOutlined, LockOutlined, MoreOutlined, PlusOutlined, FundViewOutlined, MehOutlined, CameraOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Input, Table, Switch, Avatar, Image, Tooltip, Radio, Modal, Card, Row, Col, Typography, Empty } from "antd";
 import { useEffect, useState } from "react";
 import ViewUserDetail from './DetailUser';
 import UpdateUser from './UpdateUser';
 import ResetPassWord from './ResetPassWord';
 import FaceDataManagement from './FaceDataManagement';
+import FaceRegistration from './FaceRegistration';
 
 const { Title, Text } = Typography;
 
@@ -22,7 +23,11 @@ function AllUsers(props) {
     const [emailChangePass, setEmailChangePass] = useState(null);
     const [userRole, setUserRole] = useState("all"); // new state for role filter: "all", "admin", or "user"
     const [isFaceDataModalOpen, setIsFaceDataModalOpen] = useState(false);
-    
+    const [isRegistrationModalOpen, setRegistrationModalOpen] = useState(false);
+
+    // New state for face data modal
+    const [selectedUser, setSelectedUser] = useState(null);
+
     useEffect(() => {
         const uniqueEmails = [...new Set(dataUsers.map(user => user.email))];
         const filters = uniqueEmails.map(email => ({
@@ -33,30 +38,30 @@ function AllUsers(props) {
     }, [dataUsers]);
 
     const [searchText, setSearchText] = useState('');
-    
+
     // Modified handleSearch to include role filtering
     const handleSearch = (value, role = userRole) => {
-        let filtered = dataUsers.filter((item) => 
+        let filtered = dataUsers.filter((item) =>
             item.fullName.toLowerCase().includes(value.toLowerCase())
         );
-        
+
         // Apply role filter if not "all"
         if (role !== "all") {
-            filtered = filtered.filter(user => 
+            filtered = filtered.filter(user =>
                 role === "admin" ? user.role === "ADMIN" : user.role === "USER"
             );
         }
-        
+
         setFilteredData(filtered);
     };
-    
+
     // Handle role change
     const handleRoleChange = (e) => {
         const role = e.target.value;
         setUserRole(role);
         handleSearch(searchText, role);
     };
-    
+
     const handleActiveToggle = (checked, record) => {
         // Here you would handle the API call to update the user's active status
         console.log(`Toggling active status for user ${record.fullName} to ${checked}`);
@@ -66,17 +71,16 @@ function AllUsers(props) {
     const columns = [
         {
             title: 'Avatar',
-            dataIndex: 'avatar',
-            key: 'profileDTO',
+            dataIndex: 'profileDTO',
+            key: 'avatar',
             width: '10%',
             render: (profileDTO) => {
                 const imagePath = profileDTO?.avatar || 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png';
-                
+
                 return (
-                
-                    <Avatar 
-                        size={40} 
-                        src={<Image src={imagePath} preview={{ mask: <span>View</span> }} />} 
+                    <Avatar
+                        size={40}
+                        src={<Image src={imagePath} preview={{ mask: <span>View</span> }} />}
                     />
                 );
             }
@@ -111,7 +115,7 @@ function AllUsers(props) {
             dataIndex: 'role',
             width: '10%',
             render: (role) => (
-                <span style={{ 
+                <span style={{
                     color: role === "ADMIN" ? "#1890ff" : "#52c41a",
                     fontWeight: 500
                 }}>
@@ -143,7 +147,19 @@ function AllUsers(props) {
                             setChangePassOpen(true);
                         }
                     }
+
                 ];
+                if (!record.faceDataReponseDTO || !record.faceDataReponseDTO.originalImagePath) {
+                    menuItems.push({
+                        key: "createFaceData",
+                        label: "Create FaceId",
+                        icon: <CameraOutlined style={{ color: 'green' }} />,
+                        onClick: () => {
+                            setSelectedUser(record);
+                            setRegistrationModalOpen(true);
+                        }
+                    });
+                }
 
                 return (
                     <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomLeft">
@@ -170,10 +186,10 @@ function AllUsers(props) {
                         <h2 style={{ fontWeight: 600, fontSize: "24px" }}>Users</h2>
                     </div>
                     <div className="user-form" style={{ display: "flex", alignItems: "center" }}>
-                        <Radio.Group 
-                            value={userRole} 
+                        <Radio.Group
+                            value={userRole}
                             onChange={handleRoleChange}
-                            optionType="button" 
+                            optionType="button"
                             buttonStyle="solid"
                             style={{ marginRight: 16 }}
                         >
@@ -196,8 +212,8 @@ function AllUsers(props) {
                             type="primary"
                             icon={<PlusOutlined />}
                             onClick={() => { setIsModelOpen(true); }}
-                            style={{ 
-                                height: 40, 
+                            style={{
+                                height: 40,
                                 borderRadius: "6px",
                                 backgroundColor: "#FF6600",
                                 borderColor: "#FF6600"
@@ -261,9 +277,19 @@ function AllUsers(props) {
                 setChangePassOpen={setChangePassOpen}
                 email={emailChangePass}
             />
+            <FaceRegistration
+                userId={selectedUser?.id} // Pass the selected user's ID
+                isModalOpen={isRegistrationModalOpen}
+                setIsModalOpen={setRegistrationModalOpen}
+                onSuccess={() => {
+                    // Callback function when face registration is successful
+                    loadUsers(); // Reload users to get updated face data
+                    setSelectedUser(null); // Clear the selected user
+                }}
+            />
 
             {/* FaceData Management Modal */}
-            <FaceDataManagement            
+            <FaceDataManagement
                 users={dataUsers}
                 isModalOpen={isFaceDataModalOpen}
                 setIsModalOpen={setIsFaceDataModalOpen}
