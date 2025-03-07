@@ -68,6 +68,23 @@ const CreateNewPost = () => {
         status: "PENDING",
     };
 
+    const allowedFileTypes = [
+        "image/png", "image/jpeg", "image/gif", "image/bmp",
+        "image/webp", "image/tiff", "video/mp4"
+    ];
+
+    const [fileError, setFileError] = useState("");
+    const beforeUpload = (file) => {
+        if (!allowedFileTypes.includes(file.type)) {
+            const errorMsg = "Chỉ hỗ trợ các định dạng: PNG, JPEG, GIF, BMP, WEBP, TIFF, MP4.";
+            setFileError(errorMsg);
+            message.error(errorMsg);
+            return Upload.LIST_IGNORE;
+        }
+        setFileError(""); // Xóa lỗi nếu file hợp lệ
+        return false; // Ngăn tải lên ngay lập tức
+    };
+
     const handleSubmit = async (values) => {
         const { title, content, tag, category, imageQuestionUrl, authorId, author, status } = values;
 
@@ -93,15 +110,41 @@ const CreateNewPost = () => {
         try {
             setLoading(true);
             const response = await CreateQuestion(formData, tokenData.access_token);
-            // console.log("response: ", response);
+            console.log("response: ", response);
             if (response.status === 201) {
                 message.success("Tạo bài viết thành công!");
                 navigate(`/forums/post-new`);
-            } else {
+            }
+            else {
                 message.error(response.message || "Tạo bài viết thất bại!");
             }
         } catch (error) {
-            message.error("Có lỗi xảy ra khi tạo bài viết!");
+            console.log("Full error:", error);
+
+            let errorMessage = "Lỗi không xác định"; // Default message
+            let statusCode = error?.response?.status || 0;
+
+            if (error.response) {
+                // Nếu response có dạng object
+                if (typeof error.response.data === "object" && error.response.data !== null) {
+                    errorMessage = error.response.data.message || errorMessage;
+                } else if (typeof error.response.data === "string") {
+                    // Nếu response trả về dạng chuỗi JSON, cần parse nó
+                    try {
+                        const parsedError = JSON.parse(error.response.data);
+                        errorMessage = parsedError.message || errorMessage;
+                    } catch (e) {
+                        errorMessage = error.response.data; // Nếu không parse được, dùng nguyên bản
+                    }
+                }
+            }
+
+            // Kiểm tra mã lỗi và nội dung message
+            if (statusCode === 500 && errorMessage.includes("Server error: Loại file không được hỗ trợ")) {
+                message.error("File không hợp lệ! Chỉ chấp nhận định dạng: image/png, image/jpeg.");
+            } else {
+                message.error(errorMessage);
+            }
         } finally {
             setLoading(false);
         }
@@ -182,10 +225,12 @@ const CreateNewPost = () => {
                         name="imageQuestionUrl"
                         valuePropName="fileList"
                         getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+                        validateStatus={fileError ? "error" : ""}
+                        help={fileError} // Hiển thị lỗi ngay dưới
                     >
                         <Upload
                             listType="picture"
-                            beforeUpload={() => false}
+                            beforeUpload={beforeUpload}
                         >
                             <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
                         </Upload>

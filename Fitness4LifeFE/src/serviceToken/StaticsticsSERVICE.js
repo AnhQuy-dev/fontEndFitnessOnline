@@ -22,7 +22,7 @@ export const fetchPaymentStatistics = async (token) => {
       data = await response.text();
     }
 
-    console.log("submitBookingRoom response:", { status, data });
+    // console.log("submitBookingRoom response:", { status, data });
 
     return { status, data };
   } catch (error) {
@@ -52,11 +52,38 @@ export const GetAllBookings = async (token) => {
       data = await response.text();
     }
 
-    console.log("submitBookingRoom response:", { status, data });
+    // console.log("submitBookingRoom response:", { status, data });
 
     return { status, data };
   } catch (error) {
     console.error("Lỗi khi đặt phòng:", error.message);
     return { status: 500, data: `Lỗi: ${error.message}` };
+  }
+};
+
+
+export const getRoomById = async (roomId, token) => {
+  try {
+    const response = await fetch(`${APIGetWay}/dashboard/room/${roomId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      credentials: "include"
+    })
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Lỗi ${response.status}: ${errorText}`);
+    }
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    } else {
+      return await response.text();
+    }
+  } catch (error) {
+    console.error("Lỗi khi tìm kiếm room:", error.message);
+    return `Lỗi: ${error.message}`;
   }
 };

@@ -629,4 +629,31 @@
 	  font-size: 20px;
 	}
   }
+  .category-tags-container {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 20px;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+  }
+  
+  .category-tag {
+	padding: 8px 15px;
+	background: #f0f0f0;
+	border: none;
+	border-radius: 20px;
+	cursor: pointer;
+	font-size: 14px;
+  }
+  
+  .category-tag.active {
+	background: #007bff;
+	color: white;
+	font-weight: bold;
+  }
+  
+  .category-tag:hover {
+	background: #0056b3;
+	color: white;
+  }
   

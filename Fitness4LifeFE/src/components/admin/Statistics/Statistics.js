@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { Card, Select, Table, Row, Col, Statistic } from "antd";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
-import { fetchPaymentStatistics, GetAllBookings } from "../../../serviceToken/StaticsticsSERVICE";
+import { fetchPaymentStatistics, GetAllBookings, getRoomById } from "../../../serviceToken/StaticsticsSERVICE";
 import { TrophyOutlined } from '@ant-design/icons';
 
 const StatisticsPage = () => {
@@ -62,10 +62,28 @@ const StatisticsPage = () => {
       try {
         setBookingsLoading(true);
         const bookingsResponse = await GetAllBookings(tokenData.access_token);
-        console.log("Bookings data:", bookingsResponse);
-
         if (bookingsResponse && bookingsResponse.data && bookingsResponse.data.data) {
           const processedData = processBookingsData(bookingsResponse.data.data);
+          const roomIds = bookingsResponse.data.data.map(booking => booking.roomId);
+          const roomsData = await Promise.all(roomIds.map(roomId => getRoomById(roomId, tokenData.access_token)));
+          const roomsMap = new Map(roomsData.map(room => [room.id, room]));
+          if (roomsMap.has(undefined)) {
+            console.warn("⚠️ Warning: roomsMap chứa giá trị lỗi", roomsMap.get(undefined));
+          }
+          // Ánh xạ lại dữ liệu, sử dụng room.key thay vì room.roomId
+          processedData.all = processedData.all.map(room => {
+            const matchingRoom = roomsMap.get(room.key); // Sửa `room.roomId` thành `room.key`
+            if (matchingRoom) {
+              return {
+                ...room,
+                startTime: matchingRoom.startTime,
+                endTime: matchingRoom.endTime,
+              };
+            } else {
+              console.warn(`❌ No matching room found for roomId ${room.key}`);
+            }
+            return { ...room, startTime: "N/A", endTime: "N/A" }; // Tránh lỗi undefined
+          });
           setTopRooms(processedData.all);
           setTop3Rooms(processedData.top3);
           setRestRooms(processedData.rest);
@@ -80,6 +98,9 @@ const StatisticsPage = () => {
     getBookingsData();
   }, [tokenData.access_token]);
 
+
+  console.log("topRooms: ", topRooms);
+
   // Lấy dữ liệu thanh toán
   useEffect(() => {
     const fetchData = async () => {
@@ -87,15 +108,15 @@ const StatisticsPage = () => {
         setIsLoading(true);
         // Gọi API để lấy dữ liệu
         const response = await fetchPaymentStatistics(tokenData.access_token);
-        console.log("API Response:", response);
+        // console.log("API Response:", response);
 
         if (response && response.data && response.data.data) {
           // API trả về response.data.data là một mảng
           const orderData = response.data.data;
-          console.log("Parsed data length:", orderData.length);
+          // console.log("Parsed data length:", orderData.length);
           processData(orderData);
         } else {
-          console.error("Response data structure is not as expected", response);
+          // console.error("Response data structure is not as expected", response);
         }
       } catch (error) {
         console.error("Error fetching statistics:", error);
@@ -167,8 +188,8 @@ const StatisticsPage = () => {
       return parseInt(year) === selectedYear;
     });
 
-    console.log("Monthly data:", groupedByMonth);
-    console.log("Daily data:", filteredDayData);
+    // console.log("Monthly data:", groupedByMonth);
+    // console.log("Daily data:", filteredDayData);
 
     setDataByMonth(groupedByMonth);
     setDataByDay(filteredDayData);

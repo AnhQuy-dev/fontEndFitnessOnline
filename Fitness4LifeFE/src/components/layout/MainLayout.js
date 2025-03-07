@@ -6,6 +6,7 @@ import '../../assets/css/styles.css'
 import '../../assets/css/font-awesome.min.css'
 import '../../assets/css/animate.min.css'
 import '../../assets/css/bootstrap.min.css'
+import '../../assets/css/Main/iconAI.css';
 import HeroBanner from '../main/HerroBanner';
 import Service from '../main/Service';
 import About from '../main/About';
@@ -15,6 +16,7 @@ import PricingSection from '../main/PricingSection';
 import Contact from '../main/Contact';
 import { toast, ToastContainer } from 'react-toastify';
 import Chatbot from '../main/chat/Chatbot';
+import { AiOutlineRobot } from "react-icons/ai"; // Import icon AI chatbot
 
 function MainLayout(props) {
 
@@ -55,9 +57,10 @@ function MainLayout(props) {
       </main>
       <Footer />
 
-      {/* Nút mở chatbot */}
+      {/* Nút mở chatbot với hiệu ứng nhảy */}
       <button className="chatbot-toggle" onClick={toggleChatbot}>
-        💬
+        {/* <AiOutlineRobot className="chatbot-icon" /> */}
+        🤖
       </button>
 
       {/* Hiển thị chatbot nếu showChatbot = true */}
@@ -67,3 +70,4 @@ function MainLayout(props) {
 }
 
 export default MainLayout;
+

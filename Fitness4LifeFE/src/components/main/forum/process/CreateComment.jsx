@@ -89,7 +89,8 @@ const CreateComment = ({ questionId }) => {
             else if (response && response.status === 402) {
                 // Xử lý lỗi khi không tìm thấy bình luận cha
                 message.error("Comment contains spam and cannot be accepted.!");
-            } else {
+            }
+            else {
                 // Xử lý các lỗi không mong muốn
                 message.error("Unexpected error occurred!");
             }

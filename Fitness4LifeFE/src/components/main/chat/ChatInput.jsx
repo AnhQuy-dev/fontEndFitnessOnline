@@ -1,34 +1,34 @@
 import React, { useState } from "react";
+import { Input, Button } from "antd"; // Import Ant Design
+import { SendOutlined } from "@ant-design/icons"; // Biểu tượng gửi tin nhắn
 import "../../../assets/css/Main/ChatInput.css";
 
 const ChatInput = ({ onSend }) => {
-    const [input, setInput] = useState("");
+    const [message, setMessage] = useState("");
 
-    const handleSendMessage = () => {
-        if (input.trim()) {
-            onSend(input);
-            setInput("");
-        }
-    };
-
-    // Handle Enter key press
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault(); // Prevents newline in input
-            handleSendMessage();
+    const handleSend = () => {
+        if (message.trim()) {
+            onSend(message);
+            setMessage("");
         }
     };
 
     return (
         <div className="chat-input">
-            <input
+            <Input
                 type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown} // Add Enter key event
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
                 placeholder="Type a message..."
+                onPressEnter={handleSend} // Xử lý Enter với Ant Design
             />
-            <button onClick={handleSendMessage}>Send</button>
+            <Button
+                type="primary"
+                shape="circle"
+                icon={<SendOutlined />}
+                onClick={handleSend}
+                size="large"
+            />
         </div>
     );
 };

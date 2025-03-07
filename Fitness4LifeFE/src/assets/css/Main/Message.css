@@ -1,20 +1,58 @@
 .message {
-    max-width: 80%;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    word-wrap: break-word;
+  max-width: 80%;
+  padding: 8px 10px;
+  border-radius: 15px;
+  margin-bottom: 7px;
+  word-wrap: break-word;
+  font-size: 16px;
+  line-height: 1.5;
+  animation: fadeIn 0.3s ease-in-out;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.message:hover {
+  transform: scale(1.02);
+  box-shadow: 3px 3px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Tin nhắn của người dùng */
+.message.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border-top-right-radius: 0;
+}
+
+/* Tin nhắn của bot */
+.message.bot {
+  align-self: flex-start;
+  background: linear-gradient(135deg, #f1f1f1, #e0e0e0);
+  color: black;
+  border-top-left-radius: 0;
+}
+
+/* Hiệu ứng xuất hiện */
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: translateY(5px);
   }
-  
-  .message.user {
-    align-self: flex-end;
-    background-color: #007bff;
-    color: white;
+  to {
+      opacity: 1;
+      transform: translateY(0);
   }
-  
-  .message.bot {
-    align-self: flex-start;
-    background-color: #f1f1f1;
-    color: black;
-  }
-  
+}
+
+/* Link trong tin nhắn */
+.message a {
+  color: #ff5f5f;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s ease-in-out;
+}
+
+.message a:hover {
+  color: #d40000;
+  text-decoration: underline;
+}

@@ -59,7 +59,7 @@ const App = () => {
           <Route path='/login' element={<LoginToken />} />
           <Route path='/Register' element={<Register />} />
           <Route path='/blog' element={<Blog />} />
-          <Route path="/blog/:id" element={<BlogDetail />} />
+          <Route path="/blog/:category/:id" element={<BlogDetail />} />
           <Route path="/contact-us/" element={<ContactForm />} />
           <Route path="/verify-otp/:email/:code?" element={<OTPVerification />} />
           <Route path="/clubs/" element={<ClubHome />} />

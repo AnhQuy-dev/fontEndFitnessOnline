@@ -1,18 +1,53 @@
+.chat-input {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 30px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.chat-input:hover {
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Ô nhập tin nhắn */
 .chat-input input {
-    flex: 1;
-    padding: 8px;
-    border: none;
-    border-radius: 5px;
-    outline: none;
-  }
-  
-  .chat-input button {
-    padding: 8px 12px;
-    margin-left: 8px;
-    border: none;
-    background: #007bff;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
+  flex: 1;
+  padding: 12px 15px;
+  border: none;
+  border-radius: 30px;
+  outline: none;
+  font-size: 16px;
+  background: white;
+  transition: all 0.3s ease-in-out;
+}
+
+.chat-input input:focus {
+  box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Nút gửi tin nhắn */
+.chat-input button {
+  padding: 10px 15px;
+  margin-left: 10px;
+  border: none;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.chat-input button:hover {
+  background: linear-gradient(135deg, #0056b3, #003d82);
+  transform: scale(1.05);
+}
+
+.chat-input button:active {
+  transform: scale(0.95);
+}

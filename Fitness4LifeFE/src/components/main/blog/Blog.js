@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // import Link for navigation
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'; // import Link for navigation
 import '../../../assets/css/blog.css';
 import { fetchAllBlogs } from '../../../serviceToken/BlogService'; // Import service mới
 
@@ -8,6 +8,12 @@ const Blog = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true); // loading state
   const blogsPerPage = 6;
+  // const [selectedCategory, setSelectedCategory] = useState(null);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const categoryFromURL = searchParams.get('category') || null;
+  const [selectedCategory, setSelectedCategory] = useState(categoryFromURL);
+
 
   useEffect(() => {
     // Sử dụng service thay vì gọi axios trực tiếp
@@ -22,11 +28,11 @@ const Blog = () => {
           return dateB - dateA; // Sort in descending order (latest first)
         });
         setBlogs(sortedBlogs);
-        setLoading(false); 
+        setLoading(false);
       })
       .catch((error) => {
         console.error('Error fetching blog data:', error);
-        setLoading(false); 
+        setLoading(false);
       });
   }, []);
 
@@ -40,6 +46,11 @@ const Blog = () => {
   const indexOfLastBlog = currentPage * blogsPerPage;
   const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
   const currentBlogs = blogs.slice(indexOfFirstBlog, indexOfLastBlog);
+
+  const categories = [...new Set(blogs.map(blog => blog.category))];
+  const filteredBlogs = selectedCategory
+    ? blogs.filter(blog => blog.category === selectedCategory)
+    : blogs;
 
   // Add placeholders if blogs are less than a multiple of 3
   const placeholders = Array.from({ length: (3 - (currentBlogs.length % 3)) % 3 });
@@ -56,6 +67,19 @@ const Blog = () => {
     }
   };
 
+  // Khi nhấn vào category, cập nhật URL và state
+  const handleCategoryClick = (category) => {
+    const newCategory = category === selectedCategory ? null : category;
+    setSelectedCategory(newCategory);
+
+    // Cập nhật URL
+    if (newCategory) {
+      navigate(`/blog?category=${newCategory.replace(/\s+/g, "-")}`);
+    } else {
+      navigate('/blog');
+    }
+  };
+
   return (
     <section id="blog-container">
       <div style={{ textAlign: "center", marginTop: "50px", marginBottom: "40px" }}>
@@ -63,48 +87,52 @@ const Blog = () => {
           <span className="daily-text">Daily</span> <span className="blogs-text">Blogs</span>
         </div>
       </div>
+      <div className="category-tags-container">
+        <button
+          className={`category-tag ${selectedCategory === null ? 'active' : ''}`}
+          onClick={() => handleCategoryClick(null)}
+        >
+          All
+        </button>
+        {categories.map((category, index) => (
+          <button
+            key={index}
+            className={`category-tag ${selectedCategory === category ? 'active' : ''}`}
+            onClick={() => handleCategoryClick(category)}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
 
       {loading ? (
         <div className="loading-spinner" style={{ textAlign: 'center', marginTop: '50px' }}>
-          <div className="spinner"></div> 
+          <div className="spinner"></div>
           <p>Loading...</p>
         </div>
       ) : (
         <div className="blog-list">
-          {currentBlogs.map((blog) => (
+          {filteredBlogs.slice(indexOfFirstBlog, indexOfLastBlog).map((blog) => (
             <div key={blog.id} className="blog-item">
               <div className="blog-thumbnail-container">
                 <img
-                  src={blog.thumbnailUrl && blog.thumbnailUrl.length > 0 
-                    ? blog.thumbnailUrl[0].imageUrl 
-                    : 'https://placehold.co/300x200?text=No+Image'}
+                  src={blog.thumbnailUrl?.length > 0 ? blog.thumbnailUrl[0].imageUrl : 'https://placehold.co/300x200?text=No+Image'}
                   alt={blog.title}
                   className="blog-thumbnail"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = 'https://placehold.co/300x200?text=No+Image';
-                  }}
                 />
               </div>
               <div className="blog-content">
                 <h3>
-                  <Link to={`/blog/${blog.id}`}>{blog.title}</Link>
+                  <Link to={`/blog/${blog.category.replace(/\s+/g, "-")}/${blog.id}`}>{blog.title}</Link>
                 </h3>
                 <p>{blog.content.substring(0, 150)}...</p>
                 <p><strong>Category:</strong> <span className="blog-category">{blog.category}</span></p>
-                <div className="blog-tags">
-                  {blog.tags.split(',').map((tag, index) => (
-                    <span key={index} className="blog-tag">{tag.trim()}</span>
-                  ))}
-                </div>
                 <p className="blog-date">{formatDateTime(blog.createdAt)}</p>
-                <div className="blog-stats">
-                  <span className="blog-likes">{blog.likesCount} Likes</span>
-                  <span className="blog-views">{blog.viewCount} Views</span>
-                </div>
               </div>
             </div>
           ))}
+
           {placeholders.map((_, index) => (
             <div key={`placeholder-${index}`} className="blog-item placeholder"></div>
           ))}
