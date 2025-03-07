@@ -67,7 +67,7 @@ function AllUsers(props) {
         {
             title: 'Avatar',
             dataIndex: 'avatar',
-            key: 'avatar',
+            key: 'profileDTO',
             width: '10%',
             render: (profileDTO) => {
                 const imagePath = profileDTO?.avatar || 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png';

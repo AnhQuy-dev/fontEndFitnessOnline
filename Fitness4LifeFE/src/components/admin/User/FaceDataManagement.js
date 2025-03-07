@@ -1,4 +1,4 @@
-import { Avatar, Image, Modal, Typography, Empty, message, Button, Spin, Alert } from "antd";
+import { Avatar, Image, Modal, Typography, Empty, message, Button, Spin, Alert, Pagination } from "antd";
 import { useEffect, useState, useRef } from "react";
 import { fetchFaceAuthData, updateFace, updateFaceById } from "../../../serviceToken/authService";
 import { getTokenData } from "../../../serviceToken/tokenUtils";
@@ -28,6 +28,9 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
   const streamRef = useRef(null);
   const detectionRef = useRef(null);
   const tokenData = getTokenData();
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 3; // 6 items per page
 
   // Fetch face data from API when modal opens
   useEffect(() => {
@@ -283,6 +286,18 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
       }
     }, 'image/jpeg', 0.9);
   };
+    // Handle page change
+    const handlePageChange = (page) => {
+      setCurrentPage(page);
+    };
+  
+    // Get current page data
+    const getCurrentPageData = () => {
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      return faceData.slice(startIndex, endIndex);
+    };
+  
 
   // Format registration date
   const formatDate = (dateArray) => {
@@ -347,7 +362,6 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
       />
     );
   };
-
   return (
     <Modal
       title={<Title level={4}>Face Data Management</Title>}
@@ -436,7 +450,7 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
               <div>Loading face data...</div>
             </div>
           ) : faceData && faceData.length > 0 ? (
-            faceData.map((user) => (
+            getCurrentPageData().map((user) => (
               <div className="ag-courses_item" key={user.faceId}>
                 <div className="ag-courses-item_link">
                   <div className="ag-courses-item_bg"></div>
@@ -501,6 +515,19 @@ function FaceDataManagement({ isModalOpen, setIsModalOpen }) {
             </div>
           )}
         </div>
+        
+        {/* Pagination component */}
+        {faceData && faceData.length > 0 && (
+          <div className="pagination-container" style={{ textAlign: 'center', marginTop: '20px' }}>
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={faceData.length}
+              onChange={handlePageChange}
+              showSizeChanger={false}
+            />
+          </div>
+        )}
       </div>
     </Modal>
   );

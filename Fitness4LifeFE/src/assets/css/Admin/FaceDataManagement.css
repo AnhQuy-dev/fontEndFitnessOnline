@@ -450,6 +450,6 @@
   
   /* Position the modal to the right */
   .face-data-modal {
-    top: -75px;
+    top: 75px;
     right: -120px;
   }
