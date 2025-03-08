@@ -35,7 +35,7 @@ const UpdateTrainer = (props) => {
     const tokenData = getTokenData();
 
 
-    
+
     useEffect(() => {
         const getAllBranch = async () => {
             try {
@@ -113,7 +113,7 @@ const UpdateTrainer = (props) => {
     // Prevent auto upload and do custom file validation if needed
     const beforeUpload = (file) => {
         console.log("File selected:", file);
-        
+
         // Validate file type
         const isImage = file.type.startsWith('image/');
         if (!isImage) {
@@ -123,7 +123,7 @@ const UpdateTrainer = (props) => {
             });
             return Upload.LIST_IGNORE;
         }
-        
+
         // Validate file size (e.g., limit to 5MB)
         const isLt5M = file.size / 1024 / 1024 < 5;
         if (!isLt5M) {
@@ -133,7 +133,7 @@ const UpdateTrainer = (props) => {
             });
             return Upload.LIST_IGNORE;
         }
-        
+
         return false; // Return false to prevent auto upload
     };
 
@@ -147,7 +147,7 @@ const UpdateTrainer = (props) => {
             setCertificate(dataUpdate.certificate || "");
             setPhoneNumber(dataUpdate.phoneNumber || "");
             setScheduleTrainers(dataUpdate.scheduleTrainers || []);
-            
+
             // Handle branch correctly
             if (dataUpdate.branch) {
                 if (typeof dataUpdate.branch === 'object' && dataUpdate.branch.id) {
@@ -158,7 +158,7 @@ const UpdateTrainer = (props) => {
             } else {
                 setBranch("");
             }
-            
+
             // Handle photo
             if (dataUpdate.photo) {
                 setFileList([{
@@ -182,13 +182,13 @@ const UpdateTrainer = (props) => {
             });
             return;
         }
-    
+
         try {
             setLoading(true);
-            
+
             // Create FormData object
             const formData = new FormData();
-            
+
             // Ensure all text fields are trimmed and not undefined
             formData.append("fullName", fullName.trim());
             formData.append("specialization", specialization.trim());
@@ -196,31 +196,31 @@ const UpdateTrainer = (props) => {
             formData.append("certificate", certificate.trim());
             formData.append("phoneNumber", phoneNumber.trim());
             formData.append("branch", branch.toString());
-            
+
             if (scheduleTrainers && scheduleTrainers.length > 0) {
                 scheduleTrainers.forEach(day => {
                     formData.append("scheduleTrainers", day);
                 });
 
             }
-            
+
             if (fileList && fileList.length > 0) {
                 const fileObj = fileList[0].originFileObj || fileList[0];
                 formData.append("file", fileObj);
             }
-            
-            
+
+
             console.log("Form data being sent:");
             for (let pair of formData.entries()) {
                 console.log(pair[0] + ': ' + pair[1]);
             }
-            
+
             const res = await updateTrainer(
-                dataUpdate.id, 
-                formData, 
-                tokenData.access_token 
+                dataUpdate.id,
+                formData,
+                tokenData.access_token
             );
-    
+
             if (res.status === 200) {
                 notification.success({
                     message: "Update Trainer",
@@ -335,7 +335,7 @@ const UpdateTrainer = (props) => {
                 </div>
 
                 <div>
-                    <span>Branch</span>
+                    <span>Club</span>
                     <Select
                         value={branch}
                         placeholder="Branch"

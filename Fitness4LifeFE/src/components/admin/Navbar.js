@@ -91,9 +91,9 @@ const Navbar = ({ menuItems, onToggleSidebar }) => {
 
   const confirmLogout = () => {
     Modal.confirm({
-      title: 'Bạn có chắc chắn muốn đăng xuất?',
-      okText: 'Đăng xuất',
-      cancelText: 'Hủy',
+      title: 'Are you sure you want to log out?',
+      okText: 'Logout',
+      cancelText: 'Cancel',
       onOk: () => {
         handleLogout();
       },

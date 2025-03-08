@@ -63,8 +63,8 @@ const CreateNewPost = () => {
     }, [location, form]);
 
     const initialValues = {
-        authorId: decotoken?.id || "Không xác định",
-        author: decotoken?.fullName || "Không xác định",
+        authorId: decotoken?.id || "Unknown",
+        author: decotoken?.fullName || "Unknown",
         status: "PENDING",
     };
 
@@ -76,7 +76,7 @@ const CreateNewPost = () => {
     const [fileError, setFileError] = useState("");
     const beforeUpload = (file) => {
         if (!allowedFileTypes.includes(file.type)) {
-            const errorMsg = "Chỉ hỗ trợ các định dạng: PNG, JPEG, GIF, BMP, WEBP, TIFF, MP4.";
+            const errorMsg = "Only supported formats: PNG, JPEG, GIF, BMP, WEBP, TIFF, MP4.";
             setFileError(errorMsg);
             message.error(errorMsg);
             return Upload.LIST_IGNORE;
@@ -112,16 +112,16 @@ const CreateNewPost = () => {
             const response = await CreateQuestion(formData, tokenData.access_token);
             console.log("response: ", response);
             if (response.status === 201) {
-                message.success("Tạo bài viết thành công!");
+                message.success("Post created successfully!");
                 navigate(`/forums/post-new`);
             }
             else {
-                message.error(response.message || "Tạo bài viết thất bại!");
+                message.error(response.message || "Post creation failed!");
             }
         } catch (error) {
             console.log("Full error:", error);
 
-            let errorMessage = "Lỗi không xác định"; // Default message
+            let errorMessage = "Unknown"; // Default message
             let statusCode = error?.response?.status || 0;
 
             if (error.response) {
@@ -141,7 +141,7 @@ const CreateNewPost = () => {
 
             // Kiểm tra mã lỗi và nội dung message
             if (statusCode === 500 && errorMessage.includes("Server error: Loại file không được hỗ trợ")) {
-                message.error("File không hợp lệ! Chỉ chấp nhận định dạng: image/png, image/jpeg.");
+                message.error("Only supported formats: image/png, image/jpeg.");
             } else {
                 message.error(errorMessage);
             }
@@ -153,7 +153,7 @@ const CreateNewPost = () => {
     return (
         <section id="services">
             <div style={{ padding: "24px", maxWidth: "800px", margin: "0 auto" }}>
-                <h1>Tạo Bài Viết Mới</h1>
+                <h1>Create New Post</h1>
                 <Form
                     form={form}
                     layout="vertical"
@@ -161,22 +161,22 @@ const CreateNewPost = () => {
                     initialValues={initialValues}
                 >
                     <Form.Item
-                        label="Tiêu đề"
+                        label="Title"
                         name="title"
-                        rules={[{ required: true, message: "Vui lòng nhập tiêu đề!" }]}
+                        rules={[{ required: true, message: "Please enter a title!" }]}
                     >
-                        <Input placeholder="Nhập tiêu đề bài viết" />
+                        <Input placeholder="Enter post title" />
                     </Form.Item>
 
                     <Form.Item
-                        label="Từ khóa"
+                        label="Tags"
                         name="tag"
-                        rules={[{ required: true, message: "Vui lòng nhập từ khóa!" }]}
+                        rules={[{ required: true, message: "Please enter tags!" }]}
                     >
-                        <Input placeholder="Nhập từ khóa" />
+                        <Input placeholder="Enter tags" />
                     </Form.Item>
                     <Form.Item
-                        label="AuthorId"
+                        label="Author ID"
                         name="authorId"
                         hidden
                     >
@@ -190,57 +190,58 @@ const CreateNewPost = () => {
                         <Input disabled />
                     </Form.Item>
                     <Form.Item
-                        label="Nội dung"
+                        label="Content"
                         name="content"
-                        rules={[{ required: true, message: "Vui lòng nhập nội dung!" }]}
+                        rules={[{ required: true, message: "Please enter content!" }]}
                     >
-                        <Input.TextArea rows={4} placeholder="Nhập nội dung bài viết" />
+                        <Input.TextArea rows={4} placeholder="Enter post content" />
                     </Form.Item>
 
                     <Form.Item
-                        label="Danh mục"
+                        label="Category"
                         name="category"
-                        rules={[{ required: true, message: "Vui lòng chọn danh mục!" }]}
+                        rules={[{ required: true, message: "Please select a category!" }]}
                     >
                         <Select
-                            mode="multiple" // Cho phép chọn nhiều mục
-                            placeholder="Chọn danh mục"
-                            options={categoryOptions} // Danh sách các danh mục
+                            mode="multiple"
+                            placeholder="Select categories"
+                            options={categoryOptions}
                         />
                     </Form.Item>
                     <Form.Item
-                        label="Trạng thái"
+                        label="Status"
                         name="status"
-                        rules={[{ required: true, message: "Vui lòng chọn trạng thái!" }]}
+                        rules={[{ required: true, message: "Please select a status!" }]}
                         hidden
                     >
                         <Select
-                            placeholder="Chọn trạng thái"
+                            placeholder="Select status"
                             options={statusOptions}
                         />
                     </Form.Item>
 
                     <Form.Item
-                        label="Hình ảnh"
+                        label="Images"
                         name="imageQuestionUrl"
                         valuePropName="fileList"
                         getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
                         validateStatus={fileError ? "error" : ""}
-                        help={fileError} // Hiển thị lỗi ngay dưới
+                        help={fileError}
                     >
                         <Upload
                             listType="picture"
                             beforeUpload={beforeUpload}
                         >
-                            <Button icon={<UploadOutlined />}>Tải lên hình ảnh</Button>
+                            <Button icon={<UploadOutlined />}>Upload Images</Button>
                         </Upload>
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit" loading={loading} block>
-                            Tạo bài viết
+                            Create Post
                         </Button>
                     </Form.Item>
                 </Form>
+
             </div>
         </section>
     );

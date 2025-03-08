@@ -85,7 +85,7 @@ function ClubHome() {
                                 <div className="shop-details">
                                     <h3 className="shop-name">{club.name}</h3>
                                     <div className="map-button">
-                                        <button onClick={() => openGoogleMaps(club.address)}>Xem bản đồ</button>
+                                        <button onClick={() => openGoogleMaps(club.address)}>View On GoogleMap</button>
                                     </div>
                                     <div className="divider"></div>
                                     <div className="shop-address">

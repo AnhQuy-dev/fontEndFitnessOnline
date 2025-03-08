@@ -334,7 +334,7 @@ const StatisticsPage = () => {
         <li onClick={scrollToDailyRevenueChart} style={{ cursor: 'pointer' }}>
           <i className='bx bx-dollar-circle'></i>
           <span className="info">
-            <h3>{isLoading ? 'Loading...' : `₫${totalSales.toLocaleString()}`}</h3>
+            <h3>{isLoading ? 'Loading...' : `$${totalSales.toLocaleString()}`}</h3>
             <p>Total Sales</p>
           </span>
         </li>

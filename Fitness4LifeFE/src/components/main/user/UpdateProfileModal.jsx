@@ -5,28 +5,27 @@ import { Option } from "antd/es/mentions";
 import { getDecodedToken, getTokenData } from "../../../serviceToken/tokenUtils";
 import { updateUserAPI } from "../../../serviceToken/authService";
 
-
 const UpdateProfileModal = ({ open, onClose, userData }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const tokenData = getTokenData();
     const decotoken = getDecodedToken();
 
-    // Giá trị enum cho Gender
+    // Gender options
     const genderOptions = [
         { label: "Male", value: "MALE" },
         { label: "Female", value: "FEMALE" },
         { label: "Other", value: "OTHER" },
     ];
 
-    // Giá trị enum cho MaritalStatus
+    // Marital status options
     const maritalStatusOptions = [
         { label: "Single", value: "SINGLE" },
         { label: "Married", value: "MARRIED" },
         { label: "Forever Alone", value: "FA" },
     ];
 
-    // Xử lý submit form
+    // Handle form submission
     const handleSubmit = async (values) => {
         const formData = new FormData();
         Object.entries(values).forEach(([key, value]) => {
@@ -37,9 +36,8 @@ const UpdateProfileModal = ({ open, onClose, userData }) => {
 
         if (values.file) {
             formData.append("file", values.file.file);
-        }
-        else {
-            // Giữ nguyên avatar nếu không có file mới
+        } else {
+            // Keep the existing avatar if no new file is uploaded
             formData.append("avatar", userData.avatar);
         }
 
@@ -48,28 +46,29 @@ const UpdateProfileModal = ({ open, onClose, userData }) => {
             const response = await updateUserAPI(decotoken.id, formData, tokenData.access_token);
             if (response != null) {
                 notification.success({
-                    message: "Cập nhật thành công",
-                    description: "Thông tin người dùng đã được cập nhật.",
+                    message: "Update Successful",
+                    description: "User information has been updated.",
                 });
                 onClose(true);
             } else {
                 notification.error({
-                    message: "Cập nhật thất bại",
-                    description: response.message || "Có lỗi xảy ra.",
+                    message: "Update Failed",
+                    description: response.message || "An error occurred.",
                 });
             }
         } catch (error) {
             notification.error({
-                message: "Lỗi",
-                description: "Không thể cập nhật thông tin.",
+                message: "Error",
+                description: "Unable to update information.",
             });
         } finally {
             setLoading(false);
         }
     };
+
     return (
         <Modal
-            title="Cập Nhật Thông Tin"
+            title="Update Profile"
             open={open}
             onCancel={() => onClose()}
             footer={null}
@@ -81,17 +80,17 @@ const UpdateProfileModal = ({ open, onClose, userData }) => {
                 layout="vertical"
                 onFinish={handleSubmit}
             >
-                <Form.Item label="Họ và tên" name="fullName">
-                    <Input placeholder="Nhập họ và tên" />
+                <Form.Item label="Full Name" name="fullName">
+                    <Input placeholder="Enter full name" />
                 </Form.Item>
-                <Form.Item label="Sở thích" name="hobbies">
-                    <Input placeholder="Nhập sở thích" />
+                <Form.Item label="Hobbies" name="hobbies">
+                    <Input placeholder="Enter hobbies" />
                 </Form.Item>
-                <Form.Item label="Số điện thoại" name="phone">
-                    <Input placeholder="Nhập số điện thoại" />
+                <Form.Item label="Phone Number" name="phone">
+                    <Input placeholder="Enter phone number" />
                 </Form.Item>
-                <Form.Item label="Giới tính" name="gender">
-                    <Select placeholder="Chọn giới tính">
+                <Form.Item label="Gender" name="gender">
+                    <Select placeholder="Select gender">
                         {genderOptions.map((option) => (
                             <Option key={option.value} value={option.value}>
                                 {option.label}
@@ -99,14 +98,14 @@ const UpdateProfileModal = ({ open, onClose, userData }) => {
                         ))}
                     </Select>
                 </Form.Item>
-                <Form.Item label="Địa chỉ" name="address">
-                    <Input placeholder="Nhập địa chỉ" />
+                <Form.Item label="Address" name="address">
+                    <Input placeholder="Enter address" />
                 </Form.Item>
-                <Form.Item label="Tuổi" name="age">
-                    <Input type="number" placeholder="Nhập tuổi" />
+                <Form.Item label="Age" name="age">
+                    <Input type="number" placeholder="Enter age" />
                 </Form.Item>
-                <Form.Item label="Tình trạng hôn nhân" name="maritalStatus">
-                    <Select placeholder="Chọn tình trạng hôn nhân">
+                <Form.Item label="Marital Status" name="maritalStatus">
+                    <Select placeholder="Select marital status">
                         {maritalStatusOptions.map((option) => (
                             <Option key={option.value} value={option.value}>
                                 {option.label}
@@ -114,22 +113,22 @@ const UpdateProfileModal = ({ open, onClose, userData }) => {
                         ))}
                     </Select>
                 </Form.Item>
-                <Form.Item label="Chiều cao" name="heightValue">
-                    <Input type="number" placeholder="Nhập chiều cao (cm)" />
+                <Form.Item label="Height" name="heightValue">
+                    <Input type="number" placeholder="Enter height (cm)" />
                 </Form.Item>
-                <Form.Item label="Mô tả" name="description">
-                    <Input.TextArea rows={3} placeholder="Nhập mô tả" />
+                <Form.Item label="Description" name="description">
+                    <Input.TextArea rows={3} placeholder="Enter description" />
                 </Form.Item>
-                <Form.Item label="Vai trò" name="role">
-                    <Input placeholder="Vai trò" disabled />
+                <Form.Item name="role">
+                    <Input placeholder="Role" hidden />
                 </Form.Item>
-                <Form.Item label="Ảnh đại diện" name="file" valuePropName="file">
+                <Form.Item label="Profile Picture" name="file" valuePropName="file">
                     <Upload beforeUpload={() => false} listType="picture">
-                        <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+                        <Button icon={<UploadOutlined />}>Choose Image</Button>
                     </Upload>
                 </Form.Item>
                 <Button type="primary" htmlType="submit" loading={loading}>
-                    Cập Nhật
+                    Update
                 </Button>
             </Form>
         </Modal>

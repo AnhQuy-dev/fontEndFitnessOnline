@@ -1,0 +1,38 @@
+#services {
+    padding: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #1890ff;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.ant-form-item-label label {
+    font-weight: bold;
+    color: #595959;
+}
+
+.ant-btn-primary {
+    background-color: #1890ff;
+    border-color: #1890ff;
+    font-size: 16px;
+    height: 40px;
+}
+
+.ant-btn-primary:hover {
+    background-color: #40a9ff;
+    border-color: #40a9ff;
+}
+
+.upload-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

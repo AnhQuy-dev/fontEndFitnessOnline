@@ -72,17 +72,17 @@ const PackageMain = () => {
     const handlePaynow = (pkg) => {
         if (user.workoutPackageId === pkg.id) {
             Modal.confirm({
-                title: 'Thông báo',
-                content: 'Bạn đã đăng ký gói này rồi. Bạn có muốn tiếp tục mua nữa không?',
-                okText: 'Tiếp tục',
-                cancelText: 'Hủy',
+                title: 'Notification',
+                content: 'You have already subscribed to this package. Do you want to purchase it again?',
+                okText: 'Continue',
+                cancelText: 'Cancel',
                 onOk() {
-                    // Nếu người dùng xác nhận muốn tiếp tục mua
+                    // If the user confirms they want to continue purchasing
                     navigateToPayment(pkg);
                 }
             });
         } else {
-            // Nếu người dùng chưa đăng ký gói này
+            // If the user has not subscribed to this package yet
             navigateToPayment(pkg);
         }
     };
@@ -199,7 +199,7 @@ const PackageMain = () => {
                                                     <h3 className="package-name">{pkg.packageName}</h3>
                                                     <p className="package-description">{pkg.description}</p>
                                                     <p className="package-price">
-                                                        {pkg.price.toLocaleString('vi-VN')} USD/month
+                                                        {pkg.price.toLocaleString('vi-VN')} USD
                                                     </p>
                                                     <Button
                                                         type="primary"

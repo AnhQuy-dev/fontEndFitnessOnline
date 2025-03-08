@@ -36,7 +36,7 @@ const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
                 });
             }
         };
-        
+
         getAllBranch();
     }, [tokenData.access_token]);
 
@@ -51,7 +51,7 @@ const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
     const handleSubmit = async (values) => {
         try {
             setLoading(true);
-            
+
             // Create FormData object
             const formData = new FormData();
             formData.append("fullName", values.fullName);
@@ -61,13 +61,13 @@ const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
             formData.append("certificate", values.certificate);
             formData.append("phoneNumber", values.phoneNumber);
             formData.append("branch", values.branch);
-            
+
             if (values.scheduleTrainers && values.scheduleTrainers.length > 0) {
                 values.scheduleTrainers.forEach(day => {
                     formData.append("scheduleTrainers", day);
                 });
             }
-            
+
             if (fileList && fileList.length > 0) {
                 const fileObj = fileList[0].originFileObj || fileList[0];
                 formData.append("file", fileObj);
@@ -106,7 +106,7 @@ const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
         setFileList([]);
         setIsModelOpen(false);
     };
-    
+
     // Handle file changes directly
     const handleFileChange = ({ fileList: newFileList }) => {
         console.log("File change detected:", newFileList);
@@ -117,7 +117,7 @@ const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
     const beforeUpload = (file) => {
         console.log("File selected:", file);
         // Optional: Add file validation here if needed
-        
+
         // Validate file type
         const isImage = file.type.startsWith('image/');
         if (!isImage) {
@@ -127,7 +127,7 @@ const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
             });
             return Upload.LIST_IGNORE;
         }
-        
+
         // Validate file size (e.g., limit to 5MB)
         const isLt5M = file.size / 1024 / 1024 < 5;
         if (!isLt5M) {
@@ -137,7 +137,7 @@ const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
             });
             return Upload.LIST_IGNORE;
         }
-        
+
         return false; // Return false to prevent auto upload
     };
 
@@ -211,8 +211,8 @@ const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
 
                 <Form.Item
                     name="branch"
-                    label="Branch"
-                    rules={[{ required: true, message: "Branch is required." }]}
+                    label="Club"
+                    rules={[{ required: true, message: "Club is required." }]}
                 >
                     <Select placeholder="Select branch">
                         {branches.map((branchItem) => (
@@ -228,7 +228,7 @@ const CreateTrainer = ({ isModalOpen, setIsModelOpen, loadTrainers }) => {
                     label="Schedule"
                     rules={[{ required: true, message: "Schedule is required." }]}
                 >
-                    <Select 
+                    <Select
                         mode="multiple"
                         placeholder="Select working days"
                         options={scheduleOptions}

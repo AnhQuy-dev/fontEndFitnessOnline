@@ -26,7 +26,7 @@ const OrderPage = () => {
 
         const completePayment = async () => {
             if (discountedCode != null && discountedCode !== "no-code") {
-                console.log("✅ Thanh toán thành công, gọi usedCodeOfPromotion...");
+                console.log("✅ Payment SuccessFully, gọi usedCodeOfPromotion...");
                 // console.log("discountedCode: ", discountedCode);
                 usedCodeOfPromotion(); // Gọi API sử dụng mã giảm giá
             }
@@ -48,10 +48,10 @@ const OrderPage = () => {
                 setMembershipData(membershipResponse.body);
 
                 if (membershipResponse.statusCodeValue == 200) {
-                    setMessage("Thanh toán thành công! Cảm ơn bạn đã sử dụng dịch vụ.");
+                    setMessage("Payment Successfully! Thank you for using our service.");
                     notification.success({
-                        message: 'Thanh toán thành công',
-                        description: 'Gói dịch vụ của bạn đã được kích hoạt',
+                        message: 'Payment Successfully',
+                        description: 'Your service package has been activated.',
                     });
                 }
             }
@@ -62,10 +62,10 @@ const OrderPage = () => {
                     response: error.response?.data
                 });
 
-                setMessage("Có lỗi xảy ra trong quá trình hoàn tất thanh toán.");
+                setMessage("An error occurred while completing the payment.");
                 notification.error({
-                    message: 'Lỗi thanh toán',
-                    description: error.response?.data?.message || 'Không thể hoàn tất thanh toán. Vui lòng thử lại.',
+                    message: 'Payment error',
+                    description: error.response?.data?.message || 'Payment could not be completed. Please try again.',
                 });
             } finally {
                 setLoading(false);
@@ -149,7 +149,7 @@ const OrderPage = () => {
                     marginTop: '20px',
                     fontSize: '16px',
                     color: '#1890ff'
-                }}>Đang xử lý thanh toán, vui lòng đợi trong giây lát...</p>
+                }}>Processing payment, please wait a moment...</p>
             </div>
         );
     }
@@ -186,7 +186,7 @@ const OrderPage = () => {
                         fontSize: '24px',
                         fontWeight: 'bold'
                     }}>
-                        {membershipData ? 'THANH TOÁN THÀNH CÔNG' : 'THANH TOÁN THẤT BẠI'}
+                        {membershipData ? 'PAYMENT SUCCESSFUL' : 'PAYMENT FAILED'}
                     </h1>
                 </div>
 
@@ -200,10 +200,10 @@ const OrderPage = () => {
                     fontSize: '14px'
                 }}>
                     <div>
-                        <strong>Mã giao dịch:</strong> {searchParams.get("paymentId") || 'N/A'}
+                        <strong>Transaction code :</strong> {searchParams.get("paymentId") || 'N/A'}
                     </div>
                     <div>
-                        <strong>Ngày:</strong> {new Date().toLocaleDateString('vi-VN')}
+                        <strong>Date:</strong> {new Date().toLocaleDateString('vi-VN')}
                     </div>
                 </div>
 
@@ -228,7 +228,7 @@ const OrderPage = () => {
                                 paddingBottom: '10px',
                                 color: '#333'
                             }}>
-                                CHI TIẾT GÓI DỊCH VỤ
+                                SERVICE PACKAGE DETAILS
                             </h2>
 
                             {/* Bảng thông tin chi tiết */}
@@ -239,24 +239,24 @@ const OrderPage = () => {
                                 marginBottom: '30px'
                             }}>
                                 <div style={{ display: 'flex', borderBottom: '1px solid #f0f0f0', paddingBottom: '10px' }}>
-                                    <div style={{ flex: '1', fontWeight: 'bold', color: '#666' }}>Tên gói:</div>
+                                    <div style={{ flex: '1', fontWeight: 'bold', color: '#666' }}>Package Name:</div>
                                     <div style={{ flex: '2', fontWeight: 'bold' }}>{membershipData.packageName}</div>
                                 </div>
 
                                 <div style={{ display: 'flex', borderBottom: '1px solid #f0f0f0', paddingBottom: '10px' }}>
-                                    <div style={{ flex: '1', fontWeight: 'bold', color: '#666' }}>Mô tả:</div>
+                                    <div style={{ flex: '1', fontWeight: 'bold', color: '#666' }}>Descriptrion:</div>
                                     <div style={{ flex: '2' }}>{membershipData.description}</div>
                                 </div>
 
                                 <div style={{ display: 'flex', borderBottom: '1px solid #f0f0f0', paddingBottom: '10px' }}>
-                                    <div style={{ flex: '1', fontWeight: 'bold', color: '#666' }}>Thời hạn:</div>
+                                    <div style={{ flex: '1', fontWeight: 'bold', color: '#666' }}>Duration:</div>
                                     <div style={{ flex: '2' }}>
                                         {formatDate(membershipData.startDate)} - {formatDate(membershipData.endDate)}
                                     </div>
                                 </div>
 
                                 <div style={{ display: 'flex', borderBottom: '1px solid #f0f0f0', paddingBottom: '10px' }}>
-                                    <div style={{ flex: '1', fontWeight: 'bold', color: '#666' }}>Trạng thái:</div>
+                                    <div style={{ flex: '1', fontWeight: 'bold', color: '#666' }}>Status:</div>
                                     <div style={{
                                         flex: '2',
                                         color: membershipData.payStatusType === 'SUCCESS' ? '#52c41a' : '#faad14',
@@ -277,13 +277,13 @@ const OrderPage = () => {
                                 justifyContent: 'space-between',
                                 alignItems: 'center'
                             }}>
-                                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>Tổng thanh toán:</div>
+                                <div style={{ fontSize: '18px', fontWeight: 'bold' }}>Total:</div>
                                 <div style={{
                                     fontSize: '24px',
                                     fontWeight: 'bold',
                                     color: '#1890ff'
                                 }}>
-                                    {formatCurrency(membershipData.totalAmount)}
+                                    {(membershipData.totalAmount)} USD
                                 </div>
                             </div>
                         </>
@@ -318,8 +318,8 @@ const OrderPage = () => {
                     color: '#666',
                     textAlign: 'center'
                 }}>
-                    <p style={{ margin: '0 0 5px 0' }}>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
-                    <p style={{ margin: '0' }}>Nếu có bất kỳ thắc mắc nào, vui lòng liên hệ hỗ trợ khách hàng.</p>
+                    <p style={{ margin: '0 0 5px 0' }}>Thank you for using our service!</p>
+                    <p style={{ margin: '0' }}>If you have any questions, please contact customer support.</p>
                 </div>
             </div>
         </section>

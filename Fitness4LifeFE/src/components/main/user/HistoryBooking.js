@@ -37,7 +37,7 @@ const BookingHistoryPage = () => {
                 }
             });
         } catch (error) {
-            setError(error.message || "Không thể tải lịch sử đặt phòng");
+            setError(error.message || "Unable to load booking history");
         } finally {
             setLoading(false);
         }
@@ -57,14 +57,14 @@ const BookingHistoryPage = () => {
         const date = new Date(year, month - 1, day, hour, minute);
 
         // Format date
-        const dateStr = date.toLocaleDateString('vi-VN', {
+        const dateStr = date.toLocaleDateString('en-GB', {
             year: 'numeric',
             month: '2-digit',
             day: '2-digit'
         });
 
         // Format time
-        const timeStr = date.toLocaleTimeString('vi-VN', {
+        const timeStr = date.toLocaleTimeString('en-GB', {
             hour: '2-digit',
             minute: '2-digit'
         });
@@ -77,9 +77,9 @@ const BookingHistoryPage = () => {
 
     const getStatusTag = (status) => {
         const statusConfig = {
-            'COMPLETED': { color: 'success', text: 'Hoàn thành' },
-            'PENDING': { color: 'processing', text: 'Đang chờ' },
-            'CANCELLED': { color: 'error', text: 'Đã hủy' },
+            'COMPLETED': { color: 'success', text: 'Completed' },
+            'PENDING': { color: 'processing', text: 'Pending' },
+            'CANCELLED': { color: 'error', text: 'Cancelled' },
             'default': { color: 'default', text: status }
         };
 
@@ -90,7 +90,7 @@ const BookingHistoryPage = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <Spin size="large" tip="Đang tải..." />
+                <Spin size="large" tip="Loading..." />
             </div>
         );
     }
@@ -100,7 +100,7 @@ const BookingHistoryPage = () => {
             <div className="p-4">
                 <Alert
                     type="error"
-                    message="Lỗi"
+                    message="Error"
                     description={error}
                     showIcon
                 />
@@ -114,8 +114,8 @@ const BookingHistoryPage = () => {
                 <Empty
                     description={
                         <div>
-                            <Title level={4}>Chưa có lịch sử đặt phòng</Title>
-                            <Text type="secondary">Bạn chưa đặt phòng nào.</Text>
+                            <Title level={4}>No booking history</Title>
+                            <Text type="secondary">You have not made any bookings yet.</Text>
                         </div>
                     }
                 />
@@ -149,8 +149,8 @@ const BookingHistoryPage = () => {
                                 <div className="space-y-2">
                                     {qrCodes[booking.id] && (
                                         <div className="mt-3 text-center">
-                                            <Title level={5} className="mb-1">Ngày đặt: {bookingDateTime.date}</Title>
-                                            <Title level={5} className="mb-2">Khung giờ: {bookingDateTime.time}</Title>
+                                            <Title level={5} className="mb-1">Booking date: {bookingDateTime.date}</Title>
+                                            <Title level={5} className="mb-2">Time slot: {bookingDateTime.time}</Title>
                                             <div className="p-3 bg-white rounded-lg shadow-inner inline-block">
                                                 <img
                                                     src={qrCodes[booking.id].qrCodeUrl}

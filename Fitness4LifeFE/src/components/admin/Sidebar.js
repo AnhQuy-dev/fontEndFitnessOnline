@@ -15,6 +15,8 @@ const Sidebar = ({ setMenuItems, isCollapsed }) => {
     { label: 'User', icon: 'bxs-user-rectangle', path: '/admin/users' },
     { label: 'Blogs', icon: 'bx bxl-blogger', path: '/admin/Blogs' },
     { label: 'Club', icon: 'bx-buildings', path: '/admin/Club' },
+    { label: 'Goal', icon: 'bx-buildings', path: '/admin/Goal' },
+
     { label: 'Room', icon: 'bx-message-square-dots', path: '/admin/Room' },
     { label: 'Branch', icon: 'bx-message-square-dots', path: '/admin/Branch' },
     { label: 'Trainer', icon: 'bx-message-square-dots', path: '/admin/Trainer' },

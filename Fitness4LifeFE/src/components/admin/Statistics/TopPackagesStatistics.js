@@ -136,13 +136,13 @@ const TopPackagesStatistics = () => {
       dataIndex: 'totalRevenue',
       key: 'totalRevenue',
       sorter: (a, b) => b.totalRevenue - a.totalRevenue,
-      render: (value) => <span>₫{value.toLocaleString()}</span>
+      render: (value) => <span>${value.toLocaleString()}</span>
     },
     {
       title: 'Average Price',
       dataIndex: 'averagePrice',
       key: 'averagePrice',
-      render: (value) => <span>₫{value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+      render: (value) => <span>${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
     }
   ];
 
@@ -177,13 +177,13 @@ const TopPackagesStatistics = () => {
                 />
                 <Statistic
                   title="Total Revenue"
-                  value={`₫${top3Packages[0]?.totalRevenue.toLocaleString()}`}
+                  value={`$${top3Packages[0]?.totalRevenue.toLocaleString()}`}
                   valueStyle={{ color: '#52c41a', fontSize: '18px' }}
                 />
               </div>
               <Statistic
                 title="Average Price"
-                value={`₫${top3Packages[0]?.averagePrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+                value={`$${top3Packages[0]?.averagePrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                 valueStyle={{ color: '#1890ff', fontSize: '18px' }}
               />
             </Card>
@@ -214,13 +214,13 @@ const TopPackagesStatistics = () => {
                   />
                   <Statistic
                     title="Revenue"
-                    value={`₫${pkg.totalRevenue.toLocaleString()}`}
+                    value={`$${pkg.totalRevenue.toLocaleString()}`}
                     valueStyle={{ color: '#52c41a', fontSize: '16px' }}
                   />
                 </div>
                 <Statistic
                   title="Avg Price"
-                  value={`₫${pkg.averagePrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+                  value={`$${pkg.averagePrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                   valueStyle={{ color: '#1890ff', fontSize: '16px' }}
                 />
               </Card>
@@ -238,7 +238,7 @@ const TopPackagesStatistics = () => {
         title={
           <div style={{ textAlign: 'center' }}>
             <h3>Top 3 Most Purchased Packages</h3>
-            <p>Total Package Sales: ₫{totalPackageSales.toLocaleString()}</p>
+            <p>Total Package Sales: ${totalPackageSales.toLocaleString()}</p>
           </div>
         }
         style={{ marginTop: 20 }}

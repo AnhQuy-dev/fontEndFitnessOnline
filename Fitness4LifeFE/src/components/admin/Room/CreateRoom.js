@@ -11,8 +11,8 @@ const { Option } = Select;
 function CreateRoom(props) {
     const { loadRoom, isModalOpen, setIsModalOpen, token } = props;
 
-    const [club, setClub] = useState(0);
-    const [trainer, setTrainer] = useState(0);
+    const [club, setClub] = useState("SELECT");
+    const [trainer, setTrainer] = useState("SELECT");
     const [roomName, setRoomName] = useState("");
     const [slug, setSlug] = useState("");
     const [capacity, setCapacity] = useState(0);

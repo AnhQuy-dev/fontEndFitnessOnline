@@ -46,6 +46,7 @@ import BookingManage from './components/admin/Booking/BookingManage';
 import Order from './components/admin/Orders/Orders';
 import BookingMain from './components/main/booking/Booking';
 import PackageMain from './components/main/package/Package';
+import GoalAdmin from './components/admin/Goal/GoalAdmin';
 
 const App = () => {
   return (
@@ -104,6 +105,8 @@ const App = () => {
             <Route path="Users" element={<Users />} />
             <Route path="Blogs" element={<BlogAdmin />} />
             <Route path="Club" element={<Club />} />
+            <Route path="Goal" element={<GoalAdmin />} />
+
             <Route path="Room" element={<Room />} />
             <Route path="Branch" element={<Branch />} />
             <Route path="Trainer" element={<Trainer />} />

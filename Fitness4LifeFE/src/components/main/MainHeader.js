@@ -136,15 +136,16 @@ const MainHeader = () => {
 
   const confirmLogout = () => {
     Modal.confirm({
-      title: 'Bạn có chắc chắn muốn đăng xuất?',
-      okText: 'Đăng xuất',
-      cancelText: 'Hủy',
+      title: 'Are you sure you want to log out?',
+      okText: 'Log Out',
+      cancelText: 'Cancel',
       onOk: () => {
         handleLogout();
         navigate('/login');
       },
     });
   };
+
 
   const profileMenu = (
     <Menu>
@@ -258,7 +259,7 @@ const MainHeader = () => {
                       <a className="profile">
                         {user?.profile?.avatar ? (
                           <img
-                            src={user.profile.avatar}
+                            src={user?.profile?.avatar}
                             alt="Profile"
                             style={{
                               width: '40px',

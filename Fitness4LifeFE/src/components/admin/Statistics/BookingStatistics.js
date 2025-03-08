@@ -249,7 +249,7 @@ const BookingStatistics = () => {
       dataIndex: 'estimatedRevenue',
       key: 'estimatedRevenue',
       sorter: (a, b) => b.estimatedRevenue - a.estimatedRevenue,
-      render: (value) => <span>₫{value.toLocaleString()}</span>
+      render: (value) => <span>${value.toLocaleString()}</span>
     }
   ];
 
@@ -273,7 +273,7 @@ const BookingStatistics = () => {
       dataIndex: 'revenue',
       key: 'revenue',
       sorter: (a, b) => b.revenue - a.revenue,
-      render: (value) => <span>₫{value.toLocaleString()}</span>
+      render: (value) => <span>${value.toLocaleString()}</span>
     }
   ];
 
@@ -319,7 +319,7 @@ const BookingStatistics = () => {
               />
               <Statistic
                 title="Revenue"
-                value={`₫${top3Rooms[0]?.estimatedRevenue.toLocaleString()}`}
+                value={`$${top3Rooms[0]?.estimatedRevenue.toLocaleString()}`}
                 valueStyle={{ color: '#52c41a', fontSize: '18px' }}
               />
             </Card>
@@ -361,7 +361,7 @@ const BookingStatistics = () => {
                 />
                 <Statistic
                   title="Revenue"
-                  value={`₫${room.estimatedRevenue.toLocaleString()}`}
+                  value={`$${room.estimatedRevenue.toLocaleString()}`}
                   valueStyle={{ color: '#52c41a', fontSize: '16px' }}
                 />
               </Card>
@@ -451,7 +451,7 @@ const BookingStatistics = () => {
           <Col xs={24} sm={8}>
             <Statistic
               title="Estimated Total Revenue"
-              value={`₫${topRooms.reduce((sum, room) => sum + room.estimatedRevenue, 0).toLocaleString()}`}
+              value={`$${topRooms.reduce((sum, room) => sum + room.estimatedRevenue, 0).toLocaleString()}`}
               valueStyle={{ color: '#52c41a' }}
             />
           </Col>

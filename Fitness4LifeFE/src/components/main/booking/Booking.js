@@ -392,7 +392,7 @@ const BookingMain = () => {
                                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
                             }}>
                                 <img src={stickman} alt="Loading..." width={120} height={120} />
-                                <Text style={{ color: '#1890ff', fontWeight: 'bold' }}>Đang tải danh sách phòng...</Text>
+                                <Text style={{ color: '#1890ff', fontWeight: 'bold' }}>"Loading room list..."</Text>
                             </div>
                         ) : filteredRooms.length === 0 ? (
                             <div style={{
@@ -406,7 +406,7 @@ const BookingMain = () => {
                                 <BranchesOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
                                 <div>
                                     <Text style={{ fontSize: '16px', color: '#8c8c8c' }}>
-                                        Không có phòng nào khả dụng cho lựa chọn hiện tại.
+                                        No rooms available for the current selection.
                                     </Text>
                                 </div>
                                 <Button
@@ -414,7 +414,7 @@ const BookingMain = () => {
                                     style={{ marginTop: '16px' }}
                                     onClick={() => filterRoomsByClub('all')}
                                 >
-                                    Xem tất cả phòng
+                                    View all rooms
                                 </Button>
                             </div>
                         ) : (
@@ -537,7 +537,7 @@ const BookingMain = () => {
                                             onChange={handlePageChange}
                                             showSizeChanger={false}
                                             showQuickJumper
-                                            showTotal={(total) => `Tổng cộng ${total} phòng`}
+                                            showTotal={(total) => `Total ${total} rooms`}
                                         />
                                     </div>
                                 )}
@@ -584,7 +584,7 @@ const BookingMain = () => {
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <BranchesOutlined style={{ color: '#1890ff' }} />
                                 <Text strong>Club: </Text>
-                                <Text>{selectedRoom.club.name || 'Câu lạc bộ chưa xác định'}</Text>
+                                <Text>{selectedRoom.club.name || 'Club not specified'}</Text>
                             </div>
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <CalendarOutlined style={{ color: '#1890ff' }} />
@@ -601,11 +601,10 @@ const BookingMain = () => {
                                 <Text strong>Available Seats: </Text>
                                 <Text>{selectedRoom.availableSeats}/{selectedRoom.capacity}</Text>
                             </div>
-
                             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                 <UserOutlined style={{ color: '#1890ff' }} />
                                 <Text strong>Trainer: </Text>
-                                <Text>{selectedRoom.trainer?.fullName || 'Chưa có HLV'}</Text>
+                                <Text>{selectedRoom.trainer?.fullName || 'No trainer assigned'}</Text>
                             </div>
                         </div>
                     )}
